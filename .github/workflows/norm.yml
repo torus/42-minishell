@@ -10,7 +10,7 @@ jobs:
   # This workflow contains a single job called "build"
   norm:
     # The type of runner that the job will run on
-    runs-on: python:3.9-buster
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -19,7 +19,9 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Install Norminette
-        run: pip install norminette
+        run: |
+          python3 -m pip install --upgrade pip setuptools
+          python3 -m pip install norminette
         
       - name: Run Norminette
         run: norminette
