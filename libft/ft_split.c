@@ -6,14 +6,14 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/11 04:52:46 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/03/01 01:11:44 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/02 18:56:48 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include <stdio.h>
 
-int				get_split_size(char *str, char c)
+int	get_split_size(char *str, char c)
 {
 	int		split_size;
 
@@ -31,7 +31,7 @@ int				get_split_size(char *str, char c)
 	return (split_size);
 }
 
-static void		free_n(char **arr, size_t n)
+static void	free_n(char **arr, size_t n)
 {
 	size_t	i;
 
@@ -41,7 +41,7 @@ static void		free_n(char **arr, size_t n)
 	free(arr);
 }
 
-static char		**split(char **result, char *str, char c)
+static char	**split(char **result, char *str, char c)
 {
 	size_t	i;
 	size_t	len;
@@ -57,7 +57,8 @@ static char		**split(char **result, char *str, char c)
 		len = 0;
 		while (str[len] && str[len] != c)
 			len++;
-		if (!(result[i] = ft_substr(str, 0, len)))
+		result[i] = ft_substr(str, 0, len);
+		if (!result[i])
 		{
 			free_n(result, i);
 			return (NULL);
@@ -69,13 +70,14 @@ static char		**split(char **result, char *str, char c)
 	return (result);
 }
 
-char			**ft_split(char const *s, char c)
+char	**ft_split(char const *s, char c)
 {
 	int		split_size;
 	char	**result;
 
-	split_size = get_split_size((char*)s, c);
-	if (!(result = (char **)malloc(sizeof(char*) * (split_size + 1))))
+	split_size = get_split_size((char *)s, c);
+	result = (char **)malloc(sizeof(char *) * (split_size + 1));
+	if (!result)
 		return (NULL);
-	return (split(result, (char*)s, c));
+	return (split(result, (char *)s, c));
 }
