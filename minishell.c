@@ -6,13 +6,13 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/27 16:21:15 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/03/27 16:21:44 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/02 20:58:25 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	printf("Welcome Minishell\n");
 }
