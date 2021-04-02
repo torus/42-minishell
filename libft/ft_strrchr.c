@@ -6,7 +6,7 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/06 04:58:56 by jtanaka           #+#    #+#             */
-/*   Updated: 2020/10/16 01:35:20 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/02 18:50:52 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ char	*ft_strrchr(const char *s, int c)
 	char	*str;
 	int		i;
 
-	str = (char*)s;
+	str = (char *)s;
 	i = ft_strlen(str);
 	while (i >= 0)
 	{

@@ -6,7 +6,7 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/06 00:54:12 by jtanaka           #+#    #+#             */
-/*   Updated: 2020/10/16 01:22:01 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/02 17:37:55 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 
 	if (dest == NULL && src == NULL)
 		return (NULL);
-	dest_ptr = (unsigned char*)dest;
-	src_ptr = (unsigned char*)src;
+	dest_ptr = (unsigned char *)dest;
+	src_ptr = (unsigned char *)src;
 	counter = (int)n;
 	while (counter--)
 		*dest_ptr++ = *src_ptr++;

@@ -6,7 +6,7 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/12 03:29:18 by jtanaka           #+#    #+#             */
-/*   Updated: 2020/10/20 16:20:24 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/02 20:11:57 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 void	ft_putchar_fd(char c, int fd)
 {
-	unsigned char head;
-	unsigned char tail;
+	unsigned char	head;
+	unsigned char	tail;
 
 	if ((unsigned char)c <= 0x7f)
 		write(fd, &c, 1);

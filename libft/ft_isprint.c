@@ -6,13 +6,13 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 03:38:24 by jtanaka           #+#    #+#             */
-/*   Updated: 2020/10/16 22:32:00 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/02 18:51:35 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int		ft_isprint(int c)
+int	ft_isprint(int c)
 {
 	return (c >= ' ' && c <= '~');
 }
