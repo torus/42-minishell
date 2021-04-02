@@ -6,7 +6,7 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 04:07:10 by jtanaka           #+#    #+#             */
-/*   Updated: 2020/10/23 20:54:09 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/02 20:13:43 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ char	*ft_strdup(const char *s)
 	char			*new_str;
 
 	s_len = ft_strlen(s);
-	if (!(new_str = (char*)malloc(s_len + 1)))
+	new_str = (char *)malloc(s_len + 1);
+	if (!new_str)
 		return (NULL);
 	ft_strlcpy(new_str, s, s_len + 1);
 	return (new_str);

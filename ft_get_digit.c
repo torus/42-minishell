@@ -1,32 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memccpy.c                                       :+:      :+:    :+:   */
+/*   ft_get_digit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/06 01:04:24 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/04/02 18:59:45 by jtanaka          ###   ########.fr       */
+/*   Created: 2021/04/02 20:21:05 by jtanaka           #+#    #+#             */
+/*   Updated: 2021/04/02 20:21:10 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memccpy(void *dest, const void *src, int c, size_t n)
+int	get_digit(int n)
 {
-	unsigned char	*dest_ptr;
-	unsigned char	*src_ptr;
-	size_t			idx;
+	int		digit;
 
-	dest_ptr = (unsigned char *)dest;
-	src_ptr = (unsigned char *)src;
-	idx = 0;
-	while (idx < n)
+	if (n == 0)
+		return (1);
+	digit = 0;
+	while (n)
 	{
-		dest_ptr[idx] = src_ptr[idx];
-		if (src_ptr[idx] == (unsigned char)c)
-			return (dest_ptr + idx + 1);
-		idx++;
+		digit++;
+		n /= 10;
 	}
-	return (NULL);
+	return (digit);
 }

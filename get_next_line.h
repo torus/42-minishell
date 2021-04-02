@@ -6,7 +6,7 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/25 02:22:45 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/01/13 23:50:13 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/02 18:54:20 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #  define BUFFER_SIZE 256
 # endif
 
-typedef struct	s_gnl_list
+typedef struct s_gnl_list
 {
 	int					fd;
 	char				*save;
