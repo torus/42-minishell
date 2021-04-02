@@ -7,6 +7,9 @@
 
 #define MAXLINE 1000
 
+static void sig_int(int signo);  /* Ctrl + C */
+static void sig_quit(int signo); /* Ctrl + \ */
+
 int	main(int argc, char **argv)
 {
 	char	*line;
@@ -14,12 +17,16 @@ int	main(int argc, char **argv)
 	int		status;
 	int		gnl_status;
 
+	if ((signal(SIGINT, sig_int)) == SIG_ERR)
+		printf("signal(SIGINT) error\n");
+	if ((signal(SIGQUIT, sig_quit)) == SIG_ERR)
+		printf("signal(SIGQUIT) error\n");
 	printf("%% ");  // プロンプトを表示
 	while ((gnl_status = get_next_line(STDIN_FILENO, &line)) == SUCCESS)
 	{
 		if ((pid = fork()) < 0){
 			printf("fork() error\n");
-		}else{  /* 子プロセスの処理 */
+		}else if (pid == 0){  /* 子プロセスの処理 */
 			execlp(line, "", (char *)0);
 			printf("couldn't execute %s\n", line);
 			exit(127);
@@ -34,4 +41,16 @@ int	main(int argc, char **argv)
 		printf("%% ");  // プロンプトを表示
 	}
 	free(line);
+}
+
+void	sig_int(int signo)
+{
+	printf("receive SIGINT: %d\n", signo);
+	exit(0);
+}
+
+void	sig_quit(int signo)
+{
+	printf("receive SIGQUIT: %d\n", signo);
+	exit(0);
 }
