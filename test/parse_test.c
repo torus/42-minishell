@@ -23,12 +23,12 @@ void	check(int64_t val, const char *msg)
 	if (val)
 	{
 		success_count++;
-		printf("✔ %s\n", msg);
+		printf("  ✔ %s\n", msg);
 	}
 	else
 	{
 		fail_count++;
-		printf("✖ %s\n", msg);
+		printf("  ✖ %s\n", msg);
 	}
 }
 
