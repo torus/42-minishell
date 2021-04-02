@@ -70,16 +70,70 @@ int main()
         CHECK(!strncmp(tok.text, "cat", 3));
     }
 
-    TEST_SECTION("parse_get_token");
+    TEST_SECTION("parse_get_token クォートなしの場合");
     {
         t_parse_buffer	buf;
-        init_buf_with_string(&buf, "cat $ABC | grep x | wc > file.txt\n");
+        init_buf_with_string(&buf, "cat $ABC |wc> file.txt\n");
         t_parse_token	tok;
+
         parse_get_token(&buf, &tok);
         CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
-        printf("tok.length = %d, tok.text = %s\n", tok.length, tok.text);
         CHECK_EQ(tok.length, 3);
         CHECK(!strncmp(tok.text, "cat", 3));
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+        CHECK_EQ(tok.length, 4);
+        CHECK(!strncmp(tok.text, "$ABC", 4));
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_PIPE);
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+        CHECK_EQ(tok.length, 2);
+        CHECK(!strncmp(tok.text, "wc", 2));
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_OUTPUT_REDIRECTION);
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+        CHECK_EQ(tok.length, 8);
+        CHECK(!strncmp(tok.text, "file.txt", 8));
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_NEWLINE);
+    }
+
+    TEST_SECTION("parse_get_token クォートありの場合");
+    {
+        t_parse_buffer	buf;
+        init_buf_with_string(&buf, "cat\"$ABC\"'wc'");
+        t_parse_token	tok;
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+        CHECK_EQ(tok.length, 3);
+        CHECK(!strncmp(tok.text, "cat", 3));
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+        CHECK_EQ(tok.length, 4);
+        CHECK(!strncmp(tok.text, "$ABC", 4));
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+        CHECK_EQ(tok.length, 2);
+        CHECK(!strncmp(tok.text, "wc", 2));
     }
 
 	print_result();

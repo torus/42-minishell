@@ -63,7 +63,7 @@ typedef struct	s_parse_token
 int	parse_is_special_char(char ch)
 {
     if (ch == ' ' || ch == '\t' || ch == '\n' || ch == ';'
-        || ch == '|' || ch == '>' || ch == '<')
+        || ch == '|' || ch == '>' || ch == '<' || ch == '"' || ch == '\'')
         return (1);
     return (0);
 }
