@@ -157,5 +157,6 @@ int main()
         CHECK_EQ(tok.type, TOKTYPE_SEMICOLON);
     }
 
-	print_result(fail_count);
+	print_result();
+	return (fail_count);
 }
