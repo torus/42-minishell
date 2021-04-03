@@ -21,7 +21,7 @@ int	main(int argc, char **argv)
 		printf("signal(SIGINT) error\n");
 	if ((signal(SIGQUIT, sig_quit)) == SIG_ERR)
 		printf("signal(SIGQUIT) error\n");
-	printf("%% ");  // プロンプトを表示
+	ft_putstr_fd("$ ", STDOUT_FILENO);  // プロンプトを表示
 	while ((gnl_status = get_next_line(STDIN_FILENO, &line)) == SUCCESS)
 	{
 		if ((pid = fork()) < 0){
@@ -38,7 +38,7 @@ int	main(int argc, char **argv)
 		{
 			printf("waitpid() error\n");
 		}
-		printf("%% ");  // プロンプトを表示
+		ft_putstr_fd("$ ", STDOUT_FILENO);  // プロンプトを表示
 	}
 	free(line);
 }
