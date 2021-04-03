@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "../parse.c"
+#include "../parse2.c"
 
 int		success_count = 0;
 int		fail_count = 0;
