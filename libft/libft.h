@@ -6,7 +6,7 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/06 00:05:30 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/04/02 20:22:47 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/03 17:04:05 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,5 +73,12 @@ void				ft_lstclear(t_list **lst, void (*del)(void *));
 void				ft_lstiter(t_list *lst, void (*f)(void *));
 t_list				*ft_lstmap(t_list *lst, void *(*f)(void *),
 						void (*del)(void *));
+void				put_err_msg(char *str);
+int					put_err_msg_and_ret(char *str);
+void				put_err_msg_and_exit(char *str);
+void				free_and_assign_null(void **p);
+size_t				ptrarr_len(void **ptrarr);
+void				free_ptrarr(void **ptrarr);
+void				free_ptrarr_and_assign_null(void ***ptrarr);
 
 #endif
