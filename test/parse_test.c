@@ -136,5 +136,37 @@ int main()
         CHECK(!strncmp(tok.text, "wc", 2));
     }
 
+    TEST_SECTION("parse_get_token のこり");
+    {
+        t_parse_buffer	buf;
+        init_buf_with_string(&buf, "cat < - ; ");
+        t_parse_token	tok;
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+        CHECK_EQ(tok.length, 3);
+        CHECK(!strncmp(tok.text, "cat", 3));
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_INPUT_REDIRECTION);
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+        CHECK_EQ(tok.length, 1);
+        CHECK(!strncmp(tok.text, "-", 1));
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+        parse_get_token(&buf, &tok);
+        CHECK_EQ(tok.type, TOKTYPE_SEMICOLON);
+    }
+
 	print_result();
 }
