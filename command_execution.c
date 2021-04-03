@@ -10,6 +10,12 @@
 static void sig_int(int signo);  /* Ctrl + C */
 static void sig_quit(int signo); /* Ctrl + \ */
 
+int	ft_execvp(char *filename, char **argv)
+{
+	execve(filename, argv, __environ);
+	return (ERROR);
+}
+
 int	main(int argc, char **argv)
 {
 	char	*line;
@@ -34,11 +40,7 @@ int	main(int argc, char **argv)
 				printf("ft_split() error. input: |%s|\n", line);
 				exit(127);
 			}
-			/*
-			for (int i = 0; line_args[i]; i++)
-				printf("line_args[%d]: |%s|\n", i, line_args[i]);
-				*/
-			execvp(line_args[0], line_args);
+			ft_execvp(line_args[0], line_args);
 			printf("couldn't execute %s\n", line);
 			exit(127);
 		}
