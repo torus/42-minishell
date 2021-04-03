@@ -1,34 +1,5 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include "../parse.c"
-#include "../parse2.c"
-
-int		success_count = 0;
-int		fail_count = 0;
-
-void	check(int64_t val, const char *msg)
-{
-	if (val)
-	{
-		success_count++;
-		printf("  ✔ %s\n", msg);
-	}
-	else
-	{
-		fail_count++;
-		printf("  ✖ %s\n", msg);
-	}
-}
-
-void	print_result()
-{
-	printf("✔: %d ✖: %d\n", success_count, fail_count);
-}
-
-#define CHECK(val) check((int64_t)val, #val)
-#define CHECK_EQ(actual, expected) check(actual == expected, #actual " == " #expected)
-#define TEST_SECTION(message) printf("- " message "\n")
+#include "test.h"
+#include "../parse.h"
 
 void	init_buf_with_string(t_parse_buffer *buf, const char* str)
 {
@@ -157,6 +128,6 @@ int main()
         CHECK_EQ(tok.type, TOKTYPE_SEMICOLON);
     }
 
-	print_result();
+	int fail_count = print_result();
 	return (fail_count);
 }

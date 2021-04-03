@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "parse.h"
 
 int	parse_is_special_char(char ch)

@@ -8,3 +8,6 @@
 
 void	test_check(int64_t val, const char *msg);
 int	print_result();
+
+extern int	g_success_count;
+extern int	g_fail_count;
