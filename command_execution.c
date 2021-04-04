@@ -1,14 +1,9 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include "libft/libft.h"
+#include "command_execution.h"
 
-#define MAXLINE 1000
-
-static void sig_int(int signo);  /* Ctrl + C */
-static void sig_quit(int signo); /* Ctrl + \ */
+char	*find_executable_file(char *filename)
+{
+	return (NULL);
+}
 
 int	ft_execvp(char *filename, char **argv)
 {
