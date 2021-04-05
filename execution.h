@@ -1,5 +1,5 @@
-#ifndef COMMAND_EXECUTION_H
-# define COMMAND_EXECUTION_H
+#ifndef EXECUTION_H
+# define EXECUTION_H
 
 # include <unistd.h>
 # include <stdio.h>
