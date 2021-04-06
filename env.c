@@ -2,13 +2,14 @@
 
 char	*get_env(const char *env_key)
 {
-	size_t	idx;
-	char	**key_val;
+	size_t		idx;
+	char		**key_val;
+	extern char	**environ;
 
 	idx = 0;
-	while (__environ[idx])
+	while (environ[idx])
 	{
-		key_val = ft_split(__environ[idx], '=');
+		key_val = ft_split(environ[idx], '=');
 		if (!key_val)
 			return (NULL);
 		if (ft_strncmp(key_val[0], env_key, ft_strlen(env_key)))
@@ -19,7 +20,7 @@ char	*get_env(const char *env_key)
 		free_ptrarr((void **)key_val);
 		idx++;
 	}
-	return (__environ[idx]);
+	return (environ[idx]);
 }
 
 char	**split_first_c(const char *str, char c)
