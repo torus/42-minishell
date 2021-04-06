@@ -10,13 +10,13 @@ char	*get_env(const char *env_key)
 	{
 		key_val = ft_split(__environ[idx], '=');
 		if (!key_val)
-			return	(NULL);
+			return (NULL);
 		if (ft_strncmp(key_val[0], env_key, ft_strlen(env_key)))
 		{
-			free_ptrarr((void**)key_val);
-			break;
+			free_ptrarr((void **)key_val);
+			break ;
 		}
-		free_ptrarr((void**)key_val);
+		free_ptrarr((void **)key_val);
 		idx++;
 	}
 	return (__environ[idx]);
@@ -27,7 +27,7 @@ char	**split_first_c(const char *str, char c)
 	size_t	idx;
 	char	**result;
 
-	result = ft_calloc(3, sizeof(char*));
+	result = ft_calloc(3, sizeof(char *));
 	idx = 0;
 	while (str[idx])
 	{
@@ -47,8 +47,8 @@ char	**split_first_c(const char *str, char c)
 
 char	*get_val_from_kvstr(const char *kvstr, char key)
 {
-	char **kvarr;
-	char *valstr;
+	char	**kvarr;
+	char	*valstr;
 
 	kvarr = split_first_c(kvstr, key);
 	if (!kvarr)
@@ -65,11 +65,9 @@ char	*get_env_val(char *env_key)
 	char	*path_env_kv;
 	char	*path_env_val;
 
-	// get $PATH
 	path_env_kv = get_env(env_key);
 	if (!path_env_kv)
 		return (NULL);
-	// get $PATH value
 	path_env_val = get_val_from_kvstr(path_env_kv, '=');
 	if (!path_env_val)
 		return (NULL);
