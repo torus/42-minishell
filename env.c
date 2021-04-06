@@ -36,10 +36,11 @@ char	**split_first_c(const char *str, char c)
 			result[0] = ft_substr(str, 0, idx);
 			if (!result[0])
 				return (NULL);
+			break;
 		}
+		idx++;
 	}
-	str += idx + 1;
-	result[1] = ft_strdup(str);
+	result[1] = ft_strdup(str + idx + 1);
 	if (!result[1])
 		return (NULL);
 	return (result);
