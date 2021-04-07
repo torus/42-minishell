@@ -39,7 +39,7 @@ char	**split_first_c(const char *str, char c)
 			result[0] = ft_substr(str, 0, idx);
 			if (!result[0])
 				return (free_ptrarr_and_rtn_null((void **)result));
-			break;
+			break ;
 		}
 		idx++;
 	}
