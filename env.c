@@ -12,7 +12,7 @@ char	*get_env(const char *env_key)
 		key_val = ft_split(environ[idx], '=');
 		if (!key_val)
 			return (NULL);
-		if (ft_strncmp(key_val[0], env_key, ft_strlen(env_key)) == 0)
+		if (ft_strncmp(key_val[0], env_key, ft_strlen(env_key) + 1) == 0)
 		{
 			free_ptrarr((void **)key_val);
 			break ;
