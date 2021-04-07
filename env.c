@@ -62,7 +62,6 @@ char	*get_val_from_kvstr(const char *kvstr, char key)
 		return (NULL);
 	valstr = kvarr[1];
 	free(kvarr[0]);
-	free(kvarr[1]);
 	free(kvarr);
 	return (valstr);
 }
