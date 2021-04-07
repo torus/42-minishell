@@ -6,7 +6,7 @@
 #    By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 04:46:14 by jtanaka           #+#    #+#              #
-#    Updated: 2021/04/03 17:04:39 by jtanaka          ###   ########.fr        #
+#    Updated: 2021/04/07 08:18:17 by jtanaka          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,7 +62,8 @@ SRCS =	ft_strlen.c \
 		get_next_line_utils.c \
 		error_utils.c \
 		free_utils.c \
-		ptrarr_utils.c
+		ptrarr_utils.c \
+		malloc_wrapper.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)

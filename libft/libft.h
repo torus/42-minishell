@@ -6,7 +6,7 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/06 00:05:30 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/04/07 07:54:00 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/04/07 08:18:01 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,5 +81,6 @@ size_t				ptrarr_len(void **ptrarr);
 void				free_ptrarr(void **ptrarr);
 void				*free_ptrarr_and_rtn_null(void **ptrarr);
 void				free_ptrarr_and_assign_null(void ***ptrarr);
+int					wrap_malloc(void **p, size_t len);
 
 #endif
