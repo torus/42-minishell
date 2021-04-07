@@ -67,6 +67,21 @@ int main(){
 		CHECK_EQ_STR(val_str, "==/bin/:/usr/bin/:/home/jun/bin");
 	}
 
+	TEST_SECTION("get_env_val() 通常ケース");
+	{
+		char *original0 = environ[0];
+		environ[0] = "GET_ENV_TEST=/bin/:/usr/bin/:/home/jun/bin";
+		char *val_str = get_env_val("GET_ENV_TEST");
+		CHECK_EQ_STR(val_str, "/bin/:/usr/bin/:/home/jun/bin");
+		environ[0] = original0;
+	}
+
+	TEST_SECTION("get_env_val() 指定された環境変数が存在しない");
+	{
+		char *val_str = get_env_val("THIS_IS_NOT_EXIST_IN_ENVIRON");
+		CHECK_EQ(val_str, NULL);
+	}
+
 	int fail_count = print_result();
 	return (fail_count);
 }
