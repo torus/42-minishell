@@ -22,12 +22,27 @@ int main(){
 		CHECK_EQ(str_arr[2], NULL);
 	}
 
-	TEST_SECTION("get_env()");
+	TEST_SECTION("get_env() 通常ケース");
 	{
 		char *original0 = environ[0];
 		environ[0] = "GET_ENV_TEST=/bin/:/usr/bin/:/home/jun/bin";
 		char *kvstr = get_env("GET_ENV_TEST");
 		CHECK_EQ_STR(kvstr, environ[0]);
+		environ[0] = original0;
+	}
+
+	TEST_SECTION("get_env() 指定した環境変数が存在しない場合");
+	{
+		char *kvstr = get_env("THIS_IS_NOT_EXIST_IN_ENVIRON");
+		CHECK_EQ(kvstr, NULL);
+	}
+
+	TEST_SECTION("get_env() 途中まで同じ環境変数名な時");
+	{
+		char *original0 = environ[0];
+		environ[0] = "GET_ENV_TEST_TEST=/bin/:/usr/bin/:/home/jun/bin";
+		char *kvstr = get_env("GET_ENV_TEST");
+		CHECK_EQ(kvstr, NULL);
 		environ[0] = original0;
 	}
 
