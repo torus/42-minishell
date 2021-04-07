@@ -46,6 +46,27 @@ int main(){
 		environ[0] = original0;
 	}
 
+	TEST_SECTION("get_val_from_kvstr() 通常ケース");
+	{
+		char *kvstr = "PATH=/bin/:/usr/bin/:/home/jun/bin";
+		char *val_str = get_val_from_kvstr(kvstr, '=');
+		CHECK_EQ_STR(val_str, "/bin/:/usr/bin/:/home/jun/bin");
+	}
+
+	TEST_SECTION("get_val_from_kvstr() 区切り文字が無い");
+	{
+		char *kvstr = "PATH/bin/:/usr/bin/:/home/jun/bin";
+		char *val_str = get_val_from_kvstr(kvstr, '=');
+		CHECK_EQ(val_str, NULL);
+	}
+
+	TEST_SECTION("get_val_from_kvstr() 区切り文字が連続で並ぶ");
+	{
+		char *kvstr = "PATH===/bin/:/usr/bin/:/home/jun/bin";
+		char *val_str = get_val_from_kvstr(kvstr, '=');
+		CHECK_EQ_STR(val_str, "==/bin/:/usr/bin/:/home/jun/bin");
+	}
+
 	int fail_count = print_result();
 	return (fail_count);
 }
