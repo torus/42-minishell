@@ -29,21 +29,26 @@ char	**split_first_c(const char *str, char c)
 	char	**result;
 
 	result = ft_calloc(3, sizeof(char *));
+	if (!result)
+		return (NULL);
 	idx = 0;
-	while (str[idx])
+	while (true)
 	{
-		if (str[idx] == c)
+		if (str[idx] == c || str[idx] == '\0')
 		{
 			result[0] = ft_substr(str, 0, idx);
 			if (!result[0])
-				return (NULL);
+				return (free_ptrarr_and_rtn_null((void **)result));
 			break;
 		}
 		idx++;
 	}
-	result[1] = ft_strdup(str + idx + 1);
-	if (!result[1])
-		return (NULL);
+	if (str[idx])
+	{
+		result[1] = ft_strdup(str + idx + 1);
+		if (!result[1])
+			return (free_ptrarr_and_rtn_null((void **)result));
+	}
 	return (result);
 }
 
