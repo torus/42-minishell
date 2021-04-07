@@ -13,7 +13,7 @@ int main(){
 		CHECK_EQ(str_arr[2], NULL);
 	}
 
-	TEST_SECTION("split_first_c() Valueの中に=が入っていない場合");
+	TEST_SECTION("split_first_c() 区切り文字が入っていない");
 	{
 		char *input = "PATH/bin/:/usr/bin/:/home/jun/bin";
 		char **str_arr = split_first_c(input, '=');
