@@ -39,9 +39,10 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 
 char	*find_executable_file_from_path_env(char *filename)
 {
-	char *path_env_val;
-	char **paths;
-	size_t idx;
+	char	*path_env_val;
+	char	**paths;
+	char	*executable_path;
+	size_t	idx;
 
 	// find "hoge:hoge" from "PATH=hoge:hoge"
 	path_env_val = get_env_val("PATH");
@@ -52,13 +53,11 @@ char	*find_executable_file_from_path_env(char *filename)
 	if (!paths)
 		return (NULL);
 	idx = 0;
-	while (paths[idx])
-	{
-		if (find_executable_file_in_dir(filename, paths[idx]))
-			break;
-		idx++;
-	}
-	return (find_executable_file_in_dir(filename, paths[idx]));
+	executable_path = NULL;
+	while (!executable_path && paths[idx])
+		executable_path = find_executable_file_in_dir(filename, paths[idx++]);
+	free(paths);
+	return (executable_path);
 }
 
 int	ft_execvp(char *filename, char **argv)
