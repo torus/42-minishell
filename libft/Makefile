@@ -6,7 +6,7 @@
 #    By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 04:46:14 by jtanaka           #+#    #+#              #
-#    Updated: 2021/04/07 08:18:17 by jtanaka          ###   ########.fr        #
+#    Updated: 2021/04/09 03:56:54 by jtanaka          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ SRCS =	ft_strlen.c \
 		ft_strchr.c \
 		ft_strrchr.c \
 		ft_strnstr.c \
+		ft_strcmp.c \
 		ft_strncmp.c \
 		ft_memset.c \
 		ft_bzero.c \
