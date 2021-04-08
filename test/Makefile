@@ -12,15 +12,20 @@ HEADERS = ../env.h \
 TEST_UTILS = test.c \
 			 test.h
 
-run: parse_test env_test exec_test
+run: parse_test env_test path_test exec_test
 	./parse_test
 	./env_test
+	./path_test
 	./exec_test
 
 parse_test: Makefile parse_test.c test.c test.h ../parse.c ../parse2.c ../parse.h
 	gcc -Wall -Wextra -g -o $@ parse_test.c test.c ../parse.c ../parse2.c
 
 env_test: env_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
+	$(LIBFT_MAKE)
+	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+
+path_test: path_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
 	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
 
