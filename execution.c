@@ -1,9 +1,40 @@
 #include "env.h"
 #include "execution.h"
 
-char	*find_executable_file(char *filename)
+/*
+ * find executable file in dirpath.
+ *
+ *   filename: filename
+ *   dirpath: the directory to search
+ *
+ *   return:  fullpath of found executable file,
+ *            otherwise return NULL.
+ */
+char	*find_executable_file_in_dir(char *filename, char *dirpath)
 {
+	DIR				*dir;
+	struct dirent	*dirp;
+	struct stat		*buf;
+	char			*fullpath;
 
+	dir = opendir(dirpath);
+	if (!dir)
+		return (NULL);
+	dirp = readdir(dir);
+	while (dirp)
+	{
+		if (ft_strcmp(dirp->d_name, filename) == 0)
+		{
+			fullpath = path_join(dirpath, dirp->d_name);
+			if (!fullpath)
+				return (NULL);
+			if (stat(fullpath, buf) && S_ISREG(buf->st_mode))
+				return (fullpath);
+			free(fullpath);
+		}
+		dirp = readdir(dir);
+	}
+	return (NULL);
 }
 
 char	*find_executable_file_from_path_env(char *filename)
