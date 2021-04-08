@@ -22,8 +22,8 @@ typedef struct s_command_invocation
 
 
 /* Signal handlers */
-static void	sig_int(int signo);  /* Ctrl + C */
-static void	sig_quit(int signo); /* Ctrl + \ */
+void	sig_int(int signo);  /* Ctrl + C */
+void	sig_quit(int signo); /* Ctrl + \ */
 
 /* Execution */
 char	*find_executable_file_in_dir(char *filename, char *dirpath);
