@@ -5,7 +5,9 @@
 # include <stdio.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 # include <signal.h>
+# include <dirent.h>
 # include "libft/libft.h"
 
 # define MAXLINE 1000
@@ -28,6 +30,9 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath);
 char	*find_executable_file_from_path_env(char *filename);
 char	*find_executable_file(char *filename);
 int		ft_execvp(char *filename, char **argv);
+
+/* path */
+char	*path_join(char *dirpath, char *filename);
 
 #endif
 
