@@ -1,2 +1,3 @@
+#!/bin/sh
 echo "this file is for test"
 
