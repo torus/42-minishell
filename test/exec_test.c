@@ -66,13 +66,4 @@ int main(){
 		free(fullpath);
 		restore_env_var();
 	}
-
-	TEST_SECTION("find_executable_file_from_path_env() CWD内にシェルスクリプトが含まれている");
-	{
-		set_env_var("PATH=/usr/bin/:/home/jun/bin");
-		char *fullpath = find_executable_file_from_path_env("fot_test");
-		CHECK_TRUE(fullpath != NULL);
-		free(fullpath);
-		restore_env_var();
-	}
 }
