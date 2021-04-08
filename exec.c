@@ -71,7 +71,7 @@ int	ft_execvp(char *filename, char **argv)
 	// そうでない場合は $PATH から実行可能ファイルを検索する
 	else
 		executable_path = find_executable_file_from_path_env(filename);
-	execve(filename, argv, environ);
+	execve(executable_path, argv, environ);
 	return (ERROR);
 }
 
