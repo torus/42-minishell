@@ -28,7 +28,7 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 			fullpath = path_join(dirpath, dirp->d_name);
 			if (!fullpath)
 				return (NULL);
-			if (stat(fullpath, &buf) && S_ISREG(buf.st_mode))
+			if (stat(fullpath, &buf) == 0 && S_ISREG(buf.st_mode))
 				return (fullpath);
 			free(fullpath);
 		}
