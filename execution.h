@@ -28,6 +28,7 @@ void	sig_quit(int signo); /* Ctrl + \ */
 /* Execution */
 char	*find_executable_file_in_dir(char *filename, char *dirpath);
 char	*find_executable_file_from_path_env(char *filename);
+char	*find_executable_file_in_cwd(char *filename);
 int		ft_execvp(char *filename, char **argv);
 
 /* path */

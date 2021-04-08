@@ -60,6 +60,19 @@ char	*find_executable_file_from_path_env(char *filename)
 	return (executable_path);
 }
 
+char	*find_executable_file_in_cwd(char *filename)
+{
+	char	*cwdpath;
+	char	*executable_path;
+
+	cwdpath = getcwd(NULL, 0);
+	if (!cwdpath)
+		return (NULL);
+	executable_path = find_executable_file_in_dir(filename, cwdpath);
+	free(cwdpath);
+	return (executable_path);
+}
+
 int	ft_execvp(char *filename, char **argv)
 {
 	char		*executable_path;
@@ -71,6 +84,9 @@ int	ft_execvp(char *filename, char **argv)
 	// そうでない場合は $PATH から実行可能ファイルを検索する
 	else
 		executable_path = find_executable_file_from_path_env(filename);
+	// もし $PATH に実行可能ファイルが無かった場合はカレントディレクトリを探す
+	if (!executable_path)
+		executable_path = find_executable_file_in_cwd(filename);
 	execve(executable_path, argv, environ);
 	return (ERROR);
 }
