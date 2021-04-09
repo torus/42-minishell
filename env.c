@@ -66,6 +66,14 @@ char	*get_val_from_kvstr(const char *kvstr, char key)
 	return (valstr);
 }
 
+/*
+ * Get value from environment variable with key ("key=value").
+ *
+ * env_key: key name of environment variable
+ *
+ * return: value of environment variable if env_key is found,
+ *         or else, return NULL.
+ */
 char	*get_env_val(char *env_key)
 {
 	char	*path_env_kv;
