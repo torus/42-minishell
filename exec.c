@@ -80,7 +80,6 @@ int	ft_execvp(char *filename, char **argv)
 		executable_path = filename;
 	else
 		executable_path = find_executable_file_from_path_env(filename);
-	printf("executable_path: %s\n", executable_path);  // debug
 	execve(executable_path, argv, environ);
 	return (ERROR);
 }
