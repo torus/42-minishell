@@ -1,0 +1,7 @@
+version: "3"
+services:
+  norm:
+    build: .
+    volumes:
+      - "..:/code"
+    working_dir: "/code/test"
