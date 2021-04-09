@@ -1,5 +1,8 @@
 #include "libft/libft.h"
 
+/*
+ * concatenate dirpath, "/" and filename.
+ */
 char	*path_join(char *dirpath, char *filename)
 {
 	char	*tmp;
