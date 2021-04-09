@@ -12,4 +12,3 @@ char	*path_join(char *dirpath, char *filename)
 	free(tmp);
 	return (result);
 }
-
