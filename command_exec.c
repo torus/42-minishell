@@ -3,6 +3,9 @@
 #include <string.h>
 #include <errno.h>
 
+/*
+ * print t_command_invocation's attributes
+ */
 static void	print_command(t_command_invocation *command)
 {
 	size_t	i;
@@ -19,6 +22,14 @@ static void	print_command(t_command_invocation *command)
 		print_command(command->piped_command);
 }
 
+/*
+ * exec command in child process.
+ *
+ * command: information of execution command.
+ *
+ * return: If exec command successful, no value will be returned.
+ *         This function returning value means exec or other function is failed.
+ */
 static int	spawn_child(t_command_invocation *command)
 {
 	int	fd;
@@ -45,6 +56,9 @@ static int	spawn_child(t_command_invocation *command)
 	return (ERROR);
 }
 
+/*
+ * fork and execute command.
+ */
 int	command_execution(t_command_invocation *command)
 {
 	pid_t	pid;
