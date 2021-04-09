@@ -25,8 +25,8 @@ int main(){
 
 		command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		// CHECK_TRUE(system("diff /etc/passwd output.txt") == 0);
-		// remove("output.txt");
+		CHECK_TRUE(system("diff /etc/passwd output.txt") == 0);
+		remove("output.txt");
     }
 
 	/*
