@@ -55,6 +55,7 @@ int main(){
 		remove("output.txt");
     }
 
+	/*
     TEST_SECTION("cat /etc/passwd | wc > output.txt");
     {
 		t_command_invocation wc_command;
@@ -75,6 +76,7 @@ int main(){
 		CHECK_TRUE(system("diff <(cat /etc/passwd | wc) output.txt") == 0);
 		remove("output.txt");
     }
+	*/
 
 	int fail_count = print_result();
 	return (fail_count);
