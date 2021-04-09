@@ -5,18 +5,20 @@ SRCS = ../env.c \
 	   ../parse.c \
 	   ../parse2.c \
 	   ../exec.c \
-	   ../path.c
+	   ../path.c \
+	   ../command_exec.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h
 TEST_UTILS = test.c \
 			 test.h
 
-run: parse_test env_test path_test exec_test
+run: parse_test env_test path_test exec_test command_exec_test
 	./parse_test
 	./env_test
 	./path_test
 	./exec_test
+	./command_exec_test
 
 parse_test: Makefile parse_test.c test.c test.h ../parse.c ../parse2.c ../parse.h
 	gcc -Wall -Wextra -g -o $@ parse_test.c test.c ../parse.c ../parse2.c
@@ -32,3 +34,8 @@ path_test: path_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 exec_test: exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
 	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+
+command_exec_test: command_exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
+	$(LIBFT_MAKE)
+	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+
