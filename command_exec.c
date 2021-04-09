@@ -1,5 +1,7 @@
 #include "env.h"
 #include "execution.h"
+#include <string.h>
+#include <errno.h>
 
 static void	print_command(t_command_invocation *command)
 {
@@ -24,7 +26,7 @@ static int	spawn_child(t_command_invocation *command)
 		if (fd == -1)
 			put_err_msg_and_exit("error open()");
 		if (dup2(fd, STDIN_FILENO) == -1)
-			put_err_msg_and_exit("error dup2()");
+			put_err_msg_and_exit("error dup2(fd, STDIN_NO)");
 	}
 	if (command->output_file_path)
 	{
@@ -32,10 +34,9 @@ static int	spawn_child(t_command_invocation *command)
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
 			put_err_msg_and_exit("error open()");
-		if (dup2(fd, STDOUT_FILENO))
-			put_err_msg_and_exit("error dup2()");
+		if (dup2(fd, STDOUT_FILENO) == -1)
+			put_err_msg_and_exit("error dup2(fd, STDOUT_NO)");
 	}
-	printf("----------------start exec----------------\n");
 	ft_execvp((char *)command->exec_and_args[0], (char **)command->exec_and_args);
 	return (ERROR);
 }
@@ -47,21 +48,17 @@ int	command_execution(t_command_invocation *command)
 
 	print_command(command);
 	pid = fork();
-	printf("processID: %d\n", getpid());
 	if (pid == -1)
-		return (put_err_msg_and_ret("failed fork()"));
+		return (put_err_msg_and_ret("error fork()"));
 	else if (pid == 0)
 	{
-		printf("parent ID: %d\n", getppid());
 		/* Child process */
-		spawn_child(command);
+		status = spawn_child(command);
 	}
 	else
 	{
 		/* Parent process */
-		printf("child ID: %d\n", pid);
 		waitpid(pid, &status, 0);
-		printf("child status: %d\n", status);
 	}
-	return (0);
+	return (status);
 }
