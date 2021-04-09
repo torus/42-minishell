@@ -22,19 +22,20 @@ static int	spawn_child(t_command_invocation *command)
 	{
 		fd = open(command->input_file_path, O_RDONLY);
 		if (fd == -1)
-			return (ERROR);
+			put_err_msg_and_exit("error open()");
 		if (dup2(fd, STDIN_FILENO) == -1)
-			return (ERROR);
+			put_err_msg_and_exit("error dup2()");
 	}
 	if (command->output_file_path)
 	{
 		fd = open(command->output_file_path, O_WRONLY | O_CREAT,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
-			return (ERROR);
+			put_err_msg_and_exit("error open()");
 		if (dup2(fd, STDOUT_FILENO))
-			return (ERROR);
+			put_err_msg_and_exit("error dup2()");
 	}
+	printf("----------------start exec----------------\n");
 	ft_execvp((char *)command->exec_and_args[0], (char **)command->exec_and_args);
 	return (ERROR);
 }
@@ -51,6 +52,7 @@ int	command_execution(t_command_invocation *command)
 		return (put_err_msg_and_ret("failed fork()"));
 	else if (pid == 0)
 	{
+		printf("parent ID: %d\n", getppid());
 		/* Child process */
 		spawn_child(command);
 	}
@@ -59,6 +61,7 @@ int	command_execution(t_command_invocation *command)
 		/* Parent process */
 		printf("child ID: %d\n", pid);
 		waitpid(pid, &status, 0);
+		printf("child status: %d\n", status);
 	}
 	return (0);
 }
