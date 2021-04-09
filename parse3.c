@@ -100,7 +100,12 @@ int	parse_redirection(
 	if (tok->type != TOKTYPE_INPUT_REDIRECTION)
 		return (PARSE_KO);
 
-	parse_get_token(buf, tok);
+	while (1)
+	{
+		parse_get_token(buf, tok);
+		if (tok->type != TOKTYPE_SPACE)
+			break ;
+	}
 	if (parse_string(buf, &str_node, tok) == PARSE_OK)
 	{
 		new_node = malloc(sizeof(t_parse_ast_node));
@@ -110,7 +115,9 @@ int	parse_redirection(
 
 		new_node->type = ASTNODE_REDIRECTION;
 		redirection->type = TOKTYPE_INPUT_REDIRECTION;
-		redirection->path = "aho";
+
+		redirection->string_node = str_node;
+
 		new_node->content.redirection = redirection;
 
 		*node = new_node;

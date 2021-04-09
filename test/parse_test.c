@@ -153,8 +153,8 @@ int main()
 	TEST_SECTION("parse_redirection");
 	{
 		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "< file");
-		t_parse_ast_node	*node;
+		init_buf_with_string(&buf, "< file\n");
+		t_parse_ast_node	*node = NULL;
 		t_parse_token	tok;
 
 		parse_get_token(&buf, &tok);
@@ -164,7 +164,8 @@ int main()
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
 		CHECK_EQ(node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
-		CHECK_STREQ(node->content.redirection->path, "file");
+		CHECK_STREQ(node->content.redirection->string_node
+					->content.string->text, "file");
 	}
 
 

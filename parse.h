@@ -42,10 +42,12 @@ typedef struct s_parse_node_string
 	struct s_parse_node_string	*next;
 }	t_parse_node_string;
 
+typedef struct s_parse_ast_node	t_parse_ast_node;
+
 typedef struct s_parse_node_redirection
 {
-	const char	*path;
-	int			type;
+	t_parse_ast_node	*string_node;
+	int					type;
 }	t_parse_node_redirection;
 
 typedef struct s_parse_ast_node
