@@ -5,11 +5,14 @@
 
 static void	print_command(t_command_invocation *command)
 {
+	size_t	i;
+
 	printf("output_file_path: %s\n", command->output_file_path);
 	printf("input_file_path: %s\n", command->input_file_path);
 	printf("command: ");
-	for (int i = 0; command->exec_and_args[i]; i++)
-		printf("%s ", command->exec_and_args[i]);
+	i = 0;
+	while (command->exec_and_args[i])
+		printf("%s ", command->exec_and_args[i++]);
 	printf("\n");
 	printf("piped_command: %p\n", command->piped_command);
 	if (command->piped_command)
@@ -37,7 +40,8 @@ static int	spawn_child(t_command_invocation *command)
 		if (dup2(fd, STDOUT_FILENO) == -1)
 			put_err_msg_and_exit("error dup2(fd, STDOUT_NO)");
 	}
-	ft_execvp((char *)command->exec_and_args[0], (char **)command->exec_and_args);
+	ft_execvp((char *)command->exec_and_args[0],
+		(char **)command->exec_and_args);
 	return (ERROR);
 }
 
@@ -52,12 +56,10 @@ int	command_execution(t_command_invocation *command)
 		return (put_err_msg_and_ret("error fork()"));
 	else if (pid == 0)
 	{
-		/* Child process */
 		status = spawn_child(command);
 	}
 	else
 	{
-		/* Parent process */
 		waitpid(pid, &status, 0);
 	}
 	return (status);
