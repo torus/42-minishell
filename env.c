@@ -1,5 +1,13 @@
 #include "env.h"
 
+/*
+ * Get environment variable with key.
+ *
+ * env_key: key name of environment variable.
+ *
+ * return: value of environment variable.
+ *         That forms "key=value"
+ */
 char	*get_env(const char *env_key)
 {
 	size_t		idx;
@@ -23,6 +31,14 @@ char	*get_env(const char *env_key)
 	return (environ[idx]);
 }
 
+/*
+ * Split a string at the first appearance of a character.
+ *
+ * str: zero-terminated string.
+ * c: split text with this character.
+ *
+ * return: NULL-terminated char's pointer array.
+ */
 char	**split_first_c(const char *str, char c)
 {
 	size_t	idx;
@@ -52,12 +68,21 @@ char	**split_first_c(const char *str, char c)
 	return (result);
 }
 
-char	*get_val_from_kvstr(const char *kvstr, char key)
+/*
+ * Get value from key-value string.
+ * key-value string form like "key=value", "key:value", or something like that.
+ *
+ * kvstr: key-value string.
+ * delimiter: delimiter of key-value string.
+ *
+ * return: value of key-value string.
+ */
+char	*get_val_from_kvstr(const char *kvstr, char delimiter)
 {
 	char	**kvarr;
 	char	*valstr;
 
-	kvarr = split_first_c(kvstr, key);
+	kvarr = split_first_c(kvstr, delimiter);
 	if (!kvarr)
 		return (NULL);
 	valstr = kvarr[1];
