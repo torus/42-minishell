@@ -5,4 +5,4 @@ parse_test: Makefile parse_test.c test.c test.h ../parse.c ../parse2.c ../parse.
 	gcc -Wall -Wextra -g -o $@ parse_test.c test.c ../parse.c ../parse2.c
 
 norm:
-	sudo docker-compose run norm norminette ../*.[ch]
+	docker-compose run --rm norm norminette ../*.[ch]
