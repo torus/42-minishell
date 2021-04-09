@@ -86,7 +86,7 @@ int main()
         CHECK(!strncmp(tok.text, "cat", 3));
 
         parse_get_token(&buf, &tok);
-        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+        CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE_QUOTED);
         CHECK_EQ(tok.length, 4);
         CHECK(!strncmp(tok.text, "$ABC", 4));
 

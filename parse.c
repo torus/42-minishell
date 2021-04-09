@@ -49,7 +49,7 @@ int	parse_get_quoted(t_parse_buffer *buf, t_parse_token *result, int ch)
 {
 	if (ch == '"')
 	{
-		result->type = TOKTYPE_EXPANDABLE;
+		result->type = TOKTYPE_EXPANDABLE_QUOTED;
 		return (parse_read_double_quoted(buf, result));
 	}
 	else if (ch == '\'')
