@@ -44,11 +44,9 @@ char	*find_executable_file_from_path_env(char *filename)
 	char	*executable_path;
 	size_t	idx;
 
-	// find "hoge:hoge" from "PATH=hoge:hoge"
 	path_env_val = get_env_val("PATH");
 	if (!path_env_val)
 		return (NULL);
-	// split path_env_val with ':'
 	paths = ft_split(path_env_val, ':');
 	if (!paths)
 		return (NULL);
@@ -78,13 +76,10 @@ int	ft_execvp(char *filename, char **argv)
 	char		*executable_path;
 	extern char	**environ;
 
-	// ファイル名に / が入っていればパス名とみなす
 	if (ft_strchr(filename, '/'))
 		executable_path = filename;
-	// そうでない場合は $PATH から実行可能ファイルを検索する
 	else
 		executable_path = find_executable_file_from_path_env(filename);
 	execve(executable_path, argv, environ);
 	return (ERROR);
 }
-
