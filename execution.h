@@ -25,11 +25,14 @@ typedef struct s_command_invocation
 void	sig_int(int signo);  /* Ctrl + C */
 void	sig_quit(int signo); /* Ctrl + \ */
 
-/* Execution */
+/* exec */
 char	*find_executable_file_in_dir(char *filename, char *dirpath);
 char	*find_executable_file_from_path_env(char *filename);
 char	*find_executable_file_in_cwd(char *filename);
 int		ft_execvp(char *filename, char **argv);
+
+/* Command Execution */
+int		command_execution(t_command_invocation *command);
 
 /* path */
 char	*path_join(char *dirpath, char *filename);
