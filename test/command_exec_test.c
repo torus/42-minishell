@@ -10,6 +10,8 @@ int main(){
 		command.piped_command = NULL;
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("echo hello", ' ');
+
+		command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
     }
 
@@ -20,6 +22,8 @@ int main(){
 		command.piped_command = NULL;
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
+
+		command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
     }
 
@@ -30,6 +34,8 @@ int main(){
 		command.piped_command = NULL;
 		command.input_file_path = "/etc/passwd";
 		command.exec_and_args = (const char**)ft_split("cat", ' ');
+
+		command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
     }
 
@@ -47,6 +53,7 @@ int main(){
 		cat_command.input_file_path = "/etc/passwd";
 		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
+		command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
     }
