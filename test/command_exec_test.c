@@ -15,18 +15,21 @@ int main(){
 		free_ptrarr((void**)command.exec_and_args);
     }
 
-    TEST_SECTION("cat /etc/passwd > passwd_tmp.txt");
+    TEST_SECTION("cat /etc/passwd > output.txt");
     {
 		t_command_invocation command;
-		command.output_file_path = "passwd_tmp.txt";
+		command.output_file_path = "output.txt";
 		command.piped_command = NULL;
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
 		command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
+		// CHECK_TRUE(system("diff /etc/passwd output.txt") == 0);
+		// remove("output.txt");
     }
 
+	/*
     TEST_SECTION("cat < /etc/passwd");
     {
 		t_command_invocation command;
@@ -57,4 +60,8 @@ int main(){
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
     }
+	*/
+
+	int fail_count = print_result();
+	return (fail_count);
 }
