@@ -51,9 +51,9 @@ char	*find_executable_file_from_path_env(char *filename)
 	i = 0;
 	path_len = 0;
 	executable_path = NULL;
-	while (!executable_path && path_env_val[i + path_len])
+	while (!executable_path)
 	{
-		if (path_env_val[i + path_len] == ':')
+		if (path_env_val[i + path_len] == ':' || path_env_val[i + path_len] == '\0')
 		{
 			if (path_len == 0)
 				dirpath = getcwd(NULL, 0);
@@ -63,9 +63,9 @@ char	*find_executable_file_from_path_env(char *filename)
 				return (NULL);
 			executable_path = find_executable_file_in_dir(filename, dirpath);
 			free(dirpath);
-			i += path_len;
-			if (path_env_val[i + path_len + 1])
-				i++;
+			if (path_env_val[i + path_len] == '\0')
+				break ;
+			i += path_len + 1;
 			path_len = 0;
 		}
 		else
