@@ -37,40 +37,44 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 	return (NULL);
 }
 
-char	*find_executable_file_from_path_env(char *filename)
+static char	*get_executable_filepath(char *filename, const char *path_env_val)
 {
-	char	*path_env_val;
 	char	*executable_path;
-	size_t	i;
 	size_t	path_len;
 	char	*dirpath;
 
-	path_env_val = get_env_val("PATH");
-	if (!path_env_val)
-		return (NULL);
-	i = 0;
 	path_len = 0;
 	executable_path = NULL;
 	while (!executable_path)
 	{
-		if (path_env_val[i + path_len] == ':' || path_env_val[i + path_len] == '\0')
+		if (path_env_val[path_len] == ':' || path_env_val[path_len] == '\0')
 		{
 			if (path_len == 0)
 				dirpath = getcwd(NULL, 0);
 			else
-				dirpath = ft_substr(path_env_val, i, path_len);
-			if (!dirpath)
-				return (NULL);
+				dirpath = ft_substr(path_env_val, 0, path_len);
 			executable_path = find_executable_file_in_dir(filename, dirpath);
 			free(dirpath);
-			if (path_env_val[i + path_len] == '\0')
+			if (path_env_val[path_len] == '\0')
 				break ;
-			i += path_len + 1;
+			path_env_val += path_len + 1;
 			path_len = 0;
 		}
 		else
 			path_len++;
 	}
+	return (executable_path);
+}
+
+char	*find_executable_file_from_path_env(char *filename)
+{
+	char	*path_env_val;
+	char	*executable_path;
+
+	path_env_val = get_env_val("PATH");
+	if (!path_env_val)
+		return (NULL);
+	executable_path = get_executable_filepath(filename, path_env_val);
 	free(path_env_val);
 	return (executable_path);
 }
