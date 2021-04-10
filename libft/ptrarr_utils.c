@@ -24,6 +24,12 @@ void	free_ptrarr(void **ptrarr)
 	free(ptrarr);
 }
 
+void	*free_ptrarr_and_rtn_null(void **ptrarr)
+{
+	free_ptrarr(ptrarr);
+	return (NULL);
+}
+
 void	free_ptrarr_and_assign_null(void ***ptrarr)
 {
 	free_ptrarr(*ptrarr);

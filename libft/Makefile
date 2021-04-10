@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/10/10 04:46:14 by jtanaka           #+#    #+#              #
-#    Updated: 2021/04/09 04:05:36 by jtanaka          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 NAME = libft.a
@@ -63,7 +51,8 @@ SRCS =	ft_strlen.c \
 		get_next_line_utils.c \
 		error_utils.c \
 		free_utils.c \
-		ptrarr_utils.c
+		ptrarr_utils.c \
+		malloc_wrapper.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
