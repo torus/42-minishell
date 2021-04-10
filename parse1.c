@@ -36,8 +36,8 @@
 **	  | string arguments
 */
 
-int	parse_arguments(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok)
+t_parse_result	parse_arguments(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
 {
 	t_parse_ast_node		*string_node;
 	t_parse_ast_node		*redirection_node;
@@ -51,7 +51,7 @@ int	parse_arguments(
 	if (!(parse_redirection(buf, &redirection_node, tok) == PARSE_OK)
 		&& !(parse_string(buf, &string_node, tok) == PARSE_OK))
 		return (PARSE_KO);
-	parse_get_token(buf, tok);
+	token_get_token(buf, tok);
 	parse_arguments(buf, &rest_node, tok);
 	args_node = malloc(sizeof(t_parse_ast_node));
 	content_node = malloc(sizeof(t_parse_node_arguments));
@@ -75,8 +75,8 @@ int	parse_arguments(
 **	  | expandable_quoted <no_space> string
 **	  | expandable_quoted
 */
-int	parse_string(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok)
+t_parse_result	parse_string(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
 {
 	t_parse_ast_node	*new_node;
 	t_parse_node_string	*string;
@@ -97,7 +97,7 @@ int	parse_string(
 	ft_memcpy(text, tok->text, tok->length);
 	text[tok->length] = '\0';
 	string->text = text;
-	parse_get_token(buf, tok);
+	token_get_token(buf, tok);
 	parse_string(buf, &string->next, tok);
 	new_node->content.string = string;
 	*node = new_node;
@@ -110,18 +110,18 @@ int	parse_string(
 **	  | ">" string
 **	  | ">>" string
 */
-void	parse_skip_spaces(t_parse_buffer *buf, t_parse_token *tok)
+void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
 {
 	while (1)
 	{
-		parse_get_token(buf, tok);
+		token_get_token(buf, tok);
 		if (tok->type != TOKTYPE_SPACE)
 			break ;
 	}
 }
 
-int	parse_redirection(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok)
+t_parse_result	parse_redirection(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
 {
 	t_parse_ast_node			*new_node;
 	t_parse_ast_node			*str_node;

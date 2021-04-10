@@ -2,8 +2,9 @@ LIBFT_PATH = ../libft
 LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
 LIBFT_LIB = ../libft/libft.a
 SRCS = ../env.c \
-	   ../parse.c \
-	   ../parse2.c \
+	   ../token1.c \
+	   ../token2.c \
+	   ../parse1.c \
 	   ../exec.c \
 	   ../path.c \
 	   ../command_exec.c
@@ -20,7 +21,7 @@ run: parse_test env_test path_test exec_test command_exec_test
 	./exec_test
 	./command_exec_test
 
-SRCS_PARSE = $(wildcard ../parse*.c) ../libft/ft_memcpy.c
+SRCS_PARSE = $(wildcard ../token*.c ../parse*.c) ../libft/ft_memcpy.c
 
 parse_test: Makefile parse_test.c test.c test.h $(SRCS_PARSE) ../parse.h
 	gcc -Wall -Wextra -g -o $@ parse_test.c test.c $(SRCS_PARSE)
