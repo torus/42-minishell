@@ -40,21 +40,35 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 char	*find_executable_file_from_path_env(char *filename)
 {
 	char	*path_env_val;
-	char	**paths;
 	char	*executable_path;
-	size_t	idx;
+	size_t	path_len;
+	char	*dirpath;
 
 	path_env_val = get_env_val("PATH");
 	if (!path_env_val)
 		return (NULL);
-	paths = ft_split(path_env_val, ':');
-	if (!paths)
-		return (NULL);
-	idx = 0;
+	path_len = 0;
 	executable_path = NULL;
-	while (!executable_path && paths[idx])
-		executable_path = find_executable_file_in_dir(filename, paths[idx++]);
-	free(paths);
+	while (!executable_path && path_env_val[path_len])
+	{
+		if (path_env_val[path_len] == ':')
+		{
+			if (path_len == 0)
+				dirpath = getcwd(NULL, 0);
+			else
+				dirpath = ft_substr(path_env_val, 0, path_len);
+			if (!dirpath)
+				return (NULL);
+			executable_path = find_executable_file_in_dir(filename, dirpath);
+			free(dirpath);
+			path_env_val += path_len;
+			if (path_env_val[path_len + 1])
+				path_env_val++;
+			path_len = 0;
+		}
+		else
+			path_len++;
+	}
 	return (executable_path);
 }
 
