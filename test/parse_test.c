@@ -146,7 +146,7 @@ int main()
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_STRING);
 		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_STREQ(node->content.string->text, "file");
+		CHECK_EQ_STR(node->content.string->text, "file");
 		CHECK_EQ(node->content.string->next, NULL);
 	}
 
@@ -164,7 +164,7 @@ int main()
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
 		CHECK_EQ(node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
-		CHECK_STREQ(node->content.redirection->string_node
+		CHECK_EQ_STR(node->content.redirection->string_node
 					->content.string->text, "file");
 	}
 
@@ -184,7 +184,7 @@ int main()
 		t_parse_ast_node *str_node = node->content.arguments->string_node;
 		CHECK(str_node);
 		CHECK_EQ(str_node->type, ASTNODE_STRING);
-		CHECK_STREQ(str_node->content.string->text, "abc");
+		CHECK_EQ_STR(str_node->content.string->text, "abc");
 	}
 
 	TEST_SECTION("parse_arguments 2 個");
@@ -203,7 +203,7 @@ int main()
 		t_parse_ast_node *str_node = node->content.arguments->string_node;
 		CHECK(str_node);
 		CHECK_EQ(str_node->type, ASTNODE_STRING);
-		CHECK_STREQ(str_node->content.string->text, "abc");
+		CHECK_EQ_STR(str_node->content.string->text, "abc");
 
 		t_parse_ast_node *rest_node = node->content.arguments->rest_node;
 
@@ -211,7 +211,7 @@ int main()
 		str_node = rest_node->content.arguments->string_node;
 		CHECK(str_node);
 		CHECK_EQ(str_node->type, ASTNODE_STRING);
-		CHECK_STREQ(str_node->content.string->text, "def");
+		CHECK_EQ_STR(str_node->content.string->text, "def");
 	}
 
 	TEST_SECTION("parse_arguments リダイレクト");
@@ -232,7 +232,7 @@ int main()
 		CHECK(red_node);
 		CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
 		CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
-		CHECK_STREQ(red_node->content.redirection->string_node
+		CHECK_EQ_STR(red_node->content.redirection->string_node
 					->content.string->text, "abc");
 	}
 
@@ -253,15 +253,15 @@ int main()
 		t_parse_ast_node *str_node = node->content.arguments->string_node;
 		CHECK(str_node);
 		CHECK_EQ(str_node->type, ASTNODE_STRING);
-		CHECK_STREQ(str_node->content.string->text, "file");
+		CHECK_EQ_STR(str_node->content.string->text, "file");
 
 		node = node->content.arguments->rest_node;
 		t_parse_ast_node *red_node = node->content.arguments->redirection_node;
 		CHECK(red_node);
 		CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
 		CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
-		CHECK_STREQ(red_node->content.redirection->string_node
-					->content.string->text, "abc");
+		CHECK_EQ_STR(red_node->content.redirection->string_node
+					 ->content.string->text, "abc");
 	}
 
 	int fail_count = print_result();
