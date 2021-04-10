@@ -75,19 +75,6 @@ char	*find_executable_file_from_path_env(char *filename)
 	return (executable_path);
 }
 
-char	*find_executable_file_in_cwd(char *filename)
-{
-	char	*cwdpath;
-	char	*executable_path;
-
-	cwdpath = getcwd(NULL, 0);
-	if (!cwdpath)
-		return (NULL);
-	executable_path = find_executable_file_in_dir(filename, cwdpath);
-	free(cwdpath);
-	return (executable_path);
-}
-
 /*
  * This function works just like execvp.
  *
