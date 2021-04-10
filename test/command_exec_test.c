@@ -25,7 +25,7 @@ int main(){
 
 		command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK_TRUE(system("diff /etc/passwd output.txt") == 0);
+		CHECK(system("diff /etc/passwd output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -39,7 +39,7 @@ int main(){
 
 		command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK_TRUE(system("diff /etc/passwd output.txt") == 0);
+		CHECK(system("diff /etc/passwd output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -77,7 +77,7 @@ int main(){
 
 		command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK_TRUE(system("diff test.h output.txt") == 0);
+		CHECK(system("diff test.h output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -99,7 +99,7 @@ int main(){
 		command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK_TRUE(system("diff <(cat /etc/passwd | wc) output.txt") == 0);
+		CHECK(system("diff <(cat /etc/passwd | wc) output.txt") == 0);
 		remove("output.txt");
     }
 	*/
