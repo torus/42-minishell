@@ -66,4 +66,43 @@ int main(){
 		free(fullpath);
 		restore_env_var();
 	}
+
+	TEST_SECTION("find_executable_file_from_path_env() PATH内に . が含まれている");
+	{
+		set_env_var("PATH=.:/usr/bin/:/home/jun/bin");
+		char *fullpath = find_executable_file_from_path_env("test_executable_file");
+		CHECK(fullpath);
+		free(fullpath);
+		restore_env_var();
+	}
+
+	TEST_SECTION("find_executable_file_from_path_env() PATHの先頭に長さ0のパス接頭辞が含まれている");
+	{
+		set_env_var("PATH=:/usr/bin/:/home/jun/bin");
+		char *fullpath = find_executable_file_from_path_env("test_executable_file");
+		CHECK(fullpath);
+		free(fullpath);
+		restore_env_var();
+	}
+
+	TEST_SECTION("find_executable_file_from_path_env() PATHの途中に長さ0のパス接頭辞が含まれている");
+	{
+		set_env_var("PATH=/usr/bin/::/home/jun/bin");
+		char *fullpath = find_executable_file_from_path_env("test_executable_file");
+		CHECK(fullpath);
+		free(fullpath);
+		restore_env_var();
+	}
+
+	TEST_SECTION("find_executable_file_from_path_env() PATHの最後に長さ0のパス接頭辞が含まれている");
+	{
+		set_env_var("PATH=/usr/bin/:/home/jun/bin:");
+		char *fullpath = find_executable_file_from_path_env("test_executable_file");
+		CHECK(fullpath);
+		free(fullpath);
+		restore_env_var();
+	}
+
+	int fail_count = print_result();
+	return (fail_count);
 }
