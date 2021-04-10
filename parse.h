@@ -38,9 +38,9 @@ typedef struct s_parse_token
 
 typedef struct s_parse_node_string
 {
-	const char					*text;
-	int							type;
-	struct s_parse_node_string	*next;
+	const char				*text;
+	int						type;
+	struct s_parse_ast_node	*next;
 }	t_parse_node_string;
 
 typedef struct s_parse_ast_node	t_parse_ast_node;
@@ -81,11 +81,11 @@ int		parse_get_quoted(t_parse_buffer *buf, t_parse_token *result, int ch);
 int		parse_get_token(t_parse_buffer *buf, t_parse_token *result);
 
 int		parse_redirection(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
+			t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
 int		parse_string(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
+			t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
 int		parse_arguments(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
+			t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
 
 void	parse_fatal_error(void);
 
