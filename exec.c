@@ -37,7 +37,15 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 	return (NULL);
 }
 
-static char	*get_executable_filepath(char *filename, const char *path_env_val)
+/*
+ * Find filename in directories which is listed in dirpaths_str.
+ *
+ * filename: program name that is searched.
+ * dirpaths_str: string that has directory paths which is delimited with colon.
+ *
+ * return: filepath if executable file is found, otherwise return NULL.
+ */
+static char	*get_executable_filepath(char *filename, const char *dirpaths_str)
 {
 	char	*executable_path;
 	size_t	path_len;
@@ -47,17 +55,17 @@ static char	*get_executable_filepath(char *filename, const char *path_env_val)
 	executable_path = NULL;
 	while (!executable_path)
 	{
-		if (path_env_val[path_len] == ':' || path_env_val[path_len] == '\0')
+		if (dirpaths_str[path_len] == ':' || dirpaths_str[path_len] == '\0')
 		{
 			if (path_len == 0)
 				dirpath = getcwd(NULL, 0);
 			else
-				dirpath = ft_substr(path_env_val, 0, path_len);
+				dirpath = ft_substr(dirpaths_str, 0, path_len);
 			executable_path = find_executable_file_in_dir(filename, dirpath);
 			free(dirpath);
-			if (path_env_val[path_len] == '\0')
+			if (dirpaths_str[path_len] == '\0')
 				break ;
-			path_env_val += path_len + 1;
+			dirpaths_str += path_len + 1;
 			path_len = 0;
 		}
 		else
@@ -66,6 +74,13 @@ static char	*get_executable_filepath(char *filename, const char *path_env_val)
 	return (executable_path);
 }
 
+/*
+ * Find executable file in directories which is listed in $PATH.
+ *
+ * filename: program name that is searched.
+ *
+ * return: filepath if executable file is found, otherwise return NULL.
+ */
 char	*find_executable_file_from_path_env(char *filename)
 {
 	char	*path_env_val;
