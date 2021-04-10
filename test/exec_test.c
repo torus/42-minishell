@@ -58,6 +58,15 @@ int main(){
 		restore_env_var();
 	}
 
+	TEST_SECTION("find_executable_file_from_path_env() PATH内の最後のパスに実行可能ファイルが含まれている");
+	{
+		set_env_var("PATH=/home/jun/bin:/usr/bin");
+		char *fullpath = find_executable_file_from_path_env("cat");
+		CHECK_EQ_STR(fullpath, "/usr/bin//cat");
+		free(fullpath);
+		restore_env_var();
+	}
+
 	TEST_SECTION("find_executable_file_from_path_env() PATH内に実行可能ファイルが含まれていない");
 	{
 		set_env_var("PATH=/usr/bin/:/home/jun/bin");
