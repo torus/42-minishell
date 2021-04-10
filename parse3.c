@@ -26,13 +26,47 @@
 **		arguments
 **	  | (bonus) "(" sequencial_commands ")"
 **	  | (bonus) "(" sequencial_commands delimiter ")"
-**
+*/
+
+/*
 **arguments ::=
 **		redirection
 **	  | redirection arguments
 **	  | string
 **	  | string arguments
-**
+*/
+
+int	parse_arguments(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok)
+{
+	t_parse_ast_node		*string_node;
+	t_parse_ast_node		*redirection_node;
+	t_parse_ast_node		*rest_node;
+	t_parse_node_arguments	*content_node;
+	t_parse_ast_node		*args_node;
+
+	string_node = NULL;
+	redirection_node = NULL;
+	rest_node = NULL;
+	if (!(parse_redirection(buf, &redirection_node, tok) == PARSE_OK)
+		&& !(parse_string(buf, &string_node, tok) == PARSE_OK))
+		return (PARSE_KO);
+	parse_get_token(buf, tok);
+	parse_arguments(buf, &rest_node, tok);
+	args_node = malloc(sizeof(t_parse_ast_node));
+	content_node = malloc(sizeof(t_parse_node_arguments));
+	if (!content_node || !args_node)
+		parse_fatal_error();
+	content_node->string_node = string_node;
+	content_node->redirection_node = redirection_node;
+	content_node->rest_node = rest_node;
+	args_node->type = ASTNODE_ARGUMENTS;
+	args_node->content.arguments = content_node;
+	*node = args_node;
+	return (PARSE_OK);
+}
+
+/*
 **string ::=
 **		expandable <no_space> string
 **	  | expandable
@@ -40,13 +74,7 @@
 **	  | not_expandable
 **	  | expandable_quoted <no_space> string
 **	  | expandable_quoted
-**
-**redirection ::=
-**		"<" string
-**	  | ">" string
-**	  | ">>" string
 */
-
 int	parse_string(
 	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok)
 {
@@ -90,6 +118,12 @@ int	parse_string(
 	return (PARSE_OK);
 }
 
+/*
+**redirection ::=
+**		"<" string
+**	  | ">" string
+**	  | ">>" string
+*/
 int	parse_redirection(
 	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok)
 {

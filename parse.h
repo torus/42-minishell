@@ -26,6 +26,7 @@ enum e_parse_values
 	TOKTYPE_SPACE,
 	ASTNODE_STRING,
 	ASTNODE_REDIRECTION,
+	ASTNODE_ARGUMENTS,
 };
 
 typedef struct s_parse_token
@@ -44,6 +45,13 @@ typedef struct s_parse_node_string
 
 typedef struct s_parse_ast_node	t_parse_ast_node;
 
+typedef struct s_parse_node_arguments
+{
+	t_parse_ast_node	*string_node;
+	t_parse_ast_node	*redirection_node;
+	t_parse_ast_node	*rest_node;
+}	t_parse_node_arguments;
+
 typedef struct s_parse_node_redirection
 {
 	t_parse_ast_node	*string_node;
@@ -57,6 +65,7 @@ typedef struct s_parse_ast_node
 	{
 		t_parse_node_redirection	*redirection;
 		t_parse_node_string			*string;
+		t_parse_node_arguments		*arguments;
 	}	content;
 }	t_parse_ast_node;
 
@@ -74,6 +83,8 @@ int		parse_get_token(t_parse_buffer *buf, t_parse_token *result);
 int		parse_redirection(
 	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
 int		parse_string(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
+int		parse_arguments(
 	t_parse_buffer *buf, t_parse_ast_node **node, t_parse_token *tok);
 
 void	parse_fatal_error(void);
