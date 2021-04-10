@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   libft.h                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/06 00:05:30 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/04/09 04:05:47 by jtanaka          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef LIBFT_H
 # define LIBFT_H
 
@@ -80,6 +68,8 @@ void				put_err_msg_and_exit(char *str);
 void				free_and_assign_null(void **p);
 size_t				ptrarr_len(void **ptrarr);
 void				free_ptrarr(void **ptrarr);
+void				*free_ptrarr_and_rtn_null(void **ptrarr);
 void				free_ptrarr_and_assign_null(void ***ptrarr);
+int					wrap_malloc(void **p, size_t len);
 
 #endif
