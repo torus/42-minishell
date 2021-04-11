@@ -8,7 +8,7 @@ void	init_buf_with_string(t_parse_buffer *buf, const char* str)
 	buf->size = strlen(str);
 }
 
-int main()
+void test_lexer()
 {
 	TEST_CHAPTER("レキサー");
 
@@ -129,7 +129,29 @@ int main()
 		token_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SEMICOLON);
 	}
+}
 
+void test_args(t_parse_ast_node	*node)
+{
+    CHECK(node);
+    CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
+
+    t_parse_ast_node *str_node = node->content.arguments->string_node;
+    CHECK(str_node);
+    CHECK_EQ(str_node->type, ASTNODE_STRING);
+    CHECK_EQ_STR(str_node->content.string->text, "file");
+
+    node = node->content.arguments->rest_node;
+    t_parse_ast_node *red_node = node->content.arguments->redirection_node;
+    CHECK(red_node);
+    CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
+    CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
+    CHECK_EQ_STR(red_node->content.redirection->string_node
+                 ->content.string->text, "abc");
+}
+
+void test_parser(void)
+{
 	TEST_CHAPTER("パーサ");
 
 	TEST_SECTION("parse_string 単純な文字列");
@@ -246,24 +268,30 @@ int main()
 		token_get_token(&buf, &tok);
 
 		int ret = parse_arguments(&buf, &node, &tok);
-		CHECK_EQ(ret, PARSE_OK);
-		CHECK(node);
-		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
-
-		t_parse_ast_node *str_node = node->content.arguments->string_node;
-		CHECK(str_node);
-		CHECK_EQ(str_node->type, ASTNODE_STRING);
-		CHECK_EQ_STR(str_node->content.string->text, "file");
-
-		node = node->content.arguments->rest_node;
-		t_parse_ast_node *red_node = node->content.arguments->redirection_node;
-		CHECK(red_node);
-		CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
-		CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
-		CHECK_EQ_STR(red_node->content.redirection->string_node
-					 ->content.string->text, "abc");
+        CHECK_EQ(ret, PARSE_OK);
+        test_args(node);
 	}
 
+    TEST_SECTION("parse_command ファイル + リダイレクト");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "file < abc \n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		token_get_token(&buf, &tok);
+
+		int ret = parse_command(&buf, &node, &tok);
+        CHECK_EQ(ret, PARSE_OK);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+        test_args(node->content.command->arguments_node);
+	}
+}
+
+int main()
+{
+    test_lexer();
+    test_parser();
 	int fail_count = print_result();
 	return (fail_count);
 }

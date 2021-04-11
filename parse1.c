@@ -21,12 +21,34 @@
 **piped_commands ::=
 **		command "|" piped_commands
 **	  | command
-**
+*/
+
+/*
 **command ::=
 **		arguments
 **	  | (bonus) "(" sequencial_commands ")"
 **	  | (bonus) "(" sequencial_commands delimiter ")"
 */
+
+t_parse_result	parse_command(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+{
+	t_parse_ast_node		*cmd_node;
+	t_parse_node_command	*content_node;
+	t_parse_ast_node		*args_node;
+
+    if (parse_arguments(buf, &args_node, tok) != PARSE_OK)
+        return (PARSE_KO);
+    cmd_node = malloc(sizeof(t_parse_ast_node));
+	content_node = malloc(sizeof(t_parse_node_command));
+	if (!content_node || !cmd_node)
+		parse_fatal_error();
+    cmd_node->type = ASTNODE_COMMAND;
+    cmd_node->content.command = content_node;
+    cmd_node->content.command->arguments_node = args_node;
+    *node = cmd_node;
+    return (PARSE_OK);
+}
 
 /*
 **arguments ::=
