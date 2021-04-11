@@ -21,9 +21,9 @@ typedef enum e_token_type
 
 typedef struct s_token
 {
-	char	text[TOKEN_BUFFER_SIZE];
-	int		length;
-	int		type;
+	char			text[TOKEN_BUFFER_SIZE];
+	int				length;
+	t_token_type	type;
 }	t_token;
 
 int		token_getc(t_parse_buffer *buf);

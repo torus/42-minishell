@@ -18,21 +18,21 @@ typedef enum e_parse_result
 	PARSE_KO,
 }	t_parse_result;
 
-typedef enum e_ast_type
+typedef enum e_parse_ast_type
 {
 	ASTNODE_STRING = 0xc201,
 	ASTNODE_REDIRECTION,
 	ASTNODE_ARGUMENTS,
-}	t_ast_type;
+}	t_parse_ast_type;
+
+typedef struct s_parse_ast_node	t_parse_ast_node;
 
 typedef struct s_parse_node_string
 {
 	const char				*text;
-	int						type;
-	s_parse_ast_node		*next;
+	t_token_type			type;
+	t_parse_ast_node		*next;
 }	t_parse_node_string;
-
-typedef struct s_parse_ast_node	t_parse_ast_node;
 
 typedef struct s_parse_node_arguments
 {
@@ -44,27 +44,27 @@ typedef struct s_parse_node_arguments
 typedef struct s_parse_node_redirection
 {
 	t_parse_ast_node	*string_node;
-	int					type;
+	t_token_type		type;
 }	t_parse_node_redirection;
 
 typedef struct s_parse_ast_node
 {
-	int	type;
+	t_parse_ast_type	type;
 	union u_parse_ast_node_content
 	{
 		t_parse_node_redirection	*redirection;
 		t_parse_node_string			*string;
 		t_parse_node_arguments		*arguments;
-	}	content;
+	}					content;
 }	t_parse_ast_node;
 
 t_parse_result	parse_redirection(
-		t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
+					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
 t_parse_result	parse_string(
-		t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
+					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
 t_parse_result	parse_arguments(
-		t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
+					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
 
-void	parse_fatal_error(void);
+void			parse_fatal_error(void);
 
 #endif
