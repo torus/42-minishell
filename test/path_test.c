@@ -15,4 +15,7 @@ int main(){
 		CHECK_EQ_STR(fullpath, "/usr/bin//cat");
 		free(fullpath);
 	}
+
+	int fail_count = print_result();
+	return (fail_count);
 }
