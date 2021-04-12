@@ -33,7 +33,18 @@ static void	print_command(t_command_invocation *command)
 static int	spawn_child(t_command_invocation *command)
 {
 	int	fd;
+	int	pipe_fd[2];
+	pid_t	pid;
 
+	// パイプ: 最初のコマンド (a | b | c の a)  input: stdin, output: pipe_fd[1]
+	// パイプ: 途中のコマンド (a | b | c の b)  input: pipe_fd[0], output: pipe_fd[1]
+	// パイプ: 最後のコマンド (a | b | c の c)  input: pipe_fd[0], output: stdout
+	// cat /etc/passwd | wc | cat
+	if (command->piped_command)
+	{
+		if (pipe(pipe_fd) == -1)
+			return (put_err_msg_and_ret("error pipe()"));
+	}
 	if (command->input_file_path)
 	{
 		fd = open(command->input_file_path, O_RDONLY);
@@ -50,6 +61,25 @@ static int	spawn_child(t_command_invocation *command)
 			put_err_msg_and_exit("error open()");
 		if (dup2(fd, STDOUT_FILENO) == -1)
 			put_err_msg_and_exit("error dup2(fd, STDOUT_NO)");
+	}
+	if (command->piped_command)
+	{
+		pid = fork();
+		if (pid == -1)
+			return (put_err_msg_and_ret("error fork()"));
+		else if (pid == 0)  /* child */
+		{
+			close(pipe_fd[1]);
+			if (dup2(pipe_fd[0], STDIN_FILENO) == -1)
+				return (put_err_msg_and_ret("error dup2(pipe_fd[0], STDIN_FILENO)"));
+			spawn_child(command->piped_command);
+		}
+		else
+		{
+			close(pipe_fd[0]);
+			if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+				put_err_msg_and_exit("error dup2(pipe_fd[1], STDOUT_NO)");
+		}
 	}
 	ft_execvp((char *)command->exec_and_args[0],
 		(char **)command->exec_and_args);
