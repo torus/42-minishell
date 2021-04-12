@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "libft/libft.h"
 #include "parse.h"
+#include "parse2.h"
 
 void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
 {
@@ -12,6 +13,20 @@ void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
 	}
 }
 
+t_parse_ast_node	*parse_new_ast_node(t_parse_ast_type type, void *content)
+{
+	t_parse_ast_node	*dest;
+
+	if (!(type > ASTNODE_NONE && type < ASTNODE_INVALID))
+		parse_fatal_error();
+	dest = malloc(sizeof(t_parse_ast_node));
+	if (!dest || !content)
+		parse_fatal_error();
+	dest->type = type;
+	dest->content.void_ptr = content;
+	return (dest);
+}
+
 /*
 **command_line ::=
 **		"\n"
@@ -21,28 +36,14 @@ void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
 **delimiter ::=
 **		";"
 **	  | (bonus) "&"
-**
+*/
+/*
 **sequencial_commands ::=
 **		piped_commands delimiter sequencial_commands
 **	  | piped_commands
 **	  | (bonus) piped_commands "&&" sequencial_commands
 **	  | (bonus) piped_commands "||" sequencial_commands
 */
-
-static t_parse_ast_node	*new_ast_node(t_parse_ast_type type, void *content)
-{
-	t_parse_ast_node	*dest;
-
-	if (!(type > ASTNODE_NONE && type < ASTNODE_INVALID))
-		parse_fatal_error();
-    dest = malloc(sizeof(t_parse_ast_node));
-    if (!dest || !content)
-        parse_fatal_error();
-    dest->type = type;
-    dest->content.void_ptr = content;
-	return (dest);
-}
-
 /*
 **piped_commands ::=
 **		command "|" piped_commands
@@ -59,11 +60,9 @@ t_parse_result	parse_piped_commands(
 
 	if (parse_command(buf, &cmd_node, tok) != PARSE_OK)
 		return (PARSE_KO);
-
 	content_node = malloc(sizeof(t_parse_node_pipcmds));
-	pip_node = new_ast_node(ASTNODE_PIPED_COMMANDS, content_node);
+	pip_node = parse_new_ast_node(ASTNODE_PIPED_COMMANDS, content_node);
 	content_node->command_node = cmd_node;
-
 	rest_node = NULL;
 	parse_skip_spaces(buf, tok);
 	if (tok->type == TOKTYPE_PIPE)
@@ -74,7 +73,6 @@ t_parse_result	parse_piped_commands(
 			return (PARSE_KO);
 	}
 	content_node->next = rest_node;
-
 	*node = pip_node;
 	return (PARSE_OK);
 }
@@ -96,7 +94,7 @@ t_parse_result	parse_command(
 	if (parse_arguments(buf, &args_node, tok) != PARSE_OK)
 		return (PARSE_KO);
 	content_node = malloc(sizeof(t_parse_node_command));
-	cmd_node = new_ast_node(ASTNODE_COMMAND, content_node);
+	cmd_node = parse_new_ast_node(ASTNODE_COMMAND, content_node);
 	content_node->arguments_node = args_node;
 	*node = cmd_node;
 	return (PARSE_OK);
@@ -131,7 +129,7 @@ t_parse_result	parse_arguments(
 	content_node->string_node = string_node;
 	content_node->redirection_node = redirection_node;
 	content_node->rest_node = rest_node;
-	args_node = new_ast_node(ASTNODE_ARGUMENTS, content_node);
+	args_node = parse_new_ast_node(ASTNODE_ARGUMENTS, content_node);
 	*node = args_node;
 	return (PARSE_OK);
 }
@@ -156,7 +154,7 @@ t_parse_result	parse_string(
 		return (PARSE_KO);
 	string = NULL;
 	string = malloc(sizeof(t_parse_node_string));
-	new_node = new_ast_node(ASTNODE_STRING, string);
+	new_node = parse_new_ast_node(ASTNODE_STRING, string);
 	text = malloc(tok->length + 1);
 	if (!string || !text)
 		parse_fatal_error();
@@ -192,7 +190,7 @@ t_parse_result	parse_redirection(
 		redirection = malloc(sizeof(t_parse_node_redirection));
 		redirection->type = TOKTYPE_INPUT_REDIRECTION;
 		redirection->string_node = str_node;
-		new_node = new_ast_node(ASTNODE_REDIRECTION, redirection);
+		new_node = parse_new_ast_node(ASTNODE_REDIRECTION, redirection);
 		*node = new_node;
 		return (PARSE_OK);
 	}
