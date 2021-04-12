@@ -20,11 +20,13 @@ typedef enum e_parse_result
 
 typedef enum e_parse_ast_type
 {
-	ASTNODE_STRING = 0xc201,
+	ASTNODE_NONE = 0xc201,
+	ASTNODE_STRING,
 	ASTNODE_REDIRECTION,
 	ASTNODE_ARGUMENTS,
 	ASTNODE_COMMAND,
 	ASTNODE_PIPED_COMMANDS,
+	ASTNODE_INVALID,
 }	t_parse_ast_type;
 
 typedef struct s_parse_ast_node	t_parse_ast_node;
@@ -67,6 +69,7 @@ typedef struct s_parse_ast_node
 	t_parse_ast_type	type;
 	union u_parse_ast_node_content
 	{
+		void						*void_ptr;
 		t_parse_node_redirection	*redirection;
 		t_parse_node_string			*string;
 		t_parse_node_arguments		*arguments;
