@@ -17,11 +17,48 @@
 **	  | piped_commands
 **	  | (bonus) piped_commands "&&" sequencial_commands
 **	  | (bonus) piped_commands "||" sequencial_commands
-**
+*/
+
+/*
 **piped_commands ::=
 **		command "|" piped_commands
 **	  | command
 */
+
+t_parse_result	parse_piped_commands(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+{
+	t_parse_ast_node		*pip_node;
+	t_parse_node_pipcmds	*content_node;
+	t_parse_ast_node		*cmd_node;
+	t_parse_ast_node		*rest_node;
+
+    if (parse_command(buf, &cmd_node, tok) != PARSE_OK)
+        return (PARSE_KO);
+
+    pip_node = malloc(sizeof(t_parse_ast_node));
+	content_node = malloc(sizeof(t_parse_node_pipcmds));
+    if (!pip_node || !content_node)
+        parse_fatal_error();
+
+
+    pip_node->type = ASTNODE_PIPED_COMMANDS;
+    pip_node->content.piped_commands = content_node;
+
+    content_node->command_node = cmd_node;
+
+    rest_node = NULL;
+	token_get_token(buf, tok);
+    if (tok->type == TOKTYPE_PIPE)
+    {
+        if (parse_command(buf, &rest_node, tok) != PARSE_OK)
+            return (PARSE_KO);
+        content_node->command_node = rest_node;
+    }
+
+	*node = pip_node;
+    return (PARSE_OK);
+}
 
 /*
 **command ::=

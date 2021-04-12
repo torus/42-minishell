@@ -286,6 +286,22 @@ void test_parser(void)
         CHECK_EQ(node->type, ASTNODE_COMMAND);
         test_args(node->content.command->arguments_node);
 	}
+
+    TEST_SECTION("parse_piped_commands パイプあり");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc | defg \n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		token_get_token(&buf, &tok);
+
+		int ret = parse_piped_commands(&buf, &node, &tok);
+        CHECK_EQ(ret, PARSE_OK);
+        CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
+		CHECK(node->content.piped_commands->command_node);
+	}
+
 }
 
 int main()
