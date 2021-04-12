@@ -287,10 +287,33 @@ void test_parser(void)
         test_args(node->content.command->arguments_node);
 	}
 
+    TEST_SECTION("parse_piped_commands パイプなし");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc \n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		token_get_token(&buf, &tok);
+
+		int ret = parse_piped_commands(&buf, &node, &tok);
+        CHECK_EQ(ret, PARSE_OK);
+        CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
+
+		t_parse_ast_node *cmd = node->content.piped_commands->command_node;
+		CHECK(cmd);
+		CHECK_EQ(cmd->type, ASTNODE_COMMAND);
+		t_parse_ast_node *str = cmd->content.command->arguments_node
+			->content.arguments->string_node;
+		CHECK(str);
+		CHECK_EQ_STR(str->content.string->text, "abc");
+		CHECK(!node->content.piped_commands->next);
+	}
+
     TEST_SECTION("parse_piped_commands パイプあり");
 	{
 		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "abc | defg \n");
+		init_buf_with_string(&buf, "abc | file < abc \n");
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
@@ -300,6 +323,13 @@ void test_parser(void)
         CHECK_EQ(ret, PARSE_OK);
         CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
 		CHECK(node->content.piped_commands->command_node);
+		CHECK(node->content.piped_commands->next);
+		t_parse_ast_node *next = node->content.piped_commands->next;
+		CHECK_EQ(next->type, ASTNODE_PIPED_COMMANDS);
+		CHECK(next->content.piped_commands->command_node);
+		test_args(next->content.piped_commands->command_node
+				  ->content.command->arguments_node);
+		CHECK(!next->content.piped_commands->next);
 	}
 
 }

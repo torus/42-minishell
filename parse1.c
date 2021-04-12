@@ -2,6 +2,16 @@
 #include "libft/libft.h"
 #include "parse.h"
 
+void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
+{
+	while (1)
+	{
+		if (tok->type != TOKTYPE_SPACE)
+			break ;
+		token_get_token(buf, tok);
+	}
+}
+
 /*
 **command_line ::=
 **		"\n"
@@ -55,13 +65,15 @@ t_parse_result	parse_piped_commands(
 	content_node->command_node = cmd_node;
 
 	rest_node = NULL;
-	token_get_token(buf, tok);
+	parse_skip_spaces(buf, tok);
 	if (tok->type == TOKTYPE_PIPE)
 	{
-		if (parse_command(buf, &rest_node, tok) != PARSE_OK)
+		token_get_token(buf, tok);
+		parse_skip_spaces(buf, tok);
+		if (parse_piped_commands(buf, &rest_node, tok) != PARSE_OK)
 			return (PARSE_KO);
-		content_node->command_node = rest_node;
 	}
+	content_node->next = rest_node;
 
 	*node = pip_node;
 	return (PARSE_OK);
@@ -164,16 +176,6 @@ t_parse_result	parse_string(
 **	  | ">" string
 **	  | ">>" string
 */
-void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
-{
-	while (1)
-	{
-		token_get_token(buf, tok);
-		if (tok->type != TOKTYPE_SPACE)
-			break ;
-	}
-}
-
 t_parse_result	parse_redirection(
 	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
 {
@@ -183,6 +185,7 @@ t_parse_result	parse_redirection(
 
 	if (tok->type != TOKTYPE_INPUT_REDIRECTION)
 		return (PARSE_KO);
+	token_get_token(buf, tok);
 	parse_skip_spaces(buf, tok);
 	if (parse_string(buf, &str_node, tok) == PARSE_OK)
 	{
