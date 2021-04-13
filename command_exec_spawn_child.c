@@ -1,6 +1,13 @@
 #include "env.h"
 #include "execution.h"
 
+/*
+ * open input file as stdin if command->input_file_path is exist
+ *
+ * command: command.
+ *
+ * return: return -1 if error has occurred, otherwise, return 0.
+ */
 int	cmd_set_input_file(t_command_invocation *command)
 {
 	int	fd;
@@ -16,6 +23,13 @@ int	cmd_set_input_file(t_command_invocation *command)
 	return (0);
 }
 
+/*
+ * open output file as stdout if command->output_file_path is exist
+ *
+ * command: command.
+ *
+ * return: return -1 if error has occurred, otherwise, return 0.
+ */
 int	cmd_set_output_file(t_command_invocation *command)
 {
 	int	fd;
@@ -32,6 +46,14 @@ int	cmd_set_output_file(t_command_invocation *command)
 	return (0);
 }
 
+/*
+ * fork and execute next command if command->piped_command is exist
+ *
+ * command: command.
+ * pipe_fd: 2 file descriptors which is set by pipe().
+ *
+ * return: return -1 if error has occurred, otherwise, return 0.
+ */
 int	cmd_pipe_process(t_command_invocation *command, int pipe_fd[2])
 {
 	pid_t	pid;
