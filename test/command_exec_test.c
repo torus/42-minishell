@@ -129,7 +129,7 @@ int main(){
 		remove("output.txt");
     }
 
-    TEST_SECTION("cat /etc/passwd > /dev/null | wc | md5sum > output.txt  パイプの途中でリダイレクトがある");
+    TEST_SECTION("cat /etc/passwd > /dev/null | wc | md5sum > output.txt  パイプの最初のコマンドでリダイレクトがある");
     {
 		t_command_invocation md5sum_command;
 		md5sum_command.output_file_path = "output.txt";
