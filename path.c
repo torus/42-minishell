@@ -1,4 +1,4 @@
-#include "libft/libft.h"
+#include "path.h"
 
 /*
  * concatenate dirpath, "/" and filename.
