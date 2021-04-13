@@ -30,20 +30,77 @@ t_parse_ast_node	*parse_new_ast_node(t_parse_ast_type type, void *content)
 /*
 **command_line ::=
 **		"\n"
-**	  | sequencial_commands delimiter "\n"
-**	  | sequencial_commands "\n"
+**	  | sequential_commands delimiter "\n"
+**	  | sequential_commands "\n"
 **
 **delimiter ::=
 **		";"
 **	  | (bonus) "&"
 */
+
+t_parse_result	parse_delimiter(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+{
+	t_parse_ast_node		*delim_node;
+	t_parse_node_delimiter	*content_node;
+
+	parse_skip_spaces(buf, tok);
+	if (tok->type != TOKTYPE_SEMICOLON)
+		return (PARSE_KO);
+	content_node = malloc(sizeof(t_parse_node_delimiter));
+	delim_node = parse_new_ast_node(ASTNODE_DELIMITER, content_node);
+	content_node->type = TOKTYPE_SEMICOLON;
+	*node = delim_node;
+	return (PARSE_OK);
+}
+
 /*
-**sequencial_commands ::=
-**		piped_commands delimiter sequencial_commands
+**sequential_commands ::=
+**		piped_commands delimiter sequential_commands
 **	  | piped_commands
-**	  | (bonus) piped_commands "&&" sequencial_commands
-**	  | (bonus) piped_commands "||" sequencial_commands
+**	  | (bonus) piped_commands "&&" sequential_commands
+**	  | (bonus) piped_commands "||" sequential_commands
 */
+
+#include <stdio.h>
+
+t_parse_result	parse_sequential_commands(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+{
+	t_parse_ast_node		*seq_node;
+	t_parse_ast_node		*pipcmd_node;
+	t_parse_ast_node		*delimiter_node;
+	t_parse_ast_node		*rest_node;
+    t_parse_node_seqcmds	*content;
+
+    printf("1 tok->type: %x\n", tok->type);
+    parse_skip_spaces(buf, tok);
+    printf("2 tok->type: %x\n", tok->type);
+	if (parse_piped_commands(buf, &pipcmd_node, tok) != PARSE_OK)
+		return (PARSE_KO);
+
+    printf("3 tok->type: %x\n", tok->type);
+
+    content = malloc(sizeof(t_parse_node_seqcmds));
+    seq_node = parse_new_ast_node(ASTNODE_SEQ_COMMANDS, content);
+    content->pipcmd_node = pipcmd_node;
+    content->delimiter_node = NULL;
+    content->rest_node = NULL;
+    parse_skip_spaces(buf, tok);
+    if (parse_delimiter(buf, &delimiter_node, tok) == PARSE_OK)
+    {
+        token_get_token(buf, tok);
+        parse_skip_spaces(buf, tok);
+        if (parse_sequential_commands(buf, &rest_node, tok) != PARSE_OK)
+            return (PARSE_KO);
+        content->delimiter_node = delimiter_node;
+        content->rest_node = rest_node;
+    }
+
+    *node = seq_node;
+	return (PARSE_OK);
+}
+
 /*
 **piped_commands ::=
 **		command "|" piped_commands
@@ -80,8 +137,8 @@ t_parse_result	parse_piped_commands(
 /*
 **command ::=
 **		arguments
-**	  | (bonus) "(" sequencial_commands ")"
-**	  | (bonus) "(" sequencial_commands delimiter ")"
+**	  | (bonus) "(" sequential_commands ")"
+**	  | (bonus) "(" sequential_commands delimiter ")"
 */
 
 t_parse_result	parse_command(

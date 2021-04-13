@@ -131,23 +131,51 @@ void test_lexer()
 	}
 }
 
-void test_args(t_parse_ast_node	*node)
+void check_string(t_parse_ast_node *node, const char *expected)
+{
+    CHECK_EQ(node->type, ASTNODE_STRING);
+    CHECK_EQ_STR(node->content.string->text, expected);
+}
+
+void check_single_argument(t_parse_ast_node *node, const char *expected)
+{
+    t_parse_ast_node *str_node = node->content.arguments->string_node;
+    CHECK(str_node);
+    check_string(str_node, expected);
+}
+
+void check_args(t_parse_ast_node	*node)
 {
     CHECK(node);
     CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
 
-    t_parse_ast_node *str_node = node->content.arguments->string_node;
-    CHECK(str_node);
-    CHECK_EQ(str_node->type, ASTNODE_STRING);
-    CHECK_EQ_STR(str_node->content.string->text, "file");
+    check_single_argument(node, "file");
 
     node = node->content.arguments->rest_node;
     t_parse_ast_node *red_node = node->content.arguments->redirection_node;
     CHECK(red_node);
     CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
     CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
-    CHECK_EQ_STR(red_node->content.redirection->string_node
-                 ->content.string->text, "abc");
+    check_string(red_node->content.redirection->string_node, "abc");
+}
+
+void check_piped_commands(t_parse_ast_node *node)
+{
+    CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
+    CHECK(node->content.piped_commands->command_node);
+    CHECK(node->content.piped_commands->next);
+    t_parse_ast_node *next = node->content.piped_commands->next;
+    CHECK_EQ(next->type, ASTNODE_PIPED_COMMANDS);
+    CHECK(next->content.piped_commands->command_node);
+    check_args(next->content.piped_commands->command_node
+              ->content.command->arguments_node);
+    CHECK(!next->content.piped_commands->next);
+}
+
+void check_delimiter(t_parse_ast_node *node)
+{
+    CHECK_EQ(node->type, ASTNODE_DELIMITER);
+    CHECK_EQ(node->content.delimiter->type, TOKTYPE_SEMICOLON);
 }
 
 void test_parser(void)
@@ -269,7 +297,7 @@ void test_parser(void)
 
 		int ret = parse_arguments(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
-        test_args(node);
+        check_args(node);
 	}
 
     TEST_SECTION("parse_command ファイル + リダイレクト");
@@ -284,7 +312,7 @@ void test_parser(void)
 		int ret = parse_command(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
         CHECK_EQ(node->type, ASTNODE_COMMAND);
-        test_args(node->content.command->arguments_node);
+        check_args(node->content.command->arguments_node);
 	}
 
     TEST_SECTION("parse_piped_commands パイプなし");
@@ -321,17 +349,49 @@ void test_parser(void)
 
 		int ret = parse_piped_commands(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
-        CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
-		CHECK(node->content.piped_commands->command_node);
-		CHECK(node->content.piped_commands->next);
-		t_parse_ast_node *next = node->content.piped_commands->next;
-		CHECK_EQ(next->type, ASTNODE_PIPED_COMMANDS);
-		CHECK(next->content.piped_commands->command_node);
-		test_args(next->content.piped_commands->command_node
-				  ->content.command->arguments_node);
-		CHECK(!next->content.piped_commands->next);
+        check_piped_commands(node);
 	}
 
+    TEST_SECTION("parse_delimiter");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "; \n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		token_get_token(&buf, &tok);
+		int ret = parse_delimiter(&buf, &node, &tok);
+        CHECK_EQ(ret, PARSE_OK);
+        check_delimiter(node);
+	}
+
+    TEST_SECTION("parse_sequential_commands");
+    {
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, " abc ; xyz \n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		token_get_token(&buf, &tok);
+		int ret = parse_sequential_commands(&buf, &node, &tok);
+        CHECK_EQ(ret, PARSE_OK);
+        check_single_argument(
+            node->content.sequential_commands
+            ->pipcmd_node->content.piped_commands
+            ->command_node->content.command
+            ->arguments_node,
+            "abc");
+        check_delimiter(
+            node->content.sequential_commands
+            ->delimiter_node);
+        check_single_argument(
+            node->content.sequential_commands
+            ->rest_node->content.sequential_commands
+            ->pipcmd_node->content.piped_commands
+            ->command_node->content.command
+            ->arguments_node,
+            "xyz");
+    }
 }
 
 int main()

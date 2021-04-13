@@ -26,6 +26,8 @@ typedef enum e_parse_ast_type
 	ASTNODE_ARGUMENTS,
 	ASTNODE_COMMAND,
 	ASTNODE_PIPED_COMMANDS,
+	ASTNODE_DELIMITER,
+	ASTNODE_SEQ_COMMANDS,
 	ASTNODE_INVALID,
 }	t_parse_ast_type;
 
@@ -64,6 +66,18 @@ typedef struct s_parse_node_redirection
 	t_token_type		type;
 }	t_parse_node_redirection;
 
+typedef struct s_parse_node_delimiter
+{
+	t_token_type		type;
+}	t_parse_node_delimiter;
+
+typedef struct s_parse_node_seqcmds
+{
+	t_parse_ast_node	*pipcmd_node;
+	t_parse_ast_node	*delimiter_node;
+	t_parse_ast_node	*rest_node;
+}	t_parse_node_seqcmds;
+
 typedef struct s_parse_ast_node
 {
 	t_parse_ast_type	type;
@@ -75,6 +89,8 @@ typedef struct s_parse_ast_node
 		t_parse_node_arguments		*arguments;
 		t_parse_node_command		*command;
 		t_parse_node_pipcmds		*piped_commands;
+		t_parse_node_delimiter		*delimiter;
+		t_parse_node_seqcmds		*sequential_commands;
 	}					content;
 }	t_parse_ast_node;
 
@@ -88,6 +104,12 @@ t_parse_result	parse_command(
 					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
 t_parse_result	parse_piped_commands(
 					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
+t_parse_result	parse_delimiter(
+					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
+t_parse_result	parse_sequential_commands(
+					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
+
+
 void			parse_skip_spaces(t_parse_buffer *buf, t_token *tok);
 
 void			parse_fatal_error(void);
