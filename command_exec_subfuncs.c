@@ -1,7 +1,7 @@
 #include "env.h"
 #include "execution.h"
 
-int	set_input_file(t_command_invocation *command)
+int	cmd_set_input_file(t_command_invocation *command)
 {
 	int	fd;
 
@@ -16,7 +16,7 @@ int	set_input_file(t_command_invocation *command)
 	return (0);
 }
 
-int	set_output_file(t_command_invocation *command)
+int	cmd_set_output_file(t_command_invocation *command)
 {
 	int	fd;
 
@@ -32,7 +32,7 @@ int	set_output_file(t_command_invocation *command)
 	return (0);
 }
 
-int	pipe_process(t_command_invocation *command, int pipe_fd[2])
+int	cmd_pipe_process(t_command_invocation *command, int pipe_fd[2])
 {
 	pid_t	pid;
 
@@ -53,7 +53,7 @@ int	pipe_process(t_command_invocation *command, int pipe_fd[2])
 			&& dup2(pipe_fd[0], STDIN_FILENO) == -1)
 			return (put_err_msg_and_ret(
 					"error dup2(pipe_fd[0], STDIN_FILENO)"));
-		spawn_child(command->piped_command);
+		cmd_spawn_child(command->piped_command);
 	}
 	return (0);
 }
@@ -66,17 +66,17 @@ int	pipe_process(t_command_invocation *command, int pipe_fd[2])
  * return: If exec command successful, no value will be returned.
  *         This function returning value means exec or other function is failed.
  */
-int	spawn_child(t_command_invocation *command)
+int	cmd_spawn_child(t_command_invocation *command)
 {
 	int		pipe_fd[2];
 
 	if (command->piped_command && pipe(pipe_fd) == -1)
 		return (put_err_msg_and_ret("error pipe()"));
-	if (set_input_file(command) == ERROR || set_output_file(command) == ERROR)
+	if (cmd_set_input_file(command) == ERROR || cmd_set_output_file(command) == ERROR)
 		return (put_err_msg_and_ret("error input/output file"));
-	if (command->piped_command && pipe_process(command, pipe_fd) == ERROR)
+	if (command->piped_command && cmd_pipe_process(command, pipe_fd) == ERROR)
 		return (put_err_msg_and_ret("error pipe process"));
-	ft_execvp((char *)command->exec_and_args[0],
+	cmd_execvp((char *)command->exec_and_args[0],
 		(char **)command->exec_and_args);
 	return (ERROR);
 }

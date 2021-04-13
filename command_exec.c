@@ -4,7 +4,7 @@
 /*
  * print t_command_invocation's attributes
  */
-static void	print_command(t_command_invocation *command)
+static void	cmd_print_command(t_command_invocation *command)
 {
 	size_t	i;
 
@@ -17,18 +17,18 @@ static void	print_command(t_command_invocation *command)
 	printf("\n");
 	printf("piped_command: %p\n", command->piped_command);
 	if (command->piped_command)
-		print_command(command->piped_command);
+		cmd_print_command(command->piped_command);
 }
 
 /*
  * fork and execute command.
  */
-int	command_execution(t_command_invocation *command)
+int	cmd_command_execution(t_command_invocation *command)
 {
 	pid_t	pid;
 	int		status;
 
-	print_command(command);
+	cmd_print_command(command);
 	pid = fork();
 	if (pid == -1)
 		return (put_err_msg_and_ret("error fork()"));
@@ -38,7 +38,7 @@ int	command_execution(t_command_invocation *command)
 	}
 	else
 	{
-		status = spawn_child(command);
+		status = cmd_spawn_child(command);
 	}
 	return (status);
 }
