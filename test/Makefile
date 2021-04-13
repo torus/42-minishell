@@ -42,3 +42,10 @@ command_exec_test: command_exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 
 norm:
 	docker-compose run --rm norm norminette ../*.[ch]
+
+clean:
+	rm ./parse_test
+	rm ./env_test
+	rm ./path_test
+	rm ./exec_test
+	rm ./command_exec_test
