@@ -25,7 +25,7 @@ int main(){
 
 		cmd_command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK(system("diff /etc/passwd output.txt") == 0);
+		CHECK(system("diff --color /etc/passwd output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -39,7 +39,7 @@ int main(){
 
 		cmd_command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK(system("diff /etc/passwd output.txt") == 0);
+		CHECK(system("diff --color /etc/passwd output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -77,7 +77,7 @@ int main(){
 
 		cmd_command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK(system("diff test.h output.txt") == 0);
+		CHECK(system("diff --color test.h output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -98,7 +98,7 @@ int main(){
 		cmd_command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd | wc > expected.txt ; diff expected.txt output.txt") == 0);
+		CHECK(system("cat /etc/passwd | wc > expected.txt ; diff --color expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -125,7 +125,7 @@ int main(){
 		cmd_command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd | wc | md5sum > expected.txt ; diff expected.txt output.txt") == 0);
+		CHECK(system("cat /etc/passwd | wc | md5sum > expected.txt ; diff --color expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -152,7 +152,7 @@ int main(){
 		cmd_command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd > /dev/null | wc | md5sum > expected.txt ; diff expected.txt output.txt") == 0);
+		CHECK(system("cat /etc/passwd > /dev/null | wc | md5sum > expected.txt ; diff --color expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -179,7 +179,7 @@ int main(){
 		cmd_command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat test.h | wc < test.c | md5sum > expected.txt ; diff expected.txt output.txt") == 0);
+		CHECK(system("cat test.h | wc < test.c | md5sum > expected.txt ; diff --color expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
