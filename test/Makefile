@@ -6,7 +6,8 @@ SRCS = ../env.c \
 	   ../parse2.c \
 	   ../exec.c \
 	   ../path.c \
-	   ../command_exec.c
+	   ../command_exec.c \
+	   ../command_exec_subfuncs.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h
