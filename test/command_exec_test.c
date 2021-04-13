@@ -25,7 +25,7 @@ int main(){
 
 		cmd_command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK(system("diff --color /etc/passwd output.txt") == 0);
+		CHECK(system("diff --color -u /etc/passwd output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -39,7 +39,7 @@ int main(){
 
 		cmd_command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK(system("diff --color /etc/passwd output.txt") == 0);
+		CHECK(system("diff --color -u /etc/passwd output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -77,7 +77,7 @@ int main(){
 
 		cmd_command_execution(&command);
 		free_ptrarr((void**)command.exec_and_args);
-		CHECK(system("diff --color test.h output.txt") == 0);
+		CHECK(system("diff --color -u test.h output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -98,21 +98,21 @@ int main(){
 		cmd_command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd | wc > expected.txt ; diff --color expected.txt output.txt") == 0);
+		CHECK(system("cat /etc/passwd | wc > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
-    TEST_SECTION("cat /etc/passwd | wc | md5sum > output.txt  パイプが2つの場合");
+    TEST_SECTION("cat /etc/passwd | wc | cat > output.txt  パイプが2つの場合");
     {
-		t_command_invocation md5sum_command;
-		md5sum_command.output_file_path = "output.txt";
-		md5sum_command.piped_command = NULL;
-		md5sum_command.input_file_path = NULL;
-		md5sum_command.exec_and_args = (const char**)ft_split("md5sum", ' ');
+		t_command_invocation lastcat_command;
+		lastcat_command.output_file_path = "output.txt";
+		lastcat_command.piped_command = NULL;
+		lastcat_command.input_file_path = NULL;
+		lastcat_command.exec_and_args = (const char**)ft_split("cat", ' ');
 
 		t_command_invocation wc_command;
 		wc_command.output_file_path = NULL;
-		wc_command.piped_command = &md5sum_command;
+		wc_command.piped_command = &lastcat_command;
 		wc_command.input_file_path = NULL;
 		wc_command.exec_and_args = (const char**)ft_split("wc", ' ');
 
@@ -125,21 +125,21 @@ int main(){
 		cmd_command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd | wc | md5sum > expected.txt ; diff --color expected.txt output.txt") == 0);
+		CHECK(system("cat /etc/passwd | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
-    TEST_SECTION("cat /etc/passwd > /dev/null | wc | md5sum > output.txt  パイプの最初のコマンドでリダイレクトがある");
+    TEST_SECTION("cat /etc/passwd > /dev/null | wc | cat > output.txt  パイプの最初のコマンドでリダイレクトがある");
     {
-		t_command_invocation md5sum_command;
-		md5sum_command.output_file_path = "output.txt";
-		md5sum_command.piped_command = NULL;
-		md5sum_command.input_file_path = NULL;
-		md5sum_command.exec_and_args = (const char**)ft_split("md5sum", ' ');
+		t_command_invocation lastcat_command;
+		lastcat_command.output_file_path = "output.txt";
+		lastcat_command.piped_command = NULL;
+		lastcat_command.input_file_path = NULL;
+		lastcat_command.exec_and_args = (const char**)ft_split("cat", ' ');
 
 		t_command_invocation wc_command;
 		wc_command.output_file_path = NULL;
-		wc_command.piped_command = &md5sum_command;
+		wc_command.piped_command = &lastcat_command;
 		wc_command.input_file_path = NULL;
 		wc_command.exec_and_args = (const char**)ft_split("wc", ' ');
 
@@ -152,21 +152,21 @@ int main(){
 		cmd_command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd > /dev/null | wc | md5sum > expected.txt ; diff --color expected.txt output.txt") == 0);
+		CHECK(system("cat /etc/passwd > /dev/null | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
-    TEST_SECTION("cat test.h | wc < test.c | md5sum > output.txt  パイプの真ん中のコマンドでリダイレクトがある");
+    TEST_SECTION("cat test.h | wc < test.c | cat > output.txt  パイプの真ん中のコマンドでリダイレクトがある");
     {
-		t_command_invocation md5sum_command;
-		md5sum_command.output_file_path = "output.txt";
-		md5sum_command.piped_command = NULL;
-		md5sum_command.input_file_path = NULL;
-		md5sum_command.exec_and_args = (const char**)ft_split("md5sum", ' ');
+		t_command_invocation lastcat_command;
+		lastcat_command.output_file_path = "output.txt";
+		lastcat_command.piped_command = NULL;
+		lastcat_command.input_file_path = NULL;
+		lastcat_command.exec_and_args = (const char**)ft_split("cat", ' ');
 
 		t_command_invocation wc_command;
 		wc_command.output_file_path = NULL;
-		wc_command.piped_command = &md5sum_command;
+		wc_command.piped_command = &lastcat_command;
 		wc_command.input_file_path = "test.c";
 		wc_command.exec_and_args = (const char**)ft_split("wc", ' ');
 
@@ -179,7 +179,7 @@ int main(){
 		cmd_command_execution(&cat_command);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat test.h | wc < test.c | md5sum > expected.txt ; diff --color expected.txt output.txt") == 0);
+		CHECK(system("cat test.h | wc < test.c | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
