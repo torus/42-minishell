@@ -5,6 +5,8 @@ SRCS = ../env.c \
 	   ../lexer1.c \
 	   ../lexer2.c \
 	   ../parse1.c \
+	   ../parse2.c \
+	   ../parse_utils.c \
 	   ../exec.c \
 	   ../path.c \
 	   ../command_exec.c
