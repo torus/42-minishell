@@ -119,7 +119,6 @@ t_parse_result	parse_sequential_commands(
 t_parse_result	parse_command_line(
 					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
 
-
 void			parse_skip_spaces(t_parse_buffer *buf, t_token *tok);
 
 void			parse_fatal_error(void);
