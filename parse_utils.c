@@ -7,7 +7,7 @@ void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
 	{
 		if (tok->type != TOKTYPE_SPACE)
 			break ;
-		token_get_token(buf, tok);
+		lex_get_token(buf, tok);
 	}
 }
 

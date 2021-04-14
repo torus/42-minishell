@@ -1,7 +1,7 @@
 #ifndef PARSE_H
 # define PARSE_H
 
-# include "token.h"
+# include "lexer.h"
 
 # define PARSE_BUFFER_SIZE 1024
 

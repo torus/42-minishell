@@ -26,7 +26,7 @@ t_parse_result	parse_piped_commands(
 	parse_skip_spaces(buf, tok);
 	if (tok->type == TOKTYPE_PIPE)
 	{
-		token_get_token(buf, tok);
+		lex_get_token(buf, tok);
 		parse_skip_spaces(buf, tok);
 		if (parse_piped_commands(buf, &rest_node, tok) != PARSE_OK)
 			return (PARSE_KO);
@@ -82,7 +82,7 @@ t_parse_result	parse_arguments(
 	if (!(parse_redirection(buf, &redirection_node, tok) == PARSE_OK)
 		&& !(parse_string(buf, &string_node, tok) == PARSE_OK))
 		return (PARSE_KO);
-	token_get_token(buf, tok);
+	lex_get_token(buf, tok);
 	parse_arguments(buf, &rest_node, tok);
 	content_node = malloc(sizeof(t_parse_node_arguments));
 	content_node->string_node = string_node;
@@ -121,7 +121,7 @@ t_parse_result	parse_string(
 	ft_memcpy(text, tok->text, tok->length);
 	text[tok->length] = '\0';
 	string->text = text;
-	token_get_token(buf, tok);
+	lex_get_token(buf, tok);
 	parse_string(buf, &string->next, tok);
 	*node = new_node;
 	return (PARSE_OK);
@@ -142,7 +142,7 @@ t_parse_result	parse_redirection(
 
 	if (tok->type != TOKTYPE_INPUT_REDIRECTION)
 		return (PARSE_KO);
-	token_get_token(buf, tok);
+	lex_get_token(buf, tok);
 	parse_skip_spaces(buf, tok);
 	if (parse_string(buf, &str_node, tok) == PARSE_OK)
 	{

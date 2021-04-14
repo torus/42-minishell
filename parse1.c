@@ -82,7 +82,7 @@ t_parse_result	parse_sequential_commands(
 	content->rest_node = NULL;
 	if (parse_delimiter(buf, &delimiter_node, tok) == PARSE_OK)
 	{
-		token_get_token(buf, tok);
+		lex_get_token(buf, tok);
 		parse_skip_spaces(buf, tok);
 		if (parse_sequential_commands(buf, &rest_node, tok) != PARSE_OK)
 			return (PARSE_KO);

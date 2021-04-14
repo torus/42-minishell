@@ -12,121 +12,121 @@ void test_lexer()
 {
 	TEST_CHAPTER("レキサー");
 
-	TEST_SECTION("token_getc");
+	TEST_SECTION("lex_getc");
 	{
 		t_parse_buffer buf;
 		init_buf_with_string(&buf, "abcde");
-		int x = token_getc(&buf);
+		int x = lex_getc(&buf);
 		CHECK_EQ(x, 'a');
-		x = token_getc(&buf);
+		x = lex_getc(&buf);
 		CHECK_EQ(x, 'b');
 	}
 
-	TEST_SECTION("token_read_word(buf, result)");
+	TEST_SECTION("lex_read_word(buf, result)");
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "cat ");
 		t_token	tok;
-		token_read_word(&buf, &tok);
+		lex_read_word(&buf, &tok);
 		CHECK_EQ(tok.length, 3);
 		CHECK(!strncmp(tok.text, "cat", 3));
 	}
 
-	TEST_SECTION("token_get_token クォートなしの場合");
+	TEST_SECTION("lex_get_token クォートなしの場合");
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "cat $ABC |wc> file.txt\n");
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ(tok.length, 3);
 		CHECK(!strncmp(tok.text, "cat", 3));
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SPACE);
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ(tok.length, 4);
 		CHECK(!strncmp(tok.text, "$ABC", 4));
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SPACE);
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_PIPE);
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ(tok.length, 2);
 		CHECK(!strncmp(tok.text, "wc", 2));
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_OUTPUT_REDIRECTION);
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SPACE);
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ(tok.length, 8);
 		CHECK(!strncmp(tok.text, "file.txt", 8));
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_NEWLINE);
 	}
 
-	TEST_SECTION("token_get_token クォートありの場合");
+	TEST_SECTION("lex_get_token クォートありの場合");
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "cat\"$ABC\"'wc'");
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ(tok.length, 3);
 		CHECK(!strncmp(tok.text, "cat", 3));
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE_QUOTED);
 		CHECK_EQ(tok.length, 4);
 		CHECK(!strncmp(tok.text, "$ABC", 4));
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
 		CHECK_EQ(tok.length, 2);
 		CHECK(!strncmp(tok.text, "wc", 2));
 	}
 
-	TEST_SECTION("token_get_token のこり");
+	TEST_SECTION("lex_get_token のこり");
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "cat < - ; ");
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ(tok.length, 3);
 		CHECK(!strncmp(tok.text, "cat", 3));
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SPACE);
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_INPUT_REDIRECTION);
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SPACE);
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ(tok.length, 1);
 		CHECK(!strncmp(tok.text, "-", 1));
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SPACE);
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SEMICOLON);
 	}
 }
@@ -204,7 +204,7 @@ void test_parser(void)
 		t_parse_ast_node	*node;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_string(&buf, &node, &tok);
 		CHECK_EQ(ret, PARSE_OK);
@@ -222,7 +222,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_redirection(&buf, &node, &tok);
 		CHECK_EQ(ret, PARSE_OK);
@@ -240,7 +240,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_arguments(&buf, &node, &tok);
 		CHECK_EQ(ret, PARSE_OK);
@@ -259,7 +259,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_arguments(&buf, &node, &tok);
 		CHECK_EQ(ret, PARSE_OK);
@@ -286,7 +286,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_arguments(&buf, &node, &tok);
 		CHECK_EQ(ret, PARSE_OK);
@@ -308,7 +308,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_arguments(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
@@ -322,7 +322,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_command(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
@@ -337,7 +337,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_piped_commands(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
@@ -360,7 +360,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 
 		int ret = parse_piped_commands(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
@@ -374,7 +374,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		int ret = parse_delimiter(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
         check_delimiter(node);
@@ -387,7 +387,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		int ret = parse_sequential_commands(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
         check_single_argument(
@@ -415,7 +415,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		int ret = parse_sequential_commands(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
 
@@ -429,7 +429,7 @@ void test_parser(void)
 		t_parse_ast_node	*node = NULL;
 		t_token	tok;
 
-		token_get_token(&buf, &tok);
+		lex_get_token(&buf, &tok);
 		int ret = parse_command_line(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
 

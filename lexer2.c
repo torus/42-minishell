@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "parse.h"
 
-int	token_is_special_char(char ch)
+int	lex_is_special_char(char ch)
 {
 	if (ch == ' ' || ch == '\t' || ch == '\n' || ch == ';'
 		|| ch == '|' || ch == '>' || ch == '<' || ch == '"' || ch == '\'')
@@ -9,7 +9,7 @@ int	token_is_special_char(char ch)
 	return (0);
 }
 
-int	token_read_word(t_parse_buffer *buf, t_token *result)
+int	lex_read_word(t_parse_buffer *buf, t_token *result)
 {
 	int	pos;
 	int	ch;
@@ -17,12 +17,12 @@ int	token_read_word(t_parse_buffer *buf, t_token *result)
 	pos = 0;
 	while (1)
 	{
-		ch = token_getc(buf);
+		ch = lex_getc(buf);
 		if (ch == EOF)
 			break ;
-		if (token_is_special_char(ch))
+		if (lex_is_special_char(ch))
 		{
-			token_ungetc(buf);
+			lex_ungetc(buf);
 			break ;
 		}
 		result->text[pos++] = ch;
@@ -31,7 +31,7 @@ int	token_read_word(t_parse_buffer *buf, t_token *result)
 	return (1);
 }
 
-int	token_read_double_quoted(t_parse_buffer *buf, t_token *result)
+int	lex_read_double_quoted(t_parse_buffer *buf, t_token *result)
 {
 	int	pos;
 	int	ch;
@@ -39,7 +39,7 @@ int	token_read_double_quoted(t_parse_buffer *buf, t_token *result)
 	pos = 0;
 	while (1)
 	{
-		ch = token_getc(buf);
+		ch = lex_getc(buf);
 		if (ch == '"' || ch == '\n' || ch == EOF)
 			break ;
 		result->text[pos++] = ch;
@@ -48,7 +48,7 @@ int	token_read_double_quoted(t_parse_buffer *buf, t_token *result)
 	return (1);
 }
 
-int	token_read_single_quoted(t_parse_buffer *buf, t_token *result)
+int	lex_read_single_quoted(t_parse_buffer *buf, t_token *result)
 {
 	int	pos;
 	int	ch;
@@ -56,7 +56,7 @@ int	token_read_single_quoted(t_parse_buffer *buf, t_token *result)
 	pos = 0;
 	while (1)
 	{
-		ch = token_getc(buf);
+		ch = lex_getc(buf);
 		if (ch == '\'' || ch == '\n' || ch == EOF)
 			break ;
 		result->text[pos++] = ch;
@@ -65,17 +65,17 @@ int	token_read_single_quoted(t_parse_buffer *buf, t_token *result)
 	return (1);
 }
 
-int	token_get_spaces(t_parse_buffer *buf, t_token *result, int ch)
+int	lex_get_spaces(t_parse_buffer *buf, t_token *result, int ch)
 {
 	if (ch == ' ' || ch == '\t')
 	{
 		while (1)
 		{
-			ch = token_getc(buf);
+			ch = lex_getc(buf);
 			if (ch != ' ' && ch != '\t')
 			{
 				if (ch != EOF)
-					token_ungetc(buf);
+					lex_ungetc(buf);
 				result->type = TOKTYPE_SPACE;
 				break ;
 			}
