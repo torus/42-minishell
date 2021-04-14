@@ -83,8 +83,8 @@ int	cmd_spawn_child(t_command_invocation *command)
 			close(pipe_prev_fd[1]);
 			if (dup2(pipe_prev_fd[0], STDIN_FILENO) == -1)
 				return (put_err_msg_and_ret("error child dup2()"));
-			close(pipe_fd[1]);
-			if (dup2(pipe_fd[0], STDOUT_FILENO) == -1)
+			close(pipe_fd[0]);
+			if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
 				return (put_err_msg_and_ret("error child dup2()"));
 			// 子プロセス
 			if (cmd_set_input_file(command) == ERROR
