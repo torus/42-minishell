@@ -28,6 +28,7 @@ typedef enum e_parse_ast_type
 	ASTNODE_PIPED_COMMANDS,
 	ASTNODE_DELIMITER,
 	ASTNODE_SEQ_COMMANDS,
+	ASTNODE_COMMAND_LINE,
 	ASTNODE_INVALID,
 }	t_parse_ast_type;
 
@@ -78,6 +79,12 @@ typedef struct s_parse_node_seqcmds
 	t_parse_ast_node	*rest_node;
 }	t_parse_node_seqcmds;
 
+typedef struct s_parse_node_cmdline
+{
+	t_parse_ast_node	*seqcmd_node;
+	t_parse_ast_node	*delimiter_node;
+}	t_parse_node_cmdline;
+
 typedef struct s_parse_ast_node
 {
 	t_parse_ast_type	type;
@@ -91,6 +98,7 @@ typedef struct s_parse_ast_node
 		t_parse_node_pipcmds		*piped_commands;
 		t_parse_node_delimiter		*delimiter;
 		t_parse_node_seqcmds		*sequential_commands;
+		t_parse_node_cmdline		*command_line;
 	}					content;
 }	t_parse_ast_node;
 
@@ -107,6 +115,8 @@ t_parse_result	parse_piped_commands(
 t_parse_result	parse_delimiter(
 					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
 t_parse_result	parse_sequential_commands(
+					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
+t_parse_result	parse_command_line(
 					t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok);
 
 

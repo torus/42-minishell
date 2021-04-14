@@ -32,7 +32,32 @@ t_parse_ast_node	*parse_new_ast_node(t_parse_ast_type type, void *content)
 **		"\n"
 **	  | sequential_commands delimiter "\n"
 **	  | sequential_commands "\n"
-**
+*/
+
+t_parse_result	parse_command_line(
+	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+{
+	t_parse_ast_node		*cmdline_node;
+	t_parse_ast_node		*seqcmd_node;
+	t_parse_ast_node		*delim_node;
+	t_parse_node_cmdline	*content_node;
+
+    if (parse_sequential_commands(buf, &seqcmd_node, tok) != PARSE_OK)
+        return (PARSE_KO);
+    delim_node = NULL;
+    parse_delimiter(buf, &delim_node, tok);
+    parse_skip_spaces(buf, tok);
+    if (tok->type != TOKTYPE_NEWLINE)
+        return (PARSE_KO);
+    content_node = malloc(sizeof(t_parse_node_cmdline));
+    cmdline_node = parse_new_ast_node(ASTNODE_COMMAND_LINE, content_node);
+    content_node->seqcmd_node = seqcmd_node;
+    content_node->delimiter_node = delim_node;
+    *node = cmdline_node;
+    return (PARSE_OK);
+}
+
+/*
 **delimiter ::=
 **		";"
 **	  | (bonus) "&"
@@ -55,6 +80,7 @@ t_parse_result	parse_delimiter(
 }
 
 /*
+** FIXME: this rule doesn't handle the "piped_commands delimiter \n" case.
 **sequential_commands ::=
 **		piped_commands delimiter sequential_commands
 **	  | piped_commands

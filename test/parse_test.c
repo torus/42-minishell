@@ -178,6 +178,21 @@ void check_delimiter(t_parse_ast_node *node)
     CHECK_EQ(node->content.delimiter->type, TOKTYPE_SEMICOLON);
 }
 
+void check_piped_seqence(t_parse_ast_node *node)
+{
+    check_piped_commands(node->content.sequential_commands->pipcmd_node);
+    check_delimiter(
+        node->content.sequential_commands
+        ->delimiter_node);
+    check_single_argument(
+        node->content.sequential_commands
+        ->rest_node->content.sequential_commands
+        ->pipcmd_node->content.piped_commands
+        ->command_node->content.command
+        ->arguments_node,
+        "xyz");
+}
+
 void test_parser(void)
 {
 	TEST_CHAPTER("パーサ");
@@ -404,17 +419,22 @@ void test_parser(void)
 		int ret = parse_sequential_commands(&buf, &node, &tok);
         CHECK_EQ(ret, PARSE_OK);
 
-        check_piped_commands(node->content.sequential_commands->pipcmd_node);
-        check_delimiter(
-            node->content.sequential_commands
-            ->delimiter_node);
-        check_single_argument(
-            node->content.sequential_commands
-            ->rest_node->content.sequential_commands
-            ->pipcmd_node->content.piped_commands
-            ->command_node->content.command
-            ->arguments_node,
-            "xyz");
+        check_piped_seqence(node);
+    }
+
+    TEST_SECTION("parse_command_line");
+    {
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, " abc | file < abc ; xyz \n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		token_get_token(&buf, &tok);
+		int ret = parse_command_line(&buf, &node, &tok);
+        CHECK_EQ(ret, PARSE_OK);
+
+        check_piped_seqence(node->content.command_line->seqcmd_node);
+        CHECK_EQ(node->content.command_line->delimiter_node, NULL);
     }
 }
 
