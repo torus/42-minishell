@@ -73,14 +73,9 @@ t_parse_result	parse_sequential_commands(
 	t_parse_ast_node		*rest_node;
     t_parse_node_seqcmds	*content;
 
-    printf("1 tok->type: %x\n", tok->type);
     parse_skip_spaces(buf, tok);
-    printf("2 tok->type: %x\n", tok->type);
 	if (parse_piped_commands(buf, &pipcmd_node, tok) != PARSE_OK)
 		return (PARSE_KO);
-
-    printf("3 tok->type: %x\n", tok->type);
-
     content = malloc(sizeof(t_parse_node_seqcmds));
     seq_node = parse_new_ast_node(ASTNODE_SEQ_COMMANDS, content);
     content->pipcmd_node = pipcmd_node;

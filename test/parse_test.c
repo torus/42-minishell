@@ -365,7 +365,7 @@ void test_parser(void)
         check_delimiter(node);
 	}
 
-    TEST_SECTION("parse_sequential_commands");
+    TEST_SECTION("parse_sequential_commands 単純なケース");
     {
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, " abc ; xyz \n");
@@ -381,6 +381,30 @@ void test_parser(void)
             ->command_node->content.command
             ->arguments_node,
             "abc");
+        check_delimiter(
+            node->content.sequential_commands
+            ->delimiter_node);
+        check_single_argument(
+            node->content.sequential_commands
+            ->rest_node->content.sequential_commands
+            ->pipcmd_node->content.piped_commands
+            ->command_node->content.command
+            ->arguments_node,
+            "xyz");
+    }
+
+    TEST_SECTION("parse_sequential_commands パイプあり");
+    {
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, " abc | file < abc ; xyz \n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		token_get_token(&buf, &tok);
+		int ret = parse_sequential_commands(&buf, &node, &tok);
+        CHECK_EQ(ret, PARSE_OK);
+
+        check_piped_commands(node->content.sequential_commands->pipcmd_node);
         check_delimiter(
             node->content.sequential_commands
             ->delimiter_node);
