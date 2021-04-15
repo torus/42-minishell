@@ -59,15 +59,15 @@ int	cmd_spawn_child(t_command_invocation *command)
 	int		pipe_fd[2];
 	int		pipe_prev_fd[2];
 	pid_t	pid;
+	t_list	*lst;
 
 	pipe_prev_fd[0] = STDIN_FILENO;
 	pipe_prev_fd[1] = -1;
+	lst = NULL;
 	while (command->piped_command)
 	{
 		if (pipe(pipe_fd) == -1)
 			return (put_err_msg_and_ret("error pipe()"));
-		// fd_in = pipe_fd[0];
-		// fd_out = pipe_fd[1];
 		pid = fork();
 		if (pid < 0)
 			return (put_err_msg_and_ret("error fork()"));
@@ -76,30 +76,49 @@ int	cmd_spawn_child(t_command_invocation *command)
 			// 親プロセス
 			pipe_prev_fd[0] = pipe_fd[0];
 			pipe_prev_fd[1] = pipe_fd[1];
+			int *pidptr = malloc(sizeof(int));  // TODO: malloc NULL check
+			*pidptr = pid;
+			ft_lstadd_back_new(&lst, (void *)pidptr);
 		}
 		else
 		{
+			printf("--------------- %s 実行準備! ---------------\n", command->exec_and_args[0]);
+			printf("%s: pipe_prev_fd = [%d, %d]\n", command->exec_and_args[0], pipe_prev_fd[0], pipe_prev_fd[1]);
+			printf("%s: pipe_fd = [%d, %d]\n", command->exec_and_args[0], pipe_fd[0], pipe_fd[1]);
+			printf("%s: input: %d, output: %d\n", command->exec_and_args[0], pipe_prev_fd[0], pipe_fd[1]);
+
 			// パイプを繋げて受信できるようにする
 			close(pipe_prev_fd[1]);
 			if (dup2(pipe_prev_fd[0], STDIN_FILENO) == -1)
-				return (put_err_msg_and_ret("error child dup2()"));
+				put_err_msg_and_exit("error child dup2()");
 			close(pipe_fd[0]);
 			if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
-				return (put_err_msg_and_ret("error child dup2()"));
+				put_err_msg_and_exit("error child dup2()");
 			// 子プロセス
 			if (cmd_set_input_file(command) == ERROR
 				|| cmd_set_output_file(command) == ERROR)
-				return (put_err_msg_and_ret("error input/output file"));
+				put_err_msg_and_exit("error input/output file");
+			printf("--------------- %s 実行開始! ---------------\n", command->exec_and_args[0]);
 			cmd_execvp((char *)command->exec_and_args[0], (char **) command->exec_and_args);
 		}
 		command = command->piped_command;
 	}
+	printf("--------------- パイプ待機! ---------------\n");
+	while (lst)
+	{
+		printf("%dを待つぞ!\n",*((int *)lst->content));
+		waitpid(*((int *)lst->content), NULL, 0);  // TODO: free lst
+		lst = lst->next;
+	}
+	printf("--------------- パイプ実行終了! ---------------\n");
 	// パイプを繋げて受信できるようにしてexecvp
 	close(pipe_prev_fd[1]);
 	if (dup2(pipe_prev_fd[0], STDIN_FILENO) == -1)
-		return (put_err_msg_and_ret("error child dup2()"));
+		put_err_msg_and_exit("error child dup2()");
+	printf("last command: input: %d, output: %d\n", pipe_prev_fd[0], STDOUT_FILENO);
 	if (cmd_set_input_file(command) == ERROR || cmd_set_output_file(command) == ERROR)
-		return (put_err_msg_and_ret("error input/output file"));
+		put_err_msg_and_exit("error input/output file");
+	printf("--------------- last %s 実行開始! ---------------\n", command->exec_and_args[0]);
 	cmd_execvp((char *)command->exec_and_args[0],
 		(char **)command->exec_and_args);
 	return (ERROR);
