@@ -22,6 +22,8 @@ static void	cmd_print_command(t_command_invocation *command)
 
 /*
  * fork and execute commands.
+ *
+ * return: status of last command
  */
 int	cmd_command_execution(t_command_invocation *command)
 {
