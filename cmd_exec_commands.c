@@ -34,7 +34,7 @@ int	cmd_command_execution(t_command_invocation *command)
 	t_list	*pid_lst;
 
 	cmd_print_command(command);
-	init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);
+	cmd_init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);
 	pid_lst = NULL;
 	while (command)
 	{
