@@ -38,4 +38,3 @@ int	cmd_wait_pid_lst(t_list *lst)
 	}
 	return (status);
 }
-
