@@ -91,7 +91,6 @@ int	cmd_spawn_child(t_command_invocation *command)
 	int		pipe_prev_fd[2];
 	pid_t	pid;
 	t_list	*lst;
-	int		*pidptr;
 
 	pipe_prev_fd[0] = STDIN_FILENO;
 	pipe_prev_fd[1] = -1;
@@ -111,9 +110,8 @@ int	cmd_spawn_child(t_command_invocation *command)
 				cmd_close_pipe(pipe_prev_fd);
 			// 親プロセス
 			cmd_copy_pipe(pipe_prev_fd, pipe_fd);
-			pidptr = malloc(sizeof(int));  // TODO: malloc NULL check
-			*pidptr = pid;
-			ft_lstadd_back_new(&lst, (void *)pidptr);
+			if (!cmd_lstadd_back_pid(&lst, pid))
+				return (put_err_msg_and_ret("error lst add pid"));
 		}
 		else
 			cmd_exec_cmd(command, pipe_prev_fd, pipe_fd);
