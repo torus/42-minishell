@@ -77,6 +77,18 @@ void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_f
 	put_err_msg_and_exit("error command execution");
 }
 
+int	cmd_wait_pid_lst(t_list *lst)
+{
+	int	status;
+
+	while (lst)
+	{
+		waitpid(*((int *)lst->content), &status, 0);
+		lst = lst->next;
+	}
+	return (status);
+}
+
 /*
  * exec command in child process.
  *
@@ -118,11 +130,8 @@ int	cmd_spawn_child(t_command_invocation *command)
 		command = command->piped_command;
 	}
 	// 最後のコマンド以外のプロセスが終了するのを待つ
-	while (lst)
-	{
-		waitpid(*((int *)lst->content), NULL, 0);  // TODO: free lst
-		lst = lst->next;
-	}
+	cmd_wait_pid_lst(lst);
+	ft_lstclear(&lst, free);
 	// パイプを繋げて受信できるようにしてexecvp
 	cmd_exec_cmd(command, pipe_prev_fd, NULL);
 	return (ERROR);
