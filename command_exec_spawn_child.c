@@ -77,18 +77,6 @@ void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_f
 	put_err_msg_and_exit("error command execution");
 }
 
-int	cmd_wait_pid_lst(t_list *lst)
-{
-	int	status;
-
-	while (lst)
-	{
-		waitpid(*((int *)lst->content), &status, 0);
-		lst = lst->next;
-	}
-	return (status);
-}
-
 /*
  * exec command in child process.
  *

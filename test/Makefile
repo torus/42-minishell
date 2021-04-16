@@ -9,7 +9,8 @@ SRCS = ../env.c \
 	   ../path.c \
 	   ../command_exec.c \
 	   ../command_exec_spawn_child.c \
-	   ../cmd_pipe.c
+	   ../cmd_pipe.c \
+	   ../cmd_pid.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h

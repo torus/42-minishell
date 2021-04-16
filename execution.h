@@ -31,5 +31,6 @@ int		cmd_spawn_child(t_command_invocation *command);
 void	cmd_close_pipe(int pipe_fd[2]);
 void	cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 t_list	*cmd_lstadd_back_pid(t_list **lst, int pid);
+int		cmd_wait_pid_lst(t_list *lst);
 
 #endif
