@@ -2,76 +2,60 @@
 #include "execution.h"
 
 /*
- * open input file as stdin if command->input_file_path is exist
- *
- * command: command.
- *
- * return: return -1 if error has occurred, otherwise, return 0.
+ * print t_command_invocation's attributes
  */
-int	cmd_set_input_file(t_command_invocation *command)
+static void	cmd_print_command(t_command_invocation *command)
 {
-	int	fd;
+	size_t	i;
 
-	if (command->input_file_path)
-	{
-		fd = open(command->input_file_path, O_RDONLY);
-		if (fd == -1)
-			return (put_err_msg_and_ret("error open()"));
-		if (dup2(fd, STDIN_FILENO) == -1)
-			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
-	}
-	return (0);
+	printf("output_file_path: %s\n", command->output_file_path);
+	printf("input_file_path: %s\n", command->input_file_path);
+	printf("command: ");
+	i = 0;
+	while (command->exec_and_args[i])
+		printf("%s ", command->exec_and_args[i++]);
+	printf("\n");
+	printf("piped_command: %p\n", command->piped_command);
+	if (command->piped_command)
+		cmd_print_command(command->piped_command);
 }
 
 /*
- * open output file as stdout if command->output_file_path is exist
- *
- * command: command.
- *
- * return: return -1 if error has occurred, otherwise, return 0.
+ * fork and execute commands.
  */
-int	cmd_set_output_file(t_command_invocation *command)
+int	cmd_command_execution(t_command_invocation *command)
 {
-	int	fd;
+	pid_t	pid;
+	int		status;
+	int		pipe_fd[2];
+	int		pipe_prev_fd[2];
+	t_list	*lst;
 
-	if (command->output_file_path)
+	cmd_print_command(command);
+	init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);
+	lst = NULL;
+	while (command)
 	{
-		fd = open(command->output_file_path, O_WRONLY | O_CREAT,
-				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
-		if (fd == -1)
-			return (put_err_msg_and_ret("error open()"));
-		if (dup2(fd, STDOUT_FILENO) == -1)
-			return (put_err_msg_and_ret("error dup2(fd, STDOUT_NO)"));
+		if (!command->piped_command)
+			pipe_fd[1] = STDOUT_FILENO;
+		if (pipe(pipe_fd) == -1)
+			return (put_err_msg_and_ret("error pipe()"));
+		pid = fork();
+		if (pid < 0)
+			return (put_err_msg_and_ret("error fork()"));
+		else if (pid > 0)
+		{
+			if (pipe_prev_fd[0] != STDIN_FILENO)
+				cmd_close_pipe(pipe_prev_fd);
+			cmd_copy_pipe(pipe_prev_fd, pipe_fd);
+			if (!cmd_lstadd_back_pid(&lst, pid))
+				return (put_err_msg_and_ret("error lst add pid"));
+		}
+		else
+			cmd_exec_cmd(command, pipe_prev_fd, pipe_fd);
+		command = command->piped_command;
 	}
-	return (0);
-}
-
-/*
- * execute one command.
- *
- * command: command
- * pipe_prev_fd[2]: A pipe that connects the previous and current process.
- * pipe_fd[2]: A pipe that connects the current and next process.
- */
-void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_fd[2])
-{
-	if (pipe_prev_fd)
-	{
-		close(pipe_prev_fd[1]);
-		if (dup2(pipe_prev_fd[0], STDIN_FILENO) == -1)
-			put_err_msg_and_exit("error child dup2()");
-		close(pipe_prev_fd[0]);
-	}
-	if (pipe_fd)
-	{
-		close(pipe_fd[0]);
-		if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
-			put_err_msg_and_exit("error child dup2()");
-		close(pipe_fd[1]);
-	}
-	if (cmd_set_input_file(command) == ERROR
-		|| cmd_set_output_file(command) == ERROR)
-		put_err_msg_and_exit("error input/output file");
-	cmd_execvp((char *)command->exec_and_args[0], (char **) command->exec_and_args);
-	put_err_msg_and_exit("error command execution");
+	status = cmd_wait_pid_lst(lst);
+	ft_lstclear(&lst, free);
+	return (status);
 }

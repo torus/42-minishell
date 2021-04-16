@@ -7,7 +7,7 @@ SRCS = ../env.c \
 	   ../parse1.c \
 	   ../exec.c \
 	   ../path.c \
-	   ../command_exec.c \
+	   ../cmd_exec_command.c \
 	   ../cmd_exec_commands.c \
 	   ../cmd_pipe.c \
 	   ../cmd_pid.c
