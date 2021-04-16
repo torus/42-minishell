@@ -54,7 +54,7 @@ int	cmd_exec_commands(t_command_invocation *command)
 				return (put_err_msg_and_ret("error pid_lst add pid"));
 		}
 		else
-			cmd_exec_cmd(command, pipe_prev_fd, pipe_fd);
+			cmd_exec_command(command, pipe_prev_fd, pipe_fd);
 		command = command->piped_command;
 	}
 	status = cmd_wait_pid_lst(pid_lst);

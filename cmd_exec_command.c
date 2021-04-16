@@ -53,7 +53,7 @@ int	cmd_set_output_file(t_command_invocation *command)
  * pipe_prev_fd[2]: A pipe that connects the previous and current process.
  * pipe_fd[2]: A pipe that connects the current and next process.
  */
-void	cmd_exec_cmd(t_command_invocation *command,
+void	cmd_exec_command(t_command_invocation *command,
 	int pipe_prev_fd[2], int pipe_fd[2])
 {
 	if (pipe_prev_fd)
