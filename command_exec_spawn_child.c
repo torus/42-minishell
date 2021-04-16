@@ -53,7 +53,7 @@ int	cmd_set_output_file(t_command_invocation *command)
  * pipe_prev_fd[2]: 前のプロセスとのパイプ
  * pipe_fd[2]: 次のプロセスとのパイプ
  */
-void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_fd[2])
+static void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_fd[2])
 {
 	// パイプを繋げて受信できるようにする
 	if (pipe_prev_fd)
