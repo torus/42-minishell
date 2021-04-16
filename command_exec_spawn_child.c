@@ -47,15 +47,14 @@ int	cmd_set_output_file(t_command_invocation *command)
 }
 
 /*
- * 最初と中間(最後以外)のコマンドを実行する
+ * execute one command.
  *
- * command: コマンド
- * pipe_prev_fd[2]: 前のプロセスとのパイプ
- * pipe_fd[2]: 次のプロセスとのパイプ
+ * command: command
+ * pipe_prev_fd[2]: A pipe that connects the previous and current process.
+ * pipe_fd[2]: A pipe that connects the current and next process.
  */
 static void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_fd[2])
 {
-	// パイプを繋げて受信できるようにする
 	if (pipe_prev_fd)
 	{
 		close(pipe_prev_fd[1]);
@@ -78,9 +77,9 @@ static void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int
 }
 
 /*
- * exec command in child process.
+ * execute commands in child process.
  *
- * command: information of execution command.
+ * command: command.
  *
  * return: If exec command successful, no value will be returned.
  *         This function returning value means exec or other function is failed.
