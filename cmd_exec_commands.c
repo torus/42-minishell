@@ -25,7 +25,7 @@ static void	cmd_print_command(t_command_invocation *command)
  *
  * return: status of last command
  */
-int	cmd_command_execution(t_command_invocation *command)
+int	cmd_exec_commands(t_command_invocation *command)
 {
 	pid_t	pid;
 	int		status;

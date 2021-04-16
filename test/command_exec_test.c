@@ -11,7 +11,7 @@ int main(){
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("echo hello", ' ');
 
-		int status = cmd_command_execution(&command);
+		int status = cmd_exec_commands(&command);
 		CHECK_EQ(status, 0);
 		free_ptrarr((void**)command.exec_and_args);
     }
@@ -24,7 +24,7 @@ int main(){
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
-		int status = cmd_command_execution(&command);
+		int status = cmd_exec_commands(&command);
 		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u /etc/passwd output.txt") == 0);
 		free_ptrarr((void**)command.exec_and_args);
@@ -39,7 +39,7 @@ int main(){
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("/usr/bin/cat /etc/passwd", ' ');
 
-		int status = cmd_command_execution(&command);
+		int status = cmd_exec_commands(&command);
 		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u /etc/passwd output.txt") == 0);
 		free_ptrarr((void**)command.exec_and_args);
@@ -54,7 +54,7 @@ int main(){
 		command.input_file_path = "Makefile";
 		command.exec_and_args = (const char**)ft_split("cat", ' ');
 
-		int status = cmd_command_execution(&command);
+		int status = cmd_exec_commands(&command);
 		CHECK_EQ(status, 0);
 		free_ptrarr((void**)command.exec_and_args);
     }
@@ -67,7 +67,7 @@ int main(){
 		command.input_file_path = "Makefile";
 		command.exec_and_args = (const char**)ft_split("/usr/bin/cat", ' ');
 
-		int status = cmd_command_execution(&command);
+		int status = cmd_exec_commands(&command);
 		CHECK_EQ(status, 0);
 		free_ptrarr((void**)command.exec_and_args);
     }
@@ -80,7 +80,7 @@ int main(){
 		command.input_file_path = "test.h";
 		command.exec_and_args = (const char**)ft_split("cat", ' ');
 
-		int status = cmd_command_execution(&command);
+		int status = cmd_exec_commands(&command);
 		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u test.h output.txt") == 0);
 		free_ptrarr((void**)command.exec_and_args);
@@ -101,7 +101,7 @@ int main(){
 		cat_command.input_file_path = NULL;
 		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
-		int status = cmd_command_execution(&cat_command);
+		int status = cmd_exec_commands(&cat_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat /etc/passwd | wc > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		free_ptrarr((void**)cat_command.exec_and_args);
@@ -129,7 +129,7 @@ int main(){
 		cat_command.input_file_path = NULL;
 		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
-		int status = cmd_command_execution(&cat_command);
+		int status = cmd_exec_commands(&cat_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat /etc/passwd | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		free_ptrarr((void**)cat_command.exec_and_args);
@@ -157,7 +157,7 @@ int main(){
 		cat_command.input_file_path = NULL;
 		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
-		int status = cmd_command_execution(&cat_command);
+		int status = cmd_exec_commands(&cat_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat /etc/passwd > /dev/null | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		free_ptrarr((void**)cat_command.exec_and_args);
@@ -185,7 +185,7 @@ int main(){
 		cat_command.input_file_path = NULL;
 		cat_command.exec_and_args = (const char**)ft_split("cat test.h", ' ');
 
-		int status = cmd_command_execution(&cat_command);
+		int status = cmd_exec_commands(&cat_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat test.h | wc < test.c | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		free_ptrarr((void**)cat_command.exec_and_args);
@@ -201,7 +201,7 @@ int main(){
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("echo", ' ');
 
-		int status = cmd_command_execution(&command);
+		int status = cmd_exec_commands(&command);
 		CHECK(status == 0);
 		free_ptrarr((void**)command.exec_and_args);
     }
@@ -214,7 +214,7 @@ int main(){
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("not_exists", ' ');
 
-		int status = cmd_command_execution(&command);
+		int status = cmd_exec_commands(&command);
 		CHECK(status != 0);
 		free_ptrarr((void**)command.exec_and_args);
     }
