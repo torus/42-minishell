@@ -47,6 +47,37 @@ int	cmd_set_output_file(t_command_invocation *command)
 }
 
 /*
+ * 最初と中間(最後以外)のコマンドを実行する
+ *
+ * command: コマンド
+ * pipe_prev_fd[2]: 前のプロセスとのパイプ
+ * pipe_fd[2]: 次のプロセスとのパイプ
+ */
+void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_fd[2])
+{
+	// パイプを繋げて受信できるようにする
+	if (pipe_prev_fd)
+	{
+		close(pipe_prev_fd[1]);
+		if (dup2(pipe_prev_fd[0], STDIN_FILENO) == -1)
+			put_err_msg_and_exit("error child dup2()");
+		close(pipe_prev_fd[0]);
+	}
+	if (pipe_fd)
+	{
+		close(pipe_fd[0]);
+		if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+			put_err_msg_and_exit("error child dup2()");
+		close(pipe_fd[1]);
+	}
+	if (cmd_set_input_file(command) == ERROR
+		|| cmd_set_output_file(command) == ERROR)
+		put_err_msg_and_exit("error input/output file");
+	cmd_execvp((char *)command->exec_and_args[0], (char **) command->exec_and_args);
+	put_err_msg_and_exit("error command execution");
+}
+
+/*
  * exec command in child process.
  *
  * command: information of execution command.
@@ -60,6 +91,7 @@ int	cmd_spawn_child(t_command_invocation *command)
 	int		pipe_prev_fd[2];
 	pid_t	pid;
 	t_list	*lst;
+	int		*pidptr;
 
 	pipe_prev_fd[0] = STDIN_FILENO;
 	pipe_prev_fd[1] = -1;
@@ -74,34 +106,17 @@ int	cmd_spawn_child(t_command_invocation *command)
 		else if (pid > 0)
 		{
 			// 各pipeは親・子プロセス全体で入り口・出口を1つずつにしないといけない
+			// 最初のコマンドでは前のプロセスとのパイプはないのでcloseしない
 			if (pipe_prev_fd[0] != STDIN_FILENO)
-			{
-				close(pipe_prev_fd[0]);
-				close(pipe_prev_fd[1]);
-			}
+				cmd_close_pipe(pipe_prev_fd);
 			// 親プロセス
-			pipe_prev_fd[0] = pipe_fd[0];
-			pipe_prev_fd[1] = pipe_fd[1];
-			int *pidptr = malloc(sizeof(int));  // TODO: malloc NULL check
+			cmd_copy_pipe(pipe_prev_fd, pipe_fd);
+			pidptr = malloc(sizeof(int));  // TODO: malloc NULL check
 			*pidptr = pid;
 			ft_lstadd_back_new(&lst, (void *)pidptr);
 		}
 		else
-		{
-			// パイプを繋げて受信できるようにする
-			close(pipe_prev_fd[1]);
-			if (dup2(pipe_prev_fd[0], STDIN_FILENO) == -1)
-				put_err_msg_and_exit("error child dup2()");
-			close(pipe_prev_fd[0]);
-			close(pipe_fd[0]);
-			if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
-				put_err_msg_and_exit("error child dup2()");
-			close(pipe_fd[1]);
-			if (cmd_set_input_file(command) == ERROR
-				|| cmd_set_output_file(command) == ERROR)
-				put_err_msg_and_exit("error input/output file");
-			cmd_execvp((char *)command->exec_and_args[0], (char **) command->exec_and_args);
-		}
+			cmd_exec_cmd(command, pipe_prev_fd, pipe_fd);
 		command = command->piped_command;
 	}
 	// 最後のコマンド以外のプロセスが終了するのを待つ
@@ -111,12 +126,6 @@ int	cmd_spawn_child(t_command_invocation *command)
 		lst = lst->next;
 	}
 	// パイプを繋げて受信できるようにしてexecvp
-	close(pipe_prev_fd[1]);
-	if (dup2(pipe_prev_fd[0], STDIN_FILENO) == -1)
-		put_err_msg_and_exit("error child dup2()");
-	if (cmd_set_input_file(command) == ERROR || cmd_set_output_file(command) == ERROR)
-		put_err_msg_and_exit("error input/output file");
-	cmd_execvp((char *)command->exec_and_args[0],
-		(char **)command->exec_and_args);
+	cmd_exec_cmd(command, pipe_prev_fd, NULL);
 	return (ERROR);
 }
