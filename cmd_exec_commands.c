@@ -103,11 +103,8 @@ int	cmd_exec_commands(t_command_invocation *command)
 			return (put_err_msg_and_ret("error fork()"));
 		else if (pid > 0)
 		{
-			// 各pipeは親・子プロセス全体で入り口・出口を1つずつにしないといけない
-			// 最初のコマンドでは前のプロセスとのパイプはないのでcloseしない
 			if (pipe_prev_fd[0] != STDIN_FILENO)
 				cmd_close_pipe(pipe_prev_fd);
-			// 親プロセス
 			cmd_copy_pipe(pipe_prev_fd, pipe_fd);
 			if (!cmd_lstadd_back_pid(&lst, pid))
 				return (put_err_msg_and_ret("error lst add pid"));
@@ -116,10 +113,8 @@ int	cmd_exec_commands(t_command_invocation *command)
 			cmd_exec_cmd(command, pipe_prev_fd, pipe_fd);
 		command = command->piped_command;
 	}
-	// 最後のコマンド以外のプロセスが終了するのを待つ
 	cmd_wait_pid_lst(lst);
 	ft_lstclear(&lst, free);
-	// パイプを繋げて受信できるようにしてexecvp
 	cmd_exec_cmd(command, pipe_prev_fd, NULL);
 	return (ERROR);
 }
