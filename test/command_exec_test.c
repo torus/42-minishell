@@ -193,6 +193,32 @@ int main(){
 		remove("output.txt");
     }
 
+    TEST_SECTION("存在するコマンドを実行すると返り値は0になる");
+    {
+		t_command_invocation command;
+		command.output_file_path = NULL;
+		command.piped_command = NULL;
+		command.input_file_path = NULL;
+		command.exec_and_args = (const char**)ft_split("echo", ' ');
+
+		int status = cmd_command_execution(&command);
+		CHECK(status == 0);
+		free_ptrarr((void**)command.exec_and_args);
+    }
+
+    TEST_SECTION("存在しないコマンドを実行すると返り値は0以外になる");
+    {
+		t_command_invocation command;
+		command.output_file_path = NULL;
+		command.piped_command = NULL;
+		command.input_file_path = NULL;
+		command.exec_and_args = (const char**)ft_split("not_exists", ' ');
+
+		int status = cmd_command_execution(&command);
+		CHECK(status != 0);
+		free_ptrarr((void**)command.exec_and_args);
+    }
+
 	int fail_count = print_result();
 	return (fail_count);
 }
