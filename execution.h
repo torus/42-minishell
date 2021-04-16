@@ -27,7 +27,8 @@ int		cmd_execvp(char *filename, char **argv);
 int		cmd_command_execution(t_command_invocation *command);
 int		cmd_set_input_file(t_command_invocation *command);
 int		cmd_set_output_file(t_command_invocation *command);
-void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_fd[2]);
+void	cmd_exec_cmd(t_command_invocation *command,
+			int pipe_prev_fd[2], int pipe_fd[2]);
 void	cmd_close_pipe(int pipe_fd[2]);
 void	cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 void	init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
