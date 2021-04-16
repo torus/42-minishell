@@ -53,7 +53,8 @@ int	cmd_set_output_file(t_command_invocation *command)
  * pipe_prev_fd[2]: A pipe that connects the previous and current process.
  * pipe_fd[2]: A pipe that connects the current and next process.
  */
-void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_fd[2])
+void	cmd_exec_cmd(t_command_invocation *command,
+	int pipe_prev_fd[2], int pipe_fd[2])
 {
 	if (pipe_prev_fd)
 	{
@@ -72,6 +73,7 @@ void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int pipe_f
 	if (cmd_set_input_file(command) == ERROR
 		|| cmd_set_output_file(command) == ERROR)
 		put_err_msg_and_exit("error input/output file");
-	cmd_execvp((char *)command->exec_and_args[0], (char **) command->exec_and_args);
+	cmd_execvp((char *)command->exec_and_args[0],
+		(char **) command->exec_and_args);
 	put_err_msg_and_exit("error command execution");
 }
