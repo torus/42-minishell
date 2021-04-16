@@ -38,7 +38,7 @@ int	cmd_command_execution(t_command_invocation *command)
 	}
 	else
 	{
-		status = cmd_spawn_child(command);
+		status = cmd_exec_commands(command);
 	}
 	return (status);
 }

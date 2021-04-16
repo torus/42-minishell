@@ -85,7 +85,7 @@ static void	cmd_exec_cmd(t_command_invocation *command, int pipe_prev_fd[2], int
  * return: If exec command successful, no value will be returned.
  *         This function returning value means exec or other function is failed.
  */
-int	cmd_spawn_child(t_command_invocation *command)
+int	cmd_exec_commands(t_command_invocation *command)
 {
 	int		pipe_fd[2];
 	int		pipe_prev_fd[2];
