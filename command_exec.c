@@ -21,7 +21,7 @@ static void	cmd_print_command(t_command_invocation *command)
 }
 
 /*
- * fork and execute command.
+ * fork and execute commands.
  */
 int	cmd_command_execution(t_command_invocation *command)
 {
