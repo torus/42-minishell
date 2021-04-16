@@ -11,7 +11,8 @@ int main(){
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("echo hello", ' ');
 
-		cmd_command_execution(&command);
+		int status = cmd_command_execution(&command);
+		CHECK_EQ(status, 0);
 		free_ptrarr((void**)command.exec_and_args);
     }
 
@@ -23,9 +24,10 @@ int main(){
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
-		cmd_command_execution(&command);
-		free_ptrarr((void**)command.exec_and_args);
+		int status = cmd_command_execution(&command);
+		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u /etc/passwd output.txt") == 0);
+		free_ptrarr((void**)command.exec_and_args);
 		remove("output.txt");
     }
 
@@ -37,9 +39,10 @@ int main(){
 		command.input_file_path = NULL;
 		command.exec_and_args = (const char**)ft_split("/usr/bin/cat /etc/passwd", ' ');
 
-		cmd_command_execution(&command);
-		free_ptrarr((void**)command.exec_and_args);
+		int status = cmd_command_execution(&command);
+		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u /etc/passwd output.txt") == 0);
+		free_ptrarr((void**)command.exec_and_args);
 		remove("output.txt");
     }
 
@@ -51,7 +54,8 @@ int main(){
 		command.input_file_path = "Makefile";
 		command.exec_and_args = (const char**)ft_split("cat", ' ');
 
-		cmd_command_execution(&command);
+		int status = cmd_command_execution(&command);
+		CHECK_EQ(status, 0);
 		free_ptrarr((void**)command.exec_and_args);
     }
 
@@ -63,7 +67,8 @@ int main(){
 		command.input_file_path = "Makefile";
 		command.exec_and_args = (const char**)ft_split("/usr/bin/cat", ' ');
 
-		cmd_command_execution(&command);
+		int status = cmd_command_execution(&command);
+		CHECK_EQ(status, 0);
 		free_ptrarr((void**)command.exec_and_args);
     }
 
@@ -75,9 +80,10 @@ int main(){
 		command.input_file_path = "test.h";
 		command.exec_and_args = (const char**)ft_split("cat", ' ');
 
-		cmd_command_execution(&command);
-		free_ptrarr((void**)command.exec_and_args);
+		int status = cmd_command_execution(&command);
+		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u test.h output.txt") == 0);
+		free_ptrarr((void**)command.exec_and_args);
 		remove("output.txt");
     }
 
@@ -95,10 +101,11 @@ int main(){
 		cat_command.input_file_path = NULL;
 		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
-		cmd_command_execution(&cat_command);
+		int status = cmd_command_execution(&cat_command);
+		CHECK_EQ(status, 0);
+		CHECK(system("cat /etc/passwd | wc > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd | wc > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -122,10 +129,11 @@ int main(){
 		cat_command.input_file_path = NULL;
 		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
-		cmd_command_execution(&cat_command);
+		int status = cmd_command_execution(&cat_command);
+		CHECK_EQ(status, 0);
+		CHECK(system("cat /etc/passwd | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -149,10 +157,11 @@ int main(){
 		cat_command.input_file_path = NULL;
 		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
 
-		cmd_command_execution(&cat_command);
+		int status = cmd_command_execution(&cat_command);
+		CHECK_EQ(status, 0);
+		CHECK(system("cat /etc/passwd > /dev/null | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat /etc/passwd > /dev/null | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
@@ -176,10 +185,11 @@ int main(){
 		cat_command.input_file_path = NULL;
 		cat_command.exec_and_args = (const char**)ft_split("cat test.h", ' ');
 
-		cmd_command_execution(&cat_command);
+		int status = cmd_command_execution(&cat_command);
+		CHECK_EQ(status, 0);
+		CHECK(system("cat test.h | wc < test.c | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
-		CHECK(system("cat test.h | wc < test.c | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
 		remove("output.txt");
     }
 
