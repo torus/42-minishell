@@ -31,11 +31,11 @@ int	cmd_command_execution(t_command_invocation *command)
 	int		status;
 	int		pipe_fd[2];
 	int		pipe_prev_fd[2];
-	t_list	*lst;
+	t_list	*pid_lst;
 
 	cmd_print_command(command);
 	init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);
-	lst = NULL;
+	pid_lst = NULL;
 	while (command)
 	{
 		if (!command->piped_command)
@@ -50,14 +50,14 @@ int	cmd_command_execution(t_command_invocation *command)
 			if (pipe_prev_fd[0] != STDIN_FILENO)
 				cmd_close_pipe(pipe_prev_fd);
 			cmd_copy_pipe(pipe_prev_fd, pipe_fd);
-			if (!cmd_lstadd_back_pid(&lst, pid))
-				return (put_err_msg_and_ret("error lst add pid"));
+			if (!cmd_lstadd_back_pid(&pid_lst, pid))
+				return (put_err_msg_and_ret("error pid_lst add pid"));
 		}
 		else
 			cmd_exec_cmd(command, pipe_prev_fd, pipe_fd);
 		command = command->piped_command;
 	}
-	status = cmd_wait_pid_lst(lst);
-	ft_lstclear(&lst, free);
+	status = cmd_wait_pid_lst(pid_lst);
+	ft_lstclear(&pid_lst, free);
 	return (status);
 }
