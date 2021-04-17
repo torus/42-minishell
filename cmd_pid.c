@@ -21,7 +21,7 @@ t_list	*cmd_lstadd_back_pid(t_list **lst, int pid)
 }
 
 /*
- * Wait processes in list.
+ * Wait processes in list and clean list.
  *
  * lst: List that has process id as content.
  *
@@ -36,5 +36,6 @@ int	cmd_wait_pid_lst(t_list *lst)
 		waitpid(*((int *)lst->content), &status, 0);
 		lst = lst->next;
 	}
+	ft_lstclear(&lst, free);
 	return (status);
 }
