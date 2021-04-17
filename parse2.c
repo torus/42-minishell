@@ -79,10 +79,10 @@ t_parse_result	parse_arguments(
 	string_node = NULL;
 	redirection_node = NULL;
 	rest_node = NULL;
+	parse_skip_spaces(buf, tok);
 	if (!(parse_redirection(buf, &redirection_node, tok) == PARSE_OK)
 		&& !(parse_string(buf, &string_node, tok) == PARSE_OK))
 		return (PARSE_KO);
-	lex_get_token(buf, tok);
 	parse_arguments(buf, &rest_node, tok);
 	content_node = malloc(sizeof(t_parse_node_arguments));
 	content_node->string_node = string_node;

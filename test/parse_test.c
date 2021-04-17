@@ -252,6 +252,25 @@ void test_parser(void)
 		CHECK_EQ_STR(str_node->content.string->text, "abc");
 	}
 
+	TEST_SECTION("parse_arguments 1 個直後に改行");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc\n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		int ret = parse_arguments(&buf, &node, &tok);
+		CHECK_EQ(ret, PARSE_OK);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
+		t_parse_ast_node *str_node = node->content.arguments->string_node;
+		CHECK(str_node);
+		CHECK_EQ(str_node->type, ASTNODE_STRING);
+		CHECK_EQ_STR(str_node->content.string->text, "abc");
+	}
+
 	TEST_SECTION("parse_arguments 2 個");
 	{
 		t_parse_buffer	buf;
@@ -421,6 +440,25 @@ void test_parser(void)
 
         check_piped_seqence(node);
     }
+
+	TEST_SECTION("parse_command_line パイプなし");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc\n");
+		t_parse_ast_node	*node = NULL;
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		int ret = parse_command_line(&buf, &node, &tok);
+		CHECK_EQ(ret, PARSE_OK);
+		check_single_argument(
+			node->content.command_line->seqcmd_node
+			->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node,
+			"abc");
+	}
 
     TEST_SECTION("parse_command_line");
     {

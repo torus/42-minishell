@@ -62,20 +62,22 @@ int	lex_get_quoted(t_parse_buffer *buf, t_token *result, int ch)
 
 int	lex_get_token(t_parse_buffer *buf, t_token *result)
 {
-	int				ch;
+	int	ch;
+	int	ret;
 
+	ret = 0;
 	ch = lex_getc(buf);
 	if (lex_get_spaces(buf, result, ch))
-		return (1);
+		ret = 1;
 	else if (lex_get_symbols(buf, result, ch))
-		return (1);
+		ret = 1;
 	else if (lex_get_quoted(buf, result, ch))
-		return (1);
+		ret = 1;
 	else if (ch != EOF)
 	{
 		result->type = TOKTYPE_EXPANDABLE;
 		lex_ungetc(buf);
-		return (lex_read_word(buf, result));
+		ret = lex_read_word(buf, result);
 	}
-	return (0);
+	return (ret);
 }
