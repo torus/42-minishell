@@ -9,7 +9,10 @@ SRCS = ../env.c \
 	   ../parse_utils.c \
 	   ../exec.c \
 	   ../path.c \
-	   ../command_exec.c
+	   ../cmd_exec_command.c \
+	   ../cmd_exec_commands.c \
+	   ../cmd_pipe.c \
+	   ../cmd_pid.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h
@@ -46,3 +49,10 @@ command_exec_test: command_exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 
 norm:
 	docker-compose run --rm norm norminette ../*.[ch]
+
+clean:
+	rm ./parse_test
+	rm ./env_test
+	rm ./path_test
+	rm ./exec_test
+	rm ./command_exec_test

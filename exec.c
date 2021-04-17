@@ -103,7 +103,7 @@ char	*find_executable_file_from_path_env(char *filename)
  * return: If exec command successful, no value will be returned.
  *         This function returning value means exec or other function is failed.
  */
-int	ft_execvp(char *filename, char **argv)
+int	cmd_execvp(char *filename, char **argv)
 {
 	char		*executable_path;
 	extern char	**environ;
