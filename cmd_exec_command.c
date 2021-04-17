@@ -36,7 +36,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 
 	if (command->output_file_path)
 	{
-		fd = open(command->output_file_path, O_WRONLY | O_CREAT,
+		fd = open(command->output_file_path, O_WRONLY | O_CREAT | O_TRUNC,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error open()"));
