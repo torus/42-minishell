@@ -6,7 +6,7 @@ LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
 LIBFT_LIB = ./libft/libft.a
 
 HEADER_FILES = minishell.h
-SRCS = minishell.c
+SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
