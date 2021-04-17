@@ -31,6 +31,22 @@ int main(){
 		remove("output.txt");
     }
 
+	TEST_SECTION("リダイレクト先が既に存在しているファイルの場合");
+    {
+		system("echo aaaaaaaaaaaaaaaaaaaaaaaaaaaaa > output.txt ; cp output.txt expected.txt ; echo hello > expected.txt");
+		t_command_invocation command;
+		command.output_file_path = "output.txt";
+		command.piped_command = NULL;
+		command.input_file_path = NULL;
+		command.exec_and_args = (const char**)ft_split("echo hello", ' ');
+
+		int status = cmd_exec_commands(&command);
+		CHECK_EQ(status, 0);
+		CHECK(system("diff --color -u expected.txt output.txt") == 0);
+		free_ptrarr((void**)command.exec_and_args);
+		remove("output.txt");
+    }
+
     TEST_SECTION("/usr/bin/cat /etc/passwd > output.txt");
     {
 		t_command_invocation command;
