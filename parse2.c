@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include "libft/libft.h"
 #include "parse.h"
-#include "parse2.h"
 
 /*
 **piped_commands ::=
