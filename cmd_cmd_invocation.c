@@ -3,7 +3,7 @@
 /*
 ** Malloc and initialize t_command_invocation
 */
-t_command_invocation *init_cmdinvo(const char *output_file_path,
+t_command_invocation	*cmd_init_cmdinvo(const char *output_file_path,
 	const char *input_file_path, const char **exec_and_args )
 {
 	t_command_invocation *cmdinvo;
@@ -14,6 +14,7 @@ t_command_invocation *init_cmdinvo(const char *output_file_path,
 	cmdinvo->input_file_path = input_file_path;
 	cmdinvo->output_file_path = output_file_path;
 	cmdinvo->exec_and_args = exec_and_args;
+	cmdinvo->piped_command = NULL;
 	return (cmdinvo);
 }
 
