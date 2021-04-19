@@ -9,8 +9,8 @@
 **	  | sequential_commands "\n"
 */
 
-t_parse_result	parse_command_line(
-	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
+t_parse_ast	*parse_command_line(
+	t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast				*cmdline_node;
 	t_parse_ast				*seqcmd_node;
@@ -38,8 +38,8 @@ t_parse_result	parse_command_line(
 **	  | (bonus) "&"
 */
 
-t_parse_result	parse_delimiter(
-	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
+t_parse_ast	*parse_delimiter(
+	t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast				*delim_node;
 	t_parse_node_delimiter	*content_node;
@@ -63,8 +63,8 @@ t_parse_result	parse_delimiter(
 **	  | (bonus) piped_commands "||" sequential_commands
 */
 
-t_parse_result	parse_sequential_commands(
-	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
+t_parse_ast	*parse_sequential_commands(
+	t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast				*seq_node;
 	t_parse_ast				*pipcmd_node;

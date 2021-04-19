@@ -9,8 +9,7 @@
 **	  | command
 */
 
-t_parse_result	parse_piped_commands(
-	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
+t_parse_ast	*parse_piped_commands(t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast				*pip_node;
 	t_parse_node_pipcmds	*content_node;
@@ -43,8 +42,8 @@ t_parse_result	parse_piped_commands(
 **	  | (bonus) "(" sequential_commands delimiter ")"
 */
 
-t_parse_result	parse_command(
-	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
+t_parse_ast	*parse_command(
+	t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast				*cmd_node;
 	t_parse_node_command	*content_node;
@@ -67,8 +66,8 @@ t_parse_result	parse_command(
 **	  | string arguments
 */
 
-t_parse_result	parse_arguments(
-	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
+t_parse_ast	*parse_arguments(
+	t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast				*string_node;
 	t_parse_ast				*redirection_node;
@@ -102,8 +101,8 @@ t_parse_result	parse_arguments(
 **	  | expandable_quoted <no_space> string
 **	  | expandable_quoted
 */
-t_parse_result	parse_string(
-	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
+t_parse_ast	*parse_string(
+	t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast			*new_node;
 	t_parse_node_string	*string;
@@ -133,8 +132,8 @@ t_parse_result	parse_string(
 **	  | ">" string
 **	  | ">>" string
 */
-t_parse_result	parse_redirection(
-	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
+t_parse_ast	*parse_redirection(
+	t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast					*new_node;
 	t_parse_ast					*str_node;
