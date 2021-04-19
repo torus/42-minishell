@@ -20,9 +20,9 @@ int	main(int argc, char **argv)
 	{
 		printf("minish > ");
 		fflush(stdout);
-		cmdline = NULL;
 		lex_get_token(&buf, &tok);
-		if (parse_command_line(&buf, &cmdline, &tok) == PARSE_OK)
+		cmdline = parse_command_line(&buf, &tok);
+		if (cmdline)
 			printf("TODO: process the command line... %p\n", cmdline);
 		else
 			put_err_msg("Parse error.");
