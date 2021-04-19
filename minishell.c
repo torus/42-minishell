@@ -10,9 +10,9 @@ void	init_buffer(t_parse_buffer *buf)
 
 int	main(int argc, char **argv)
 {
-	t_parse_ast_node	*cmdline;
-	t_parse_buffer		buf;
-	t_token				tok;
+	t_parse_ast		*cmdline;
+	t_parse_buffer	buf;
+	t_token			tok;
 
 	init_buffer(&buf);
 	printf("Welcome Minishell\n");
@@ -20,9 +20,9 @@ int	main(int argc, char **argv)
 	{
 		printf("minish > ");
 		fflush(stdout);
-		cmdline = NULL;
 		lex_get_token(&buf, &tok);
-		if (parse_command_line(&buf, &cmdline, &tok) == PARSE_OK)
+		cmdline = parse_command_line(&buf, &tok);
+		if (cmdline)
 			printf("TODO: process the command line... %p\n", cmdline);
 		else
 			put_err_msg("Parse error.");

@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include "parse.h"
-#include "parse2.h"
 
 /*
 **command_line ::=
@@ -9,27 +8,26 @@
 **	  | sequential_commands "\n"
 */
 
-t_parse_result	parse_command_line(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+t_parse_ast	*parse_command_line(
+	t_parse_buffer *buf, t_token *tok)
 {
-	t_parse_ast_node		*cmdline_node;
-	t_parse_ast_node		*seqcmd_node;
-	t_parse_ast_node		*delim_node;
+	t_parse_ast				*cmdline_node;
+	t_parse_ast				*seqcmd_node;
+	t_parse_ast				*delim_node;
 	t_parse_node_cmdline	*content_node;
 
-	if (parse_sequential_commands(buf, &seqcmd_node, tok) != PARSE_OK)
-		return (PARSE_KO);
-	delim_node = NULL;
-	parse_delimiter(buf, &delim_node, tok);
+	seqcmd_node = parse_sequential_commands(buf, tok);
+	if (!seqcmd_node)
+		return (NULL);
+	delim_node = parse_delimiter(buf, tok);
 	parse_skip_spaces(buf, tok);
 	if (tok->type != TOKTYPE_NEWLINE)
-		return (PARSE_KO);
+		return (NULL);
 	content_node = malloc(sizeof(t_parse_node_cmdline));
 	cmdline_node = parse_new_ast_node(ASTNODE_COMMAND_LINE, content_node);
 	content_node->seqcmd_node = seqcmd_node;
 	content_node->delimiter_node = delim_node;
-	*node = cmdline_node;
-	return (PARSE_OK);
+	return (cmdline_node);
 }
 
 /*
@@ -38,20 +36,19 @@ t_parse_result	parse_command_line(
 **	  | (bonus) "&"
 */
 
-t_parse_result	parse_delimiter(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+t_parse_ast	*parse_delimiter(
+	t_parse_buffer *buf, t_token *tok)
 {
-	t_parse_ast_node		*delim_node;
+	t_parse_ast				*delim_node;
 	t_parse_node_delimiter	*content_node;
 
 	parse_skip_spaces(buf, tok);
 	if (tok->type != TOKTYPE_SEMICOLON)
-		return (PARSE_KO);
+		return (NULL);
 	content_node = malloc(sizeof(t_parse_node_delimiter));
 	delim_node = parse_new_ast_node(ASTNODE_DELIMITER, content_node);
 	content_node->type = TOKTYPE_SEMICOLON;
-	*node = delim_node;
-	return (PARSE_OK);
+	return (delim_node);
 }
 
 /*
@@ -63,32 +60,29 @@ t_parse_result	parse_delimiter(
 **	  | (bonus) piped_commands "||" sequential_commands
 */
 
-t_parse_result	parse_sequential_commands(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+t_parse_ast	*parse_sequential_commands(
+	t_parse_buffer *buf, t_token *tok)
 {
-	t_parse_ast_node		*seq_node;
-	t_parse_ast_node		*pipcmd_node;
-	t_parse_ast_node		*delimiter_node;
-	t_parse_ast_node		*rest_node;
+	t_parse_ast				*seq_node;
+	t_parse_ast				*pipcmd_node;
 	t_parse_node_seqcmds	*content;
 
 	parse_skip_spaces(buf, tok);
-	if (parse_piped_commands(buf, &pipcmd_node, tok) != PARSE_OK)
-		return (PARSE_KO);
+	pipcmd_node = parse_piped_commands(buf, tok);
+	if (!pipcmd_node)
+		return (NULL);
 	content = malloc(sizeof(t_parse_node_seqcmds));
 	seq_node = parse_new_ast_node(ASTNODE_SEQ_COMMANDS, content);
 	content->pipcmd_node = pipcmd_node;
-	content->delimiter_node = NULL;
+	content->delimiter_node = parse_delimiter(buf, tok);
 	content->rest_node = NULL;
-	if (parse_delimiter(buf, &delimiter_node, tok) == PARSE_OK)
+	if (content->delimiter_node)
 	{
 		lex_get_token(buf, tok);
 		parse_skip_spaces(buf, tok);
-		if (parse_sequential_commands(buf, &rest_node, tok) != PARSE_OK)
-			return (PARSE_KO);
-		content->delimiter_node = delimiter_node;
-		content->rest_node = rest_node;
+		content->rest_node = parse_sequential_commands(buf, tok);
+		if (!content->rest_node)
+			return (NULL);
 	}
-	*node = seq_node;
-	return (PARSE_OK);
+	return (seq_node);
 }
