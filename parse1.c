@@ -10,11 +10,11 @@
 */
 
 t_parse_result	parse_command_line(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
 {
-	t_parse_ast_node		*cmdline_node;
-	t_parse_ast_node		*seqcmd_node;
-	t_parse_ast_node		*delim_node;
+	t_parse_ast		*cmdline_node;
+	t_parse_ast		*seqcmd_node;
+	t_parse_ast		*delim_node;
 	t_parse_node_cmdline	*content_node;
 
 	if (parse_sequential_commands(buf, &seqcmd_node, tok) != PARSE_OK)
@@ -39,9 +39,9 @@ t_parse_result	parse_command_line(
 */
 
 t_parse_result	parse_delimiter(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
 {
-	t_parse_ast_node		*delim_node;
+	t_parse_ast		*delim_node;
 	t_parse_node_delimiter	*content_node;
 
 	parse_skip_spaces(buf, tok);
@@ -64,12 +64,12 @@ t_parse_result	parse_delimiter(
 */
 
 t_parse_result	parse_sequential_commands(
-	t_parse_buffer *buf, t_parse_ast_node **node, t_token *tok)
+	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
 {
-	t_parse_ast_node		*seq_node;
-	t_parse_ast_node		*pipcmd_node;
-	t_parse_ast_node		*delimiter_node;
-	t_parse_ast_node		*rest_node;
+	t_parse_ast		*seq_node;
+	t_parse_ast		*pipcmd_node;
+	t_parse_ast		*delimiter_node;
+	t_parse_ast		*rest_node;
 	t_parse_node_seqcmds	*content;
 
 	parse_skip_spaces(buf, tok);

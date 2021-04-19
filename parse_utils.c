@@ -11,13 +11,13 @@ void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
 	}
 }
 
-t_parse_ast_node	*parse_new_ast_node(t_parse_ast_type type, void *content)
+t_parse_ast	*parse_new_ast_node(t_parse_ast_type type, void *content)
 {
-	t_parse_ast_node	*dest;
+	t_parse_ast	*dest;
 
 	if (!(type > ASTNODE_NONE && type < ASTNODE_INVALID))
 		parse_fatal_error();
-	dest = malloc(sizeof(t_parse_ast_node));
+	dest = malloc(sizeof(t_parse_ast));
 	if (!dest || !content)
 		parse_fatal_error();
 	dest->type = type;

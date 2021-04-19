@@ -131,20 +131,20 @@ void test_lexer()
 	}
 }
 
-void check_string(t_parse_ast_node *node, const char *expected)
+void check_string(t_parse_ast *node, const char *expected)
 {
     CHECK_EQ(node->type, ASTNODE_STRING);
     CHECK_EQ_STR(node->content.string->text, expected);
 }
 
-void check_single_argument(t_parse_ast_node *node, const char *expected)
+void check_single_argument(t_parse_ast *node, const char *expected)
 {
-    t_parse_ast_node *str_node = node->content.arguments->string_node;
+    t_parse_ast *str_node = node->content.arguments->string_node;
     CHECK(str_node);
     check_string(str_node, expected);
 }
 
-void check_args(t_parse_ast_node	*node)
+void check_args(t_parse_ast	*node)
 {
     CHECK(node);
     CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
@@ -152,19 +152,19 @@ void check_args(t_parse_ast_node	*node)
     check_single_argument(node, "file");
 
     node = node->content.arguments->rest_node;
-    t_parse_ast_node *red_node = node->content.arguments->redirection_node;
+    t_parse_ast *red_node = node->content.arguments->redirection_node;
     CHECK(red_node);
     CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
     CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
     check_string(red_node->content.redirection->string_node, "abc");
 }
 
-void check_piped_commands(t_parse_ast_node *node)
+void check_piped_commands(t_parse_ast *node)
 {
     CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
     CHECK(node->content.piped_commands->command_node);
     CHECK(node->content.piped_commands->next);
-    t_parse_ast_node *next = node->content.piped_commands->next;
+    t_parse_ast *next = node->content.piped_commands->next;
     CHECK_EQ(next->type, ASTNODE_PIPED_COMMANDS);
     CHECK(next->content.piped_commands->command_node);
     check_args(next->content.piped_commands->command_node
@@ -172,13 +172,13 @@ void check_piped_commands(t_parse_ast_node *node)
     CHECK(!next->content.piped_commands->next);
 }
 
-void check_delimiter(t_parse_ast_node *node)
+void check_delimiter(t_parse_ast *node)
 {
     CHECK_EQ(node->type, ASTNODE_DELIMITER);
     CHECK_EQ(node->content.delimiter->type, TOKTYPE_SEMICOLON);
 }
 
-void check_piped_seqence(t_parse_ast_node *node)
+void check_piped_seqence(t_parse_ast *node)
 {
     check_piped_commands(node->content.sequential_commands->pipcmd_node);
     check_delimiter(
@@ -201,7 +201,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file\n");
-		t_parse_ast_node	*node;
+		t_parse_ast	*node;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -219,7 +219,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "< file\n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -237,7 +237,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -246,7 +246,7 @@ void test_parser(void)
 		CHECK_EQ(ret, PARSE_OK);
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
-		t_parse_ast_node *str_node = node->content.arguments->string_node;
+		t_parse_ast *str_node = node->content.arguments->string_node;
 		CHECK(str_node);
 		CHECK_EQ(str_node->type, ASTNODE_STRING);
 		CHECK_EQ_STR(str_node->content.string->text, "abc");
@@ -256,7 +256,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc\n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -265,7 +265,7 @@ void test_parser(void)
 		CHECK_EQ(ret, PARSE_OK);
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
-		t_parse_ast_node *str_node = node->content.arguments->string_node;
+		t_parse_ast *str_node = node->content.arguments->string_node;
 		CHECK(str_node);
 		CHECK_EQ(str_node->type, ASTNODE_STRING);
 		CHECK_EQ_STR(str_node->content.string->text, "abc");
@@ -275,7 +275,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc def \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -284,12 +284,12 @@ void test_parser(void)
 		CHECK_EQ(ret, PARSE_OK);
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
-		t_parse_ast_node *str_node = node->content.arguments->string_node;
+		t_parse_ast *str_node = node->content.arguments->string_node;
 		CHECK(str_node);
 		CHECK_EQ(str_node->type, ASTNODE_STRING);
 		CHECK_EQ_STR(str_node->content.string->text, "abc");
 
-		t_parse_ast_node *rest_node = node->content.arguments->rest_node;
+		t_parse_ast *rest_node = node->content.arguments->rest_node;
 
 		CHECK_EQ(rest_node->type, ASTNODE_ARGUMENTS);
 		str_node = rest_node->content.arguments->string_node;
@@ -302,7 +302,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "< abc \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -312,7 +312,7 @@ void test_parser(void)
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
 
-		t_parse_ast_node *red_node = node->content.arguments->redirection_node;
+		t_parse_ast *red_node = node->content.arguments->redirection_node;
 		CHECK(red_node);
 		CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
 		CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
@@ -324,7 +324,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file < abc \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -338,7 +338,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file < abc \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -353,7 +353,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -362,10 +362,10 @@ void test_parser(void)
         CHECK_EQ(ret, PARSE_OK);
         CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
 
-		t_parse_ast_node *cmd = node->content.piped_commands->command_node;
+		t_parse_ast *cmd = node->content.piped_commands->command_node;
 		CHECK(cmd);
 		CHECK_EQ(cmd->type, ASTNODE_COMMAND);
-		t_parse_ast_node *str = cmd->content.command->arguments_node
+		t_parse_ast *str = cmd->content.command->arguments_node
 			->content.arguments->string_node;
 		CHECK(str);
 		CHECK_EQ_STR(str->content.string->text, "abc");
@@ -376,7 +376,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc | file < abc \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -390,7 +390,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "; \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -403,7 +403,7 @@ void test_parser(void)
     {
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, " abc ; xyz \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -431,7 +431,7 @@ void test_parser(void)
     {
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, " abc | file < abc ; xyz \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -445,7 +445,7 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc\n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -464,7 +464,7 @@ void test_parser(void)
     {
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, " abc | file < abc ; xyz \n");
-		t_parse_ast_node	*node = NULL;
+		t_parse_ast	*node = NULL;
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
