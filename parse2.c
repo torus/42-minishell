@@ -12,10 +12,10 @@
 t_parse_result	parse_piped_commands(
 	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
 {
-	t_parse_ast		*pip_node;
+	t_parse_ast				*pip_node;
 	t_parse_node_pipcmds	*content_node;
-	t_parse_ast		*cmd_node;
-	t_parse_ast		*rest_node;
+	t_parse_ast				*cmd_node;
+	t_parse_ast				*rest_node;
 
 	if (parse_command(buf, &cmd_node, tok) != PARSE_OK)
 		return (PARSE_KO);
@@ -46,9 +46,9 @@ t_parse_result	parse_piped_commands(
 t_parse_result	parse_command(
 	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
 {
-	t_parse_ast		*cmd_node;
+	t_parse_ast				*cmd_node;
 	t_parse_node_command	*content_node;
-	t_parse_ast		*args_node;
+	t_parse_ast				*args_node;
 
 	if (parse_arguments(buf, &args_node, tok) != PARSE_OK)
 		return (PARSE_KO);
@@ -70,11 +70,11 @@ t_parse_result	parse_command(
 t_parse_result	parse_arguments(
 	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
 {
-	t_parse_ast		*string_node;
-	t_parse_ast		*redirection_node;
-	t_parse_ast		*rest_node;
+	t_parse_ast				*string_node;
+	t_parse_ast				*redirection_node;
+	t_parse_ast				*rest_node;
 	t_parse_node_arguments	*content_node;
-	t_parse_ast		*args_node;
+	t_parse_ast				*args_node;
 
 	string_node = NULL;
 	redirection_node = NULL;
@@ -105,7 +105,7 @@ t_parse_result	parse_arguments(
 t_parse_result	parse_string(
 	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
 {
-	t_parse_ast	*new_node;
+	t_parse_ast			*new_node;
 	t_parse_node_string	*string;
 	char				*text;
 
@@ -136,8 +136,8 @@ t_parse_result	parse_string(
 t_parse_result	parse_redirection(
 	t_parse_buffer *buf, t_parse_ast **node, t_token *tok)
 {
-	t_parse_ast			*new_node;
-	t_parse_ast			*str_node;
+	t_parse_ast					*new_node;
+	t_parse_ast					*str_node;
 	t_parse_node_redirection	*redirection;
 
 	if (tok->type != TOKTYPE_INPUT_REDIRECTION)

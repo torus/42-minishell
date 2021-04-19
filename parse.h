@@ -36,8 +36,8 @@ typedef struct s_parse_ast	t_parse_ast;
 
 typedef struct s_parse_node_string
 {
-	const char				*text;
-	t_token_type			type;
+	const char		*text;
+	t_token_type	type;
 	t_parse_ast		*next;
 }	t_parse_node_string;
 
@@ -61,13 +61,13 @@ typedef struct s_parse_node_arguments
 
 typedef struct s_parse_node_redirection
 {
-	t_parse_ast	*string_node;
-	t_token_type		type;
+	t_parse_ast		*string_node;
+	t_token_type	type;
 }	t_parse_node_redirection;
 
 typedef struct s_parse_node_delimiter
 {
-	t_token_type		type;
+	t_token_type	type;
 }	t_parse_node_delimiter;
 
 typedef struct s_parse_node_seqcmds
