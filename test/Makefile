@@ -37,23 +37,23 @@ parse_test: Makefile parse_test.c test.c test.h $(SRCS_PARSE) ../parse.h
 
 env_test: env_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
 
 path_test: path_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
 
 exec_test: exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
 
 command_exec_test: command_exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
 
 ast2cmdinvo_test: ast2cmdinvo_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -fsanitize=address -o $@ $^ ${LIBFT_LIB}
 
 norm:
 	docker-compose run --rm norm norminette ../*.[ch]
