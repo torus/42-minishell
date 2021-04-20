@@ -10,6 +10,6 @@
 # include "parse.h"
 
 // AST to command_invocation
-int		cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds);
+t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds);
 
 #endif
