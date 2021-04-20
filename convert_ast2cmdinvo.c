@@ -71,7 +71,7 @@ int cmd_process_arguments_node(t_parse_node_arguments *args_node, t_command_invo
 **   | (bonus) "(" sequencial_commands ")"
 **   | (bonus) "(" sequencial_commands delimiter ")"
 */
-t_command_invocation *cmd_astcmd2cmdinvo(t_parse_node_command *cmd_node)
+t_command_invocation *cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 {
 	t_command_invocation	*command;
 	t_parse_node_arguments	*args_node;
@@ -98,7 +98,7 @@ t_command_invocation *cmd_astcmd2cmdinvo(t_parse_node_command *cmd_node)
 **       command "|" piped_commands
 **     | command
 */
-int convert_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
+int cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 {
 	t_command_invocation	*commands;
 	t_command_invocation	*command;
@@ -106,7 +106,7 @@ int convert_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 	commands = NULL;
 	while (pipcmds)
 	{
-		command = cmd_astcmd2cmdinvo(pipcmds->command_node->content.command);
+		command = cmd_ast_cmd2cmdinvo(pipcmds->command_node->content.command);
 		cmd_add_cmdinvo(commands, command);
 		pipcmds = pipcmds->next->content.piped_commands;
 	}
