@@ -10,9 +10,9 @@
 **     | expandable_quoted <no_space> string
 **     | expandable_quoted
 */
-int cmd_process_string_node(t_parse_node_string *string_node, t_command_invocation *command)
-{
-}
+// int cmd_process_string_node(t_parse_node_string *string_node, t_command_invocation *command)
+// {
+// }
 
 /* redirection node を処理する
 **
