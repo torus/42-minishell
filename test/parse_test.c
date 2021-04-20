@@ -213,6 +213,65 @@ void test_parser(void)
 		CHECK_EQ(node->content.string->next, NULL);
 	}
 
+	TEST_SECTION("parse_string シングルクォート");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "'file'\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_string(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(node->content.string->text, "file");
+		CHECK_EQ(node->content.string->next, NULL);
+	}
+
+	TEST_SECTION("parse_string ダブルクォート");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "\"file\"\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_string(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(node->content.string->text, "file");
+		CHECK_EQ(node->content.string->next, NULL);
+	}
+
+	TEST_SECTION("parse_string ミックス");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc\"def\"'ghi'\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_string(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(node->content.string->text, "abc");
+
+		node = node->content.string->next;
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(node->content.string->text, "def");
+
+		node = node->content.string->next;
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(node->content.string->text, "ghi");
+	}
+
 	TEST_SECTION("parse_redirection　<");
 	{
 		t_parse_buffer	buf;
