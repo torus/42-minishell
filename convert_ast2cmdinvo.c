@@ -27,7 +27,7 @@ int cmd_process_redirection_node(t_parse_node_redirection *redirection_node, t_c
 
 }
 
-/* arguments node を処理する
+/* arguments node の string と redirection を処理する
 **
 ** arguments ::=
 **       redirection
@@ -37,7 +37,27 @@ int cmd_process_redirection_node(t_parse_node_redirection *redirection_node, t_c
 */
 int cmd_process_arguments_node(t_parse_node_arguments *args_node, t_command_invocation *command)
 {
+	int	redirection_type;
 
+	// string
+	if (!ptrarr_add_ptr((void **)command->exec_and_args,
+			(void *)args_node->string_node->content.string->text))
+		return	(ERROR);
+	// redirection
+	redirection_type = args_node->redirection_node->content.redirection->type;
+	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
+		command->input_file_path = args_node->redirection_node->content.redirection->string_node->content.string->text;
+	else if (redirection_type == TOKTYPE_OUTPUT_REDIRECTION)
+	{
+		command->output_file_path = args_node->redirection_node->content.redirection->string_node->content.string->text;
+		command->flags |= CMD_REDIRECT_WRITE;
+	}
+	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
+	{
+		command->output_file_path = args_node->redirection_node->content.redirection->string_node->content.string->text;
+		command->flags |= CMD_REDIRECT_APPEND;
+	}
+	return (0);
 }
 
 /*
@@ -48,14 +68,22 @@ int cmd_process_arguments_node(t_parse_node_arguments *args_node, t_command_invo
 **   | (bonus) "(" sequencial_commands ")"
 **   | (bonus) "(" sequencial_commands delimiter ")"
 */
-t_command_invocation *convert_ast_cmd2cmd(t_parse_node_command *ast_command)
+t_command_invocation *cmd_astcmd2cmdinvo(t_parse_node_command *cmd_node)
 {
-	t_command_invocation *command;
+	t_command_invocation	*command;
+	t_parse_node_arguments	*args_node;
 
 	command = malloc(sizeof(t_command_invocation));
 	if (!command)
 		return (NULL);
-	// TODO: argumentsの処理
+
+	// argumentsの処理
+	args_node = cmd_node->arguments_node->content.arguments;
+	while (args_node)
+	{
+		cmd_process_arguments_node(args_node, command);
+		args_node = args_node->rest_node->content.arguments;
+	}
 	if (!command->exec_and_args)
 		return (NULL);
 }
@@ -69,12 +97,15 @@ t_command_invocation *convert_ast_cmd2cmd(t_parse_node_command *ast_command)
 */
 int convert_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 {
-	t_command_invocation *commands;
+	t_command_invocation	*commands;
+	t_command_invocation	*command;
 
 	commands = NULL;
 	while (pipcmds)
 	{
-		cmd_add_cmdinvo(&commands, convert_ast_cmd2cmd(pipcmds));
-		pipcmds = pipcmds->next;
+		command = cmd_astcmd2cmdinvo(pipcmds->command_node->content.command);
+		cmd_add_cmdinvo(commands, command);
+		pipcmds = pipcmds->next->content.piped_commands;
 	}
+	return (0);
 }
