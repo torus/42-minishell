@@ -44,12 +44,15 @@ void	**ptrarr_add_ptr(void **ptrarr, void *ptr)
 	size_t	arr_size;
 	void	**new_ptrarr;
 
-	arr_size = ptrarr_len(ptrarr);
+	arr_size = 0;
+	if (ptrarr)
+		arr_size = ptrarr_len(ptrarr);
 	new_ptrarr = ft_calloc(arr_size + 2, sizeof(void *));
 	if (!new_ptrarr)
 		return (NULL);
 	ft_memcpy(new_ptrarr, ptrarr, arr_size);
-	free_ptrarr(ptrarr);
+	if (ptrarr)
+		free_ptrarr(ptrarr);
 	new_ptrarr[arr_size] = ptr;
 	return (new_ptrarr);
 }
