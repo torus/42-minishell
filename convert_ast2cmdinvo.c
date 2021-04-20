@@ -51,8 +51,6 @@ int cmd_process_redirection_node(t_parse_node_redirection *redirection_node, t_c
 */
 int cmd_process_arguments_node(t_parse_node_arguments *args_node, t_command_invocation *command)
 {
-	char*	str;
-
 	// string
 	if (!ptrarr_add_ptr((void **)command->exec_and_args,
 			(void *)args_node->string_node->content.string->text))
@@ -88,6 +86,7 @@ t_command_invocation *cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 	}
 	if (!command->exec_and_args)
 		return (NULL);
+	return (command);
 }
 
 // pipcmds を受け取って t_command_invocation を返す
@@ -97,7 +96,7 @@ t_command_invocation *cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 **       command "|" piped_commands
 **     | command
 */
-int cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
+t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 {
 	t_command_invocation	*commands;
 	t_command_invocation	*command;
@@ -109,5 +108,5 @@ int cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 		cmd_add_cmdinvo(commands, command);
 		pipcmds = pipcmds->next->content.piped_commands;
 	}
-	return (0);
+	return (commands);
 }
