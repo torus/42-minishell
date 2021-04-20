@@ -13,8 +13,8 @@
 # include "path.h"
 
 // 書き込みOR追記
-# define CMD_WRITE  01
-# define CMD_APPEND 02
+# define CMD_REDIRECT_WRITE  01
+# define CMD_REDIRECT_APPEND 02
 
 typedef struct s_command_invocation
 {
