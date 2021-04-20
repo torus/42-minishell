@@ -12,7 +12,7 @@
 **     | expandable_quoted
 */
 int cmd_process_string_node(t_parse_node_string *string_node, t_command_invocation *command)
-{	
+{
 }
 
 /* redirection node を処理する
@@ -24,7 +24,22 @@ int cmd_process_string_node(t_parse_node_string *string_node, t_command_invocati
 */
 int cmd_process_redirection_node(t_parse_node_redirection *redirection_node, t_command_invocation *command)
 {
+	int	redirection_type;
 
+	redirection_type = redirection_node->type;
+	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
+		command->input_file_path = redirection_node->string_node->content.string->text;
+	else if (redirection_type == TOKTYPE_OUTPUT_REDIRECTION)
+	{
+		command->output_file_path = redirection_node->string_node->content.string->text;
+		command->flags |= CMD_REDIRECT_WRITE;
+	}
+	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
+	{
+		command->output_file_path = redirection_node->string_node->content.string->text;
+		command->flags |= CMD_REDIRECT_APPEND;
+	}
+	return (0);
 }
 
 /* arguments node の string と redirection を処理する
@@ -37,26 +52,14 @@ int cmd_process_redirection_node(t_parse_node_redirection *redirection_node, t_c
 */
 int cmd_process_arguments_node(t_parse_node_arguments *args_node, t_command_invocation *command)
 {
-	int	redirection_type;
+	char*	str;
 
 	// string
 	if (!ptrarr_add_ptr((void **)command->exec_and_args,
 			(void *)args_node->string_node->content.string->text))
 		return	(ERROR);
 	// redirection
-	redirection_type = args_node->redirection_node->content.redirection->type;
-	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
-		command->input_file_path = args_node->redirection_node->content.redirection->string_node->content.string->text;
-	else if (redirection_type == TOKTYPE_OUTPUT_REDIRECTION)
-	{
-		command->output_file_path = args_node->redirection_node->content.redirection->string_node->content.string->text;
-		command->flags |= CMD_REDIRECT_WRITE;
-	}
-	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
-	{
-		command->output_file_path = args_node->redirection_node->content.redirection->string_node->content.string->text;
-		command->flags |= CMD_REDIRECT_APPEND;
-	}
+	cmd_process_redirection_node(args_node->redirection_node->content.redirection, command);
 	return (0);
 }
 
