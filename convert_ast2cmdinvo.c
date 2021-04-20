@@ -1,5 +1,4 @@
-#include "parse.h"
-#include "execution.h"
+#include "minishell.h"
 
 /* string node を処理する
 ** 
