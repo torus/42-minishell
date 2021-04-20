@@ -131,8 +131,12 @@ t_parse_ast	*parse_redirection(
 	t_parse_ast					*new_node;
 	t_parse_ast					*str_node;
 	t_parse_node_redirection	*redirection;
+	t_token_type				type;
 
-	if (tok->type != TOKTYPE_INPUT_REDIRECTION)
+	type = tok->type;
+	if (type != TOKTYPE_INPUT_REDIRECTION
+		&& type != TOKTYPE_OUTPUT_REDIRECTION
+		&& type != TOKTYPE_OUTPUT_APPENDING)
 		return (NULL);
 	lex_get_token(buf, tok);
 	parse_skip_spaces(buf, tok);
@@ -140,7 +144,7 @@ t_parse_ast	*parse_redirection(
 	if (str_node)
 	{
 		redirection = malloc(sizeof(t_parse_node_redirection));
-		redirection->type = TOKTYPE_INPUT_REDIRECTION;
+		redirection->type = type;
 		redirection->string_node = str_node;
 		new_node = parse_new_ast_node(ASTNODE_REDIRECTION, redirection);
 		return (new_node);

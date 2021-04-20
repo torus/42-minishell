@@ -229,6 +229,38 @@ void test_parser(void)
 					->content.string->text, "file");
 	}
 
+	TEST_SECTION("parse_redirection　>");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "> file\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					->content.string->text, "file");
+	}
+
+	TEST_SECTION("parse_redirection　>>");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, ">> file\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_APPENDING);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					->content.string->text, "file");
+	}
+
 	TEST_SECTION("parse_arguments 1 個");
 	{
 		t_parse_buffer	buf;
