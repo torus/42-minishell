@@ -70,6 +70,7 @@ size_t				ptrarr_len(void **ptrarr);
 void				free_ptrarr(void **ptrarr);
 void				*free_ptrarr_and_rtn_null(void **ptrarr);
 void				free_ptrarr_and_assign_null(void ***ptrarr);
+void				**ptrarr_add_ptr(void **ptrarr, void *ptr);
 int					wrap_malloc(void **p, size_t len);
 
 #endif
