@@ -10,9 +10,15 @@
 **     | expandable_quoted <no_space> string
 **     | expandable_quoted
 */
-// int cmd_process_string_node(t_parse_node_string *string_node, t_command_invocation *command)
-// {
-// }
+int cmd_process_string_node(t_parse_node_string *string_node, t_command_invocation *command)
+{
+	const char **strarr = (const char **)ptrarr_add_ptr(
+		(void **)command->exec_and_args, (void *)string_node->text);
+	if (!strarr)
+		return	(ERROR);
+	command->exec_and_args = strarr;
+	return (0);
+}
 
 /* redirection node を処理する
 **
@@ -24,18 +30,20 @@
 int cmd_process_redirection_node(t_parse_node_redirection *redirection_node, t_command_invocation *command)
 {
 	int	redirection_type;
+	const char	*text;
 
 	redirection_type = redirection_node->type;
+	text = redirection_node->string_node->content.string->text;
 	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
-		command->input_file_path = redirection_node->string_node->content.string->text;
+		command->input_file_path = text;
 	else if (redirection_type == TOKTYPE_OUTPUT_REDIRECTION)
 	{
-		command->output_file_path = redirection_node->string_node->content.string->text;
+		command->output_file_path = text;
 		command->flags |= CMD_REDIRECT_WRITE;
 	}
 	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
 	{
-		command->output_file_path = redirection_node->string_node->content.string->text;
+		command->output_file_path = text;
 		command->flags |= CMD_REDIRECT_APPEND;
 	}
 	return (0);
@@ -52,9 +60,7 @@ int cmd_process_redirection_node(t_parse_node_redirection *redirection_node, t_c
 int cmd_process_arguments_node(t_parse_node_arguments *args_node, t_command_invocation *command)
 {
 	// string
-	if (!ptrarr_add_ptr((void **)command->exec_and_args,
-			(void *)args_node->string_node->content.string->text))
-		return	(ERROR);
+	cmd_process_string_node(args_node->string_node->content.string, command);
 	// redirection
 	cmd_process_redirection_node(args_node->redirection_node->content.redirection, command);
 	return (0);
@@ -73,7 +79,7 @@ t_command_invocation *cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 	t_command_invocation	*command;
 	t_parse_node_arguments	*args_node;
 
-	command = malloc(sizeof(t_command_invocation));
+	command = cmd_init_cmdinvo(NULL, NULL, NULL, 0);
 	if (!command)
 		return (NULL);
 
