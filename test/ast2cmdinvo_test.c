@@ -69,7 +69,7 @@ int main()
 		cmd_free_cmdinvo(expected);
 	}
 
-	TEST_SECTION("arguments 2個");
+	TEST_SECTION("cmd_ast_pipcmds2cmdinvo arguments 2個");
 	{
 		/* 準備 */
 		t_parse_buffer	buf;
@@ -91,7 +91,7 @@ int main()
 		cmd_free_cmdinvo(expected);
 	}
 
-	TEST_SECTION("パイプ & リダイレクション");
+	TEST_SECTION("cmd_ast_pipcmds2cmdinvo パイプ & リダイレクション");
 	{
 		/* 準備 */
 		t_parse_buffer	buf;
@@ -106,6 +106,30 @@ int main()
 		t_command_invocation *actual = cmd_ast_pipcmds2cmdinvo(node->content.piped_commands);
 		t_command_invocation *expected_first = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("abc", ' '), 0);
 		t_command_invocation *expected_second = cmd_init_cmdinvo(NULL, "abc", (const char **)ft_split("file", ' '), 0);
+		expected_first->piped_command = expected_second;
+
+		CHECK(actual);
+		check_cmdinvo(actual, expected_first);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected_first);
+	}
+
+	TEST_SECTION("cmd_ast_pipcmds2cmdinvo パイプ & 出力リダイレクション");
+	{
+		/* 準備 */
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc | file > abc \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_piped_commands(&buf, &tok);
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_pipcmds2cmdinvo(node->content.piped_commands);
+		t_command_invocation *expected_first = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("abc", ' '), 0);
+		t_command_invocation *expected_second = cmd_init_cmdinvo("abc", NULL, (const char **)ft_split("file", ' '), 0);
 		expected_first->piped_command = expected_second;
 
 		CHECK(actual);
