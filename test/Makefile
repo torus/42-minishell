@@ -23,13 +23,15 @@ HEADERS = ../env.h \
 TEST_UTILS = test.c \
 			 test.h
 
+VALGRIND = valgrind -q --leak-check=full --errors-for-leak-kinds=all --show-leak-kinds=all --error-exitcode=99
+
 run: parse_test env_test path_test exec_test command_exec_test ast2cmdinvo_test
-	valgrind -q --leak-check=full --errors-for-leak-kinds=all --show-leak-kinds=all --error-exitcode=99 ./parse_test
+	${VALGRIND} ./parse_test
 	./env_test
 	./path_test
 	./exec_test
 	./command_exec_test
-	valgrind -q --leak-check=full --errors-for-leak-kinds=all --show-leak-kinds=all --error-exitcode=99 ./ast2cmdinvo_test
+	${VALGRIND} ./ast2cmdinvo_test
 
 SRCS_PARSE = $(wildcard ../lexer*.c ../parse*.c) ../libft/ft_memcpy.c
 
