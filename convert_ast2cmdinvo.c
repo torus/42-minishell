@@ -90,7 +90,8 @@ t_command_invocation *cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 	while (args_node)
 	{
 		cmd_process_arguments_node(args_node, command);
-		args_node = args_node->rest_node->content.arguments;
+		if (args_node->rest_node)
+			args_node = args_node->rest_node->content.arguments;
 	}
 	if (!command->exec_and_args)
 		return (NULL);
