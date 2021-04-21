@@ -64,8 +64,10 @@ int cmd_process_arguments_node(t_parse_node_arguments *args_node, t_command_invo
 	if (args_node->string_node)
 		cmd_process_string_node(args_node->string_node->content.string, command);
 	// redirection
-	if (args_node->redirection_node)
+	else if (args_node->redirection_node)
 		cmd_process_redirection_node(args_node->redirection_node->content.redirection, command);
+	else
+		return (1);
 	return (0);
 }
 
