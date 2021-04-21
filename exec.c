@@ -27,14 +27,14 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 		{
 			fullpath = path_join(dirpath, dirp->d_name);
 			if (!fullpath)
-				return (NULL);
+				return (free_and_rtn_ptr(dir, NULL));
 			if (stat(fullpath, &buf) == 0 && S_ISREG(buf.st_mode))
-				return (fullpath);
+				return (free_and_rtn_ptr(dir, fullpath));
 			free(fullpath);
 		}
 		dirp = readdir(dir);
 	}
-	return (NULL);
+	return (free_and_rtn_ptr(dir, NULL));
 }
 
 /*
