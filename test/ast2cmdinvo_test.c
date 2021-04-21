@@ -26,9 +26,15 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 	while (actual_cmdinvo && expected_invo)
 	{
 		if (actual_cmdinvo->input_file_path || expected_invo->input_file_path)
+		{
+			CHECK(actual_cmdinvo->input_file_path && expected_invo->input_file_path);
 			CHECK_EQ_STR(actual_cmdinvo->input_file_path, expected_invo->input_file_path);
+		}
 		if (actual_cmdinvo->output_file_path || expected_invo->output_file_path)
+		{
+			CHECK(actual_cmdinvo->output_file_path && expected_invo->output_file_path);
 			CHECK_EQ_STR(actual_cmdinvo->output_file_path, expected_invo->output_file_path);
+		}
 		check_strarr(actual_cmdinvo->exec_and_args, expected_invo->exec_and_args);
 
 		actual_cmdinvo = actual_cmdinvo->piped_command;
