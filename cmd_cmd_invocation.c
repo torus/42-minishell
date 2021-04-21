@@ -38,16 +38,16 @@ t_command_invocation *cmd_add_cmdinvo(t_command_invocation **cmds, t_command_inv
 	return (newcmd);
 }
 
-void	cmd_free_cmdinvo(t_command_invocation **cmds)
+void	cmd_free_cmdinvo(t_command_invocation *cmds)
 {
 	t_command_invocation	*current_cmd;
 	t_command_invocation	*prev_cmd;
 
-	if (!*cmds)
+	if (!cmds)
 		return ;
 	else
 	{
-		current_cmd = *cmds;
+		current_cmd = cmds;
 		while (current_cmd->piped_command)
 		{
 			free((void *)current_cmd->input_file_path);
@@ -58,5 +58,4 @@ void	cmd_free_cmdinvo(t_command_invocation **cmds)
 			free(prev_cmd);
 		}
 	}
-	*cmds = NULL;
 }
