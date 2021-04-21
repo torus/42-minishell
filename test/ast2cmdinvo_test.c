@@ -25,8 +25,10 @@ void check_cmdinvo(t_command_invocation *actual, t_command_invocation *expected)
 {
 	while (actual && expected)
 	{
-		CHECK_EQ_STR(actual->input_file_path, expected->input_file_path);
-		CHECK_EQ_STR(actual->output_file_path, expected->output_file_path);
+		if (actual->input_file_path || expected->input_file_path)
+			CHECK_EQ_STR(actual->input_file_path, expected->input_file_path);
+		if (actual->output_file_path || expected->output_file_path)
+			CHECK_EQ_STR(actual->output_file_path, expected->output_file_path);
 		check_strarr(actual->exec_and_args, expected->exec_and_args);
 		actual = actual->piped_command;
 		expected = expected->piped_command;
