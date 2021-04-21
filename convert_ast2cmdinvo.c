@@ -16,6 +16,7 @@ int cmd_process_string_node(t_parse_node_string *string_node, t_command_invocati
 		(void **)command->exec_and_args, (void *)string_node->text);
 	if (!strarr)
 		return	(ERROR);
+	free((void **)command->exec_and_args);
 	command->exec_and_args = strarr;
 	return (0);
 }
