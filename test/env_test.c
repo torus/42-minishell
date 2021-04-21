@@ -11,6 +11,8 @@ int main(){
 		CHECK_EQ_STR(str_arr[0], "PATH");
 		CHECK_EQ_STR(str_arr[1], "/bin/:/usr/bin/:/home/jun/bin");
 		CHECK_EQ(str_arr[2], NULL);
+
+		free_ptrarr((void **)str_arr);
 	}
 
 	TEST_SECTION("split_first_c() 区切り文字が入っていない");
@@ -20,6 +22,8 @@ int main(){
 		CHECK_EQ_STR(str_arr[0], "PATH/bin/:/usr/bin/:/home/jun/bin");
 		CHECK_EQ(str_arr[1], NULL);
 		CHECK_EQ(str_arr[2], NULL);
+
+		free_ptrarr((void **)str_arr);
 	}
 
 	TEST_SECTION("get_env() 通常ケース");
@@ -51,6 +55,8 @@ int main(){
 		char *kvstr = "PATH=/bin/:/usr/bin/:/home/jun/bin";
 		char *val_str = get_val_from_kvstr(kvstr, '=');
 		CHECK_EQ_STR(val_str, "/bin/:/usr/bin/:/home/jun/bin");
+
+		free(val_str);
 	}
 
 	TEST_SECTION("get_val_from_kvstr() 区切り文字が無い");
@@ -58,6 +64,8 @@ int main(){
 		char *kvstr = "PATH/bin/:/usr/bin/:/home/jun/bin";
 		char *val_str = get_val_from_kvstr(kvstr, '=');
 		CHECK_EQ(val_str, NULL);
+
+		free(val_str);
 	}
 
 	TEST_SECTION("get_val_from_kvstr() 区切り文字が連続で並ぶ");
@@ -65,6 +73,8 @@ int main(){
 		char *kvstr = "PATH===/bin/:/usr/bin/:/home/jun/bin";
 		char *val_str = get_val_from_kvstr(kvstr, '=');
 		CHECK_EQ_STR(val_str, "==/bin/:/usr/bin/:/home/jun/bin");
+
+		free(val_str);
 	}
 
 	TEST_SECTION("get_env_val() 通常ケース");
@@ -74,12 +84,16 @@ int main(){
 		char *val_str = get_env_val("GET_ENV_TEST");
 		CHECK_EQ_STR(val_str, "/bin/:/usr/bin/:/home/jun/bin");
 		environ[0] = original0;
+
+		free(val_str);
 	}
 
 	TEST_SECTION("get_env_val() 指定された環境変数が存在しない");
 	{
 		char *val_str = get_env_val("THIS_IS_NOT_EXIST_IN_ENVIRON");
 		CHECK_EQ(val_str, NULL);
+
+		free(val_str);
 	}
 
 	int fail_count = print_result();
