@@ -37,3 +37,26 @@ t_command_invocation *cmd_add_cmdinvo(t_command_invocation **cmds, t_command_inv
 	}
 	return (newcmd);
 }
+
+void	cmd_free_cmdinvo(t_command_invocation **cmds)
+{
+	t_command_invocation	*current_cmd;
+	t_command_invocation	*prev_cmd;
+
+	if (!*cmds)
+		return ;
+	else
+	{
+		current_cmd = *cmds;
+		while (current_cmd->piped_command)
+		{
+			free((void *)current_cmd->input_file_path);
+			free((void *)current_cmd->output_file_path);
+			free_ptrarr((void **)current_cmd->exec_and_args);
+			prev_cmd = current_cmd;
+			current_cmd = current_cmd->piped_command;
+			free(prev_cmd);
+		}
+	}
+	*cmds = NULL;
+}
