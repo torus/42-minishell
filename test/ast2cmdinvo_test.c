@@ -39,6 +39,7 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 
 int main()
 {
+
 	TEST_SECTION("シンプルな文字列");
 	{
 		/* 準備 */
@@ -54,6 +55,28 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_pipcmds2cmdinvo(node->content.piped_commands);
 		t_command_invocation *expected = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("abc", ' '), 0);
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+	}
+
+	TEST_SECTION("arguments 2個");
+	{
+		/* 準備 */
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc def\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_piped_commands(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_pipcmds2cmdinvo(node->content.piped_commands);
+		t_command_invocation *expected = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("abc def", ' '), 0);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
