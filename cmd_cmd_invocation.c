@@ -22,10 +22,18 @@ t_command_invocation	*cmd_init_cmdinvo(const char *output_file_path,
 /*
 ** cmd->pipe_command にコマンドを追加
 */
-t_command_invocation *cmd_add_cmdinvo(t_command_invocation *cmds, t_command_invocation *newcmd)
+t_command_invocation *cmd_add_cmdinvo(t_command_invocation **cmds, t_command_invocation *newcmd)
 {
-	while (cmds->piped_command)
-		cmds = cmds->piped_command;
-	cmds->piped_command = newcmd;
+	t_command_invocation	*current_cmd;
+
+	if (!*cmds)
+		*cmds = newcmd;
+	else
+	{
+		current_cmd = *cmds;
+		while (current_cmd->piped_command)
+			current_cmd = current_cmd->piped_command;
+		current_cmd->piped_command = newcmd;
+	}
 	return (newcmd);
 }

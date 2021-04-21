@@ -41,6 +41,6 @@ t_command_invocation	*cmd_init_cmdinvo(const char *output_file_path,
 	const char *input_file_path, const char **exec_and_args, unsigned int flags);
 t_list	*cmd_lstadd_back_pid(t_list **lst, int pid);
 int		cmd_wait_pid_lst(t_list *lst);
-t_command_invocation	*cmd_add_cmdinvo(t_command_invocation *cmds, t_command_invocation *newcmd);
+t_command_invocation	*cmd_add_cmdinvo(t_command_invocation **cmds, t_command_invocation *newcmd);
 
 #endif
