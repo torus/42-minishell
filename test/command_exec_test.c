@@ -204,6 +204,7 @@ int main(){
 		int status = cmd_exec_commands(&cat_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat test.h | wc < test.c | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
+		free_ptrarr((void**)lastcat_command.exec_and_args);
 		free_ptrarr((void**)cat_command.exec_and_args);
 		free_ptrarr((void**)wc_command.exec_and_args);
 		remove("output.txt");
