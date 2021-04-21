@@ -6,7 +6,7 @@ void	free_and_assign_null(void **p)
 	*p = NULL;
 }
 
-void*	free_and_rtn_ptr(void *p, void *val)
+void	*free_and_rtn_ptr(void *p, void *val)
 {
 	free(p);
 	return (val);

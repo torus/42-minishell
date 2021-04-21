@@ -66,7 +66,7 @@ void				put_err_msg(char *str);
 int					put_err_msg_and_ret(char *str);
 void				put_err_msg_and_exit(char *str);
 void				free_and_assign_null(void **p);
-void*				free_and_rtn_ptr(void *p, void *val);
+void				*free_and_rtn_ptr(void *p, void *val);
 size_t				ptrarr_len(void **ptrarr);
 void				free_ptrarr(void **ptrarr);
 void				*free_ptrarr_and_rtn_null(void **ptrarr);
