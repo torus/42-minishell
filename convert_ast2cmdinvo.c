@@ -60,9 +60,11 @@ int cmd_process_redirection_node(t_parse_node_redirection *redirection_node, t_c
 int cmd_process_arguments_node(t_parse_node_arguments *args_node, t_command_invocation *command)
 {
 	// string
-	cmd_process_string_node(args_node->string_node->content.string, command);
+	if (args_node->string_node)
+		cmd_process_string_node(args_node->string_node->content.string, command);
 	// redirection
-	cmd_process_redirection_node(args_node->redirection_node->content.redirection, command);
+	if (args_node->redirection_node)
+		cmd_process_redirection_node(args_node->redirection_node->content.redirection, command);
 	return (0);
 }
 
