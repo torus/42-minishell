@@ -92,6 +92,8 @@ t_command_invocation *cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 		cmd_process_arguments_node(args_node, command);
 		if (args_node->rest_node)
 			args_node = args_node->rest_node->content.arguments;
+		else
+			args_node = NULL;
 	}
 	if (!command->exec_and_args)
 		return (NULL);
@@ -114,8 +116,11 @@ t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 	while (pipcmds)
 	{
 		command = cmd_ast_cmd2cmdinvo(pipcmds->command_node->content.command);
-		cmd_add_cmdinvo(commands, command);
-		pipcmds = pipcmds->next->content.piped_commands;
+		cmd_add_cmdinvo(&commands, command);
+		if (pipcmds->next)
+			pipcmds = pipcmds->next->content.piped_commands;
+		else
+			pipcmds = NULL;
 	}
 	return (commands);
 }
