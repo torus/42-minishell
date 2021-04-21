@@ -597,6 +597,7 @@ int main()
 {
 	test_lexer();
 	test_parser();
+	parse_free_all_ast();
 	int fail_count = print_result();
 	return (fail_count);
 }
