@@ -10,30 +10,30 @@ void	init_buf_with_string(t_parse_buffer *buf, const char* str)
 	buf->size = strlen(str);
 }
 
-void check_strarr(const char **actual, const char **expected)
+void check_strarr(const char **actual_strarr, const char **expected_strarr)
 {
 	int i = 0 ;
-	while (actual[i] && expected[i])
+	while (actual_strarr[i] && expected_strarr[i])
 	{
-		CHECK_EQ_STR(actual[i], expected[i]);
+		CHECK_EQ_STR(actual_strarr[i], expected_strarr[i]);
 		i++;
 	}
-	CHECK(!(actual || expected));  // 両方ともNULLだよね?
+	CHECK(!(actual_strarr || expected_strarr));  // 両方ともNULLだよね?
 }
 
-void check_cmdinvo(t_command_invocation *actual, t_command_invocation *expected)
+void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *expected_invo)
 {
-	while (actual && expected)
+	while (actual_cmdinvo && expected_invo)
 	{
-		if (actual->input_file_path || expected->input_file_path)
-			CHECK_EQ_STR(actual->input_file_path, expected->input_file_path);
-		if (actual->output_file_path || expected->output_file_path)
-			CHECK_EQ_STR(actual->output_file_path, expected->output_file_path);
-		check_strarr(actual->exec_and_args, expected->exec_and_args);
-		actual = actual->piped_command;
-		expected = expected->piped_command;
+		if (actual_cmdinvo->input_file_path || expected_invo->input_file_path)
+			CHECK_EQ_STR(actual_cmdinvo->input_file_path, expected_invo->input_file_path);
+		if (actual_cmdinvo->output_file_path || expected_invo->output_file_path)
+			CHECK_EQ_STR(actual_cmdinvo->output_file_path, expected_invo->output_file_path);
+		check_strarr(actual_cmdinvo->exec_and_args, expected_invo->exec_and_args);
+		actual_cmdinvo = actual_cmdinvo->piped_command;
+		expected_invo = expected_invo->piped_command;
 	}
-	CHECK(!(actual || expected));  // 両方ともNULLだよね?
+	CHECK(!(actual_cmdinvo || expected_invo));  // 両方ともNULLだよね?
 }
 
 int main()
