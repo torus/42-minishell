@@ -14,6 +14,8 @@ void	free_ptrarr(void **ptrarr)
 {
 	size_t	i;
 
+	if (!ptrarr)
+		return ;
 	i = 0;
 	while (ptrarr[i])
 	{
