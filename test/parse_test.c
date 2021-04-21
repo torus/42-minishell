@@ -144,6 +144,22 @@ void check_single_argument(t_parse_ast *node, const char *expected)
 	check_string(str_node, expected);
 }
 
+void check_output_redirection(t_parse_ast	*red_node, const char *name)
+{
+	CHECK(red_node);
+	CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
+	CHECK_EQ(red_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
+	check_string(red_node->content.redirection->string_node, name);
+}
+
+void check_redirection(t_parse_ast	*red_node, const char *name)
+{
+	CHECK(red_node);
+	CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
+	CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
+	check_string(red_node->content.redirection->string_node, name);
+}
+
 void check_args(t_parse_ast	*node)
 {
 	CHECK(node);
@@ -153,10 +169,8 @@ void check_args(t_parse_ast	*node)
 
 	node = node->content.arguments->rest_node;
 	t_parse_ast *red_node = node->content.arguments->redirection_node;
-	CHECK(red_node);
-	CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
-	CHECK_EQ(red_node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
-	check_string(red_node->content.redirection->string_node, "abc");
+	check_redirection(red_node, "abc");
+	CHECK(!node->content.arguments->rest_node);
 }
 
 void check_piped_commands(t_parse_ast *node)
@@ -301,7 +315,7 @@ void test_parser(void)
 		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
 		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
 		CHECK_EQ_STR(node->content.redirection->string_node
-					->content.string->text, "file");
+					 ->content.string->text, "file");
 	}
 
 	TEST_SECTION("parse_redirection　>>");
@@ -409,6 +423,48 @@ void test_parser(void)
 
 		t_parse_ast *node = parse_arguments(&buf, &tok);
 		check_args(node);
+	}
+
+	TEST_SECTION("parse_arguments ファイル + リダイレクト 2 個");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "file < abc < def\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_arguments(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
+		check_single_argument(node, "file");
+		node = node->content.arguments->rest_node;
+		t_parse_ast *red_node = node->content.arguments->redirection_node;
+		check_redirection(red_node, "abc");
+
+		node = node->content.arguments->rest_node;
+		red_node = node->content.arguments->redirection_node;
+		check_redirection(red_node, "def");
+	}
+
+	TEST_SECTION("parse_arguments ファイル + 出力リダイレクト 2 個");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "file > abc > def\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_arguments(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
+		check_single_argument(node, "file");
+		node = node->content.arguments->rest_node;
+		t_parse_ast *red_node = node->content.arguments->redirection_node;
+		check_output_redirection(red_node, "abc");
+
+		node = node->content.arguments->rest_node;
+		red_node = node->content.arguments->redirection_node;
+		check_output_redirection(red_node, "def");
 	}
 
 	TEST_SECTION("parse_command ファイル + リダイレクト");
