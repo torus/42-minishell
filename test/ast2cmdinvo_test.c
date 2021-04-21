@@ -18,7 +18,7 @@ void check_strarr(const char **actual_strarr, const char **expected_strarr)
 		CHECK_EQ_STR(actual_strarr[i], expected_strarr[i]);
 		i++;
 	}
-	CHECK(!(actual_strarr || expected_strarr));  // 両方ともNULLだよね?
+	CHECK(!(actual_strarr[i] || expected_strarr[i]));  // 両方ともNULLだよね?
 }
 
 void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *expected_invo)
@@ -30,6 +30,7 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 		if (actual_cmdinvo->output_file_path || expected_invo->output_file_path)
 			CHECK_EQ_STR(actual_cmdinvo->output_file_path, expected_invo->output_file_path);
 		check_strarr(actual_cmdinvo->exec_and_args, expected_invo->exec_and_args);
+
 		actual_cmdinvo = actual_cmdinvo->piped_command;
 		expected_invo = expected_invo->piped_command;
 	}
