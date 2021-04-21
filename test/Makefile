@@ -27,7 +27,7 @@ VALGRIND = valgrind -q --leak-check=full --errors-for-leak-kinds=all --show-leak
 
 run: parse_test env_test path_test exec_test command_exec_test ast2cmdinvo_test
 	${VALGRIND} ./parse_test
-	./env_test
+	${VALGRIND} ./env_test
 	./path_test
 	./exec_test
 	./command_exec_test
