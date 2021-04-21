@@ -29,7 +29,7 @@ run: parse_test env_test path_test exec_test command_exec_test ast2cmdinvo_test
 	${VALGRIND} ./parse_test
 	${VALGRIND} ./env_test
 	${VALGRIND} ./path_test
-	./exec_test
+	${VALGRIND} ./exec_test
 	./command_exec_test
 	${VALGRIND} ./ast2cmdinvo_test
 
