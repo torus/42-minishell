@@ -56,5 +56,8 @@ int main()
 		t_command_invocation *expected = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("abc", ' '), 0);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
 	}
 }
