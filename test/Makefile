@@ -22,7 +22,6 @@ TEST_UTILS = test.c \
 
 run: parse_test env_test path_test exec_test command_exec_test
 	valgrind -q --leak-check=full --errors-for-leak-kinds=all --show-leak-kinds=all --error-exitcode=99 ./parse_test
-	./parse_test
 	./env_test
 	./path_test
 	./exec_test
