@@ -14,9 +14,13 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 	t_command_invocation *command)
 {
 	const char	**strarr;
+	const char	*text;
 
+	text = ft_strdup(string_node->text);
+	if (!text)
+		return (ERROR);
 	strarr = (const char **)ptrarr_add_ptr((void **)command->exec_and_args,
-			(void *)string_node->text);
+			(void *)text);
 	if (!strarr)
 		return (ERROR);
 	free((void **)command->exec_and_args);
