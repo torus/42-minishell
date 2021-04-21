@@ -53,7 +53,7 @@ command_exec_test: command_exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 
 ast2cmdinvo_test: ast2cmdinvo_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -fsanitize=address -o $@ $^ ${LIBFT_LIB}
 
 norm:
 	docker-compose run --rm norm norminette ../*.[ch]
