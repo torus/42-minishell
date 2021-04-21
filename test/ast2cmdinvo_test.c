@@ -227,4 +227,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected_first);
 	}
+
+	int fail_count = print_result();
+	return (fail_count);
 }
