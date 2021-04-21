@@ -16,8 +16,6 @@ static int	cmd_connect_pipe(
  * fork and execute commands.
  *
  * return: status of last command
- * 
- * FIXME: エラーが発生した時にpid_lstがメモリリークを起こす
  */
 int	cmd_exec_commands(t_command_invocation *command)
 {
