@@ -43,6 +43,7 @@ void	free_ptrarr_and_assign_null(void ***ptrarr)
 */
 void	**ptrarr_add_ptr(void **ptrarr, void *ptr)
 {
+	// size_t	idx;
 	size_t	arr_size;
 	void	**new_ptrarr;
 
@@ -52,9 +53,15 @@ void	**ptrarr_add_ptr(void **ptrarr, void *ptr)
 	new_ptrarr = ft_calloc(arr_size + 2, sizeof(void *));
 	if (!new_ptrarr)
 		return (NULL);
-	ft_memcpy(new_ptrarr, ptrarr, arr_size);
-	if (ptrarr)
-		free_ptrarr(ptrarr);
+	ft_memcpy(new_ptrarr, ptrarr, sizeof(void*) * arr_size);
+	/*
+	idx = 0;
+	while (idx < arr_size)
+	{
+		new_ptrarr[idx] = ptrarr[idx];
+		idx++;
+	}
+	*/
 	new_ptrarr[arr_size] = ptr;
 	return (new_ptrarr);
 }
