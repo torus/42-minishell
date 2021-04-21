@@ -38,6 +38,9 @@ t_command_invocation *cmd_add_cmdinvo(t_command_invocation **cmds, t_command_inv
 	return (newcmd);
 }
 
+/*
+** free command_invocation recursively
+*/
 void	cmd_free_cmdinvo(t_command_invocation *cmds)
 {
 	t_command_invocation	*current_cmd;
