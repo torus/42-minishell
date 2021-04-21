@@ -65,3 +65,5 @@ fclean:
 	rm ./exec_test
 	rm ./command_exec_test
 	rm ./ast2cmdinvo_test
+
+re: fclean run
