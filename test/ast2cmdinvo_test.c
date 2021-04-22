@@ -333,7 +333,7 @@ int main()
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		t_command_invocation *expected = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("echo abc", ' '), 0);
+		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo abc", ' '));
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -364,7 +364,7 @@ int main()
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		t_command_invocation *expected = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("echo abc def", ' '), 0);
+		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo abc def", ' '));
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -394,7 +394,7 @@ int main()
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		t_command_invocation *expected = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("echo", ' '), 0);
+		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo", ' '));
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
