@@ -43,7 +43,7 @@ void					cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
 t_list					*cmd_lstadd_back_pid(t_list **lst, int pid);
 int						cmd_wait_pid_lst(t_list *lst);
 t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args);
-t_command_invocation	*cmd_add_cmdinvo(t_command_invocation **cmds,
+t_command_invocation	*cmd_cmdinvo_add_pipcmd(t_command_invocation **cmds,
 							t_command_invocation *newcmd);
 int	cmd_add_inredirect(t_command_invocation *command,
 	const char *filepath);

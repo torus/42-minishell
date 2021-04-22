@@ -166,7 +166,7 @@ int main(){
 		t_command_invocation *second_command = cmd_init_cmdinvo((const char**)ft_split("wc", ' '));
 		cmd_add_outredirect(second_command, ft_strdup("output.txt"), false);
 
-		cmd_add_cmdinvo(&first_command, second_command);
+		cmd_cmdinvo_add_pipcmd(&first_command, second_command);
 
 		int status = cmd_exec_commands(first_command);
 		CHECK_EQ(status, 0);
@@ -184,8 +184,8 @@ int main(){
 		t_command_invocation *third_command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
 		cmd_add_outredirect(third_command, ft_strdup("output.txt"), false);
 
-		cmd_add_cmdinvo(&first_command, second_command);
-		cmd_add_cmdinvo(&first_command, third_command);
+		cmd_cmdinvo_add_pipcmd(&first_command, second_command);
+		cmd_cmdinvo_add_pipcmd(&first_command, third_command);
 
 		int status = cmd_exec_commands(first_command);
 		CHECK_EQ(status, 0);
@@ -204,8 +204,8 @@ int main(){
 		t_command_invocation *third_command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
 		cmd_add_outredirect(third_command, ft_strdup("output.txt"), false);
 
-		cmd_add_cmdinvo(&first_command, second_command);
-		cmd_add_cmdinvo(&first_command, third_command);
+		cmd_cmdinvo_add_pipcmd(&first_command, second_command);
+		cmd_cmdinvo_add_pipcmd(&first_command, third_command);
 
 		int status = cmd_exec_commands(first_command);
 		CHECK_EQ(status, 0);
@@ -224,8 +224,8 @@ int main(){
 		t_command_invocation *third_command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
 		cmd_add_outredirect(third_command, ft_strdup("output.txt"), false);
 
-		cmd_add_cmdinvo(&first_command, second_command);
-		cmd_add_cmdinvo(&first_command, third_command);
+		cmd_cmdinvo_add_pipcmd(&first_command, second_command);
+		cmd_cmdinvo_add_pipcmd(&first_command, third_command);
 
 		int status = cmd_exec_commands(first_command);
 		CHECK_EQ(status, 0);

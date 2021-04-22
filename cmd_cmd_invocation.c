@@ -59,21 +59,21 @@ int	cmd_add_outredirect(t_command_invocation *command,
 /*
 ** add command to cmd->pipe_command
 */
-t_command_invocation	*cmd_add_cmdinvo(t_command_invocation **cmds,
-	t_command_invocation *newcmd)
+t_command_invocation	*cmd_cmdinvo_add_pipcmd(t_command_invocation **cmds,
+	t_command_invocation *pipcmd)
 {
 	t_command_invocation	*current_cmd;
 
 	if (!*cmds)
-		*cmds = newcmd;
+		*cmds = pipcmd;
 	else
 	{
 		current_cmd = *cmds;
 		while (current_cmd->piped_command)
 			current_cmd = current_cmd->piped_command;
-		current_cmd->piped_command = newcmd;
+		current_cmd->piped_command = pipcmd;
 	}
-	return (newcmd);
+	return (pipcmd);
 }
 
 /*

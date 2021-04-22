@@ -122,7 +122,7 @@ t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 	while (pipcmds)
 	{
 		command = cmd_ast_cmd2cmdinvo(pipcmds->command_node->content.command);
-		cmd_add_cmdinvo(&commands, command);
+		cmd_cmdinvo_add_pipcmd(&commands, command);
 		if (pipcmds->next)
 			pipcmds = pipcmds->next->content.piped_commands;
 		else
