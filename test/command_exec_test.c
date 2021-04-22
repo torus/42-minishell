@@ -5,237 +5,174 @@ int main(){
 
     TEST_SECTION("echo hello");
     {
-		t_command_invocation command;
-		command.output_file_path = NULL;
-		command.piped_command = NULL;
-		command.input_file_path = NULL;
-		command.exec_and_args = (const char**)ft_split("echo hello", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("echo hello", ' '));
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
     }
 
     TEST_SECTION("cat /etc/passwd > output.txt");
     {
-		t_command_invocation command;
-		command.output_file_path = "output.txt";
-		command.piped_command = NULL;
-		command.input_file_path = NULL;
-		command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat /etc/passwd", ' '));
+		cmd_add_outredirect(command, ft_strdup("output.txt"), false);
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u /etc/passwd output.txt") == 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
 		remove("output.txt");
     }
 
 	TEST_SECTION("リダイレクト先が既に存在しているファイルの場合");
     {
 		system("echo aaaaaaaaaaaaaaaaaaaaaaaaaaaaa > output.txt ; cp output.txt expected.txt ; echo hello > expected.txt");
-		t_command_invocation command;
-		command.output_file_path = "output.txt";
-		command.piped_command = NULL;
-		command.input_file_path = NULL;
-		command.exec_and_args = (const char**)ft_split("echo hello", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("echo hello", ' '));
+		cmd_add_outredirect(command, ft_strdup("output.txt"), false);
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u expected.txt output.txt") == 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
 		remove("output.txt");
     }
 
     TEST_SECTION("/usr/bin/cat /etc/passwd > output.txt");
     {
-		t_command_invocation command;
-		command.output_file_path = "output.txt";
-		command.piped_command = NULL;
-		command.input_file_path = NULL;
-		command.exec_and_args = (const char**)ft_split("/usr/bin/cat /etc/passwd", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("/usr/bin/cat /etc/passwd", ' '));
+		cmd_add_outredirect(command, ft_strdup("output.txt"), false);
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u /etc/passwd output.txt") == 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
 		remove("output.txt");
     }
 
     TEST_SECTION("cat < Makefile");
     {
-		t_command_invocation command;
-		command.output_file_path = NULL;
-		command.piped_command = NULL;
-		command.input_file_path = "Makefile";
-		command.exec_and_args = (const char**)ft_split("cat", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
+		cmd_add_inredirect(command, ft_strdup("Makefile"));
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
     }
 
     TEST_SECTION("/usr/bin/cat < Makefile");
     {
-		t_command_invocation command;
-		command.output_file_path = NULL;
-		command.piped_command = NULL;
-		command.input_file_path = "Makefile";
-		command.exec_and_args = (const char**)ft_split("/usr/bin/cat", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("/usr/bin/cat", ' '));
+		cmd_add_inredirect(command, ft_strdup("Makefile"));
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
     }
 
     TEST_SECTION("cat < test.h > output.txt");
     {
-		t_command_invocation command;
-		command.output_file_path = "output.txt";
-		command.piped_command = NULL;
-		command.input_file_path = "test.h";
-		command.exec_and_args = (const char**)ft_split("cat", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
+		cmd_add_inredirect(command, ft_strdup("test.h"));
+		cmd_add_outredirect(command, ft_strdup("output.txt"), false);
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
 		CHECK(system("diff --color -u test.h output.txt") == 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
 		remove("output.txt");
     }
 
     TEST_SECTION("cat /etc/passwd | wc > output.txt  パイプが1つの場合");
     {
-		t_command_invocation wc_command;
-		wc_command.output_file_path = "output.txt";
-		wc_command.piped_command = NULL;
-		wc_command.input_file_path = NULL;
-		wc_command.exec_and_args = (const char**)ft_split("wc", ' ');
+		t_command_invocation *first_command = cmd_init_cmdinvo((const char**)ft_split("cat /etc/passwd", ' '));
 
-		t_command_invocation cat_command;
-		cat_command.output_file_path = NULL;
-		cat_command.piped_command = &wc_command;
-		cat_command.input_file_path = NULL;
-		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
+		t_command_invocation *second_command = cmd_init_cmdinvo((const char**)ft_split("wc", ' '));
+		cmd_add_outredirect(second_command, ft_strdup("output.txt"), false);
 
-		int status = cmd_exec_commands(&cat_command);
+		cmd_add_cmdinvo(&first_command, second_command);
+
+		int status = cmd_exec_commands(first_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat /etc/passwd | wc > expected.txt ; diff --color -u expected.txt output.txt") == 0);
-		free_ptrarr((void**)cat_command.exec_and_args);
-		free_ptrarr((void**)wc_command.exec_and_args);
+		cmd_free_cmdinvo(first_command);
 		remove("output.txt");
     }
 
     TEST_SECTION("cat /etc/passwd | wc | cat > output.txt  パイプが2つの場合");
     {
-		t_command_invocation lastcat_command;
-		lastcat_command.output_file_path = "output.txt";
-		lastcat_command.piped_command = NULL;
-		lastcat_command.input_file_path = NULL;
-		lastcat_command.exec_and_args = (const char**)ft_split("cat", ' ');
+		t_command_invocation *first_command = cmd_init_cmdinvo((const char**)ft_split("cat /etc/passwd", ' '));
 
-		t_command_invocation wc_command;
-		wc_command.output_file_path = NULL;
-		wc_command.piped_command = &lastcat_command;
-		wc_command.input_file_path = NULL;
-		wc_command.exec_and_args = (const char**)ft_split("wc", ' ');
+		t_command_invocation *second_command = cmd_init_cmdinvo((const char**)ft_split("wc", ' '));
 
-		t_command_invocation cat_command;
-		cat_command.output_file_path = NULL;
-		cat_command.piped_command = &wc_command;
-		cat_command.input_file_path = NULL;
-		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
+		t_command_invocation *third_command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
+		cmd_add_outredirect(third_command, ft_strdup("output.txt"), false);
 
-		int status = cmd_exec_commands(&cat_command);
+		cmd_add_cmdinvo(&first_command, second_command);
+		cmd_add_cmdinvo(&first_command, third_command);
+
+		int status = cmd_exec_commands(first_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat /etc/passwd | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
-		free_ptrarr((void**)lastcat_command.exec_and_args);
-		free_ptrarr((void**)cat_command.exec_and_args);
-		free_ptrarr((void**)wc_command.exec_and_args);
+		cmd_free_cmdinvo(first_command);
 		remove("output.txt");
     }
 
     TEST_SECTION("cat /etc/passwd > /dev/null | wc | cat > output.txt  パイプの最初のコマンドでリダイレクトがある");
     {
-		t_command_invocation lastcat_command;
-		lastcat_command.output_file_path = "output.txt";
-		lastcat_command.piped_command = NULL;
-		lastcat_command.input_file_path = NULL;
-		lastcat_command.exec_and_args = (const char**)ft_split("cat", ' ');
+		t_command_invocation *first_command = cmd_init_cmdinvo((const char**)ft_split("cat /etc/passwd", ' '));
+		cmd_add_outredirect(first_command, ft_strdup("/dev/null"), false);
 
-		t_command_invocation wc_command;
-		wc_command.output_file_path = NULL;
-		wc_command.piped_command = &lastcat_command;
-		wc_command.input_file_path = NULL;
-		wc_command.exec_and_args = (const char**)ft_split("wc", ' ');
+		t_command_invocation *second_command = cmd_init_cmdinvo((const char**)ft_split("wc", ' '));
 
-		t_command_invocation cat_command;
-		cat_command.output_file_path = "/dev/null";
-		cat_command.piped_command = &wc_command;
-		cat_command.input_file_path = NULL;
-		cat_command.exec_and_args = (const char**)ft_split("cat /etc/passwd", ' ');
+		t_command_invocation *third_command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
+		cmd_add_outredirect(third_command, ft_strdup("output.txt"), false);
 
-		int status = cmd_exec_commands(&cat_command);
+		cmd_add_cmdinvo(&first_command, second_command);
+		cmd_add_cmdinvo(&first_command, third_command);
+
+		int status = cmd_exec_commands(first_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat /etc/passwd > /dev/null | wc | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
-		free_ptrarr((void**)lastcat_command.exec_and_args);
-		free_ptrarr((void**)cat_command.exec_and_args);
-		free_ptrarr((void**)wc_command.exec_and_args);
+		cmd_free_cmdinvo(first_command);
 		remove("output.txt");
     }
 
     TEST_SECTION("cat test.h | wc < test.c | cat > output.txt  パイプの真ん中のコマンドでリダイレクトがある");
     {
-		t_command_invocation lastcat_command;
-		lastcat_command.output_file_path = "output.txt";
-		lastcat_command.piped_command = NULL;
-		lastcat_command.input_file_path = NULL;
-		lastcat_command.exec_and_args = (const char**)ft_split("cat", ' ');
+		t_command_invocation *first_command = cmd_init_cmdinvo((const char**)ft_split("cat test.h", ' '));
 
-		t_command_invocation wc_command;
-		wc_command.output_file_path = NULL;
-		wc_command.piped_command = &lastcat_command;
-		wc_command.input_file_path = "test.c";
-		wc_command.exec_and_args = (const char**)ft_split("wc", ' ');
+		t_command_invocation *second_command = cmd_init_cmdinvo((const char**)ft_split("wc", ' '));
+		cmd_add_inredirect(second_command, ft_strdup("test.c"));
 
-		t_command_invocation cat_command;
-		cat_command.output_file_path = NULL;
-		cat_command.piped_command = &wc_command;
-		cat_command.input_file_path = NULL;
-		cat_command.exec_and_args = (const char**)ft_split("cat test.h", ' ');
+		t_command_invocation *third_command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
+		cmd_add_outredirect(third_command, ft_strdup("output.txt"), false);
 
-		int status = cmd_exec_commands(&cat_command);
+		cmd_add_cmdinvo(&first_command, second_command);
+		cmd_add_cmdinvo(&first_command, third_command);
+
+		int status = cmd_exec_commands(first_command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat test.h | wc < test.c | cat > expected.txt ; diff --color -u expected.txt output.txt") == 0);
-		free_ptrarr((void**)lastcat_command.exec_and_args);
-		free_ptrarr((void**)cat_command.exec_and_args);
-		free_ptrarr((void**)wc_command.exec_and_args);
+		cmd_free_cmdinvo(first_command);
 		remove("output.txt");
     }
 
     TEST_SECTION("存在するコマンドを実行すると返り値は0になる");
     {
-		t_command_invocation command;
-		command.output_file_path = NULL;
-		command.piped_command = NULL;
-		command.input_file_path = NULL;
-		command.exec_and_args = (const char**)ft_split("echo", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("echo", ' '));
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK(status == 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
     }
 
     TEST_SECTION("存在しないコマンドを実行すると返り値は0以外になる");
     {
-		t_command_invocation command;
-		command.output_file_path = NULL;
-		command.piped_command = NULL;
-		command.input_file_path = NULL;
-		command.exec_and_args = (const char**)ft_split("not_exists", ' ');
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("not_exists", ' '));
 
-		int status = cmd_exec_commands(&command);
+		int status = cmd_exec_commands(command);
 		CHECK(status != 0);
-		free_ptrarr((void**)command.exec_and_args);
+		cmd_free_cmdinvo(command);
     }
 
 	int fail_count = print_result();
