@@ -13,10 +13,6 @@
 # include "libft/libft.h"
 # include "path.h"
 
-// 書き込みOR追記
-# define CMD_REDIRECT_WRITE  01
-# define CMD_REDIRECT_APPEND 02
-
 typedef struct s_cmd_redirection
 {
 	const char	*filepath;
