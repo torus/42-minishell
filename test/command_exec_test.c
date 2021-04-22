@@ -257,6 +257,7 @@ int main(){
 		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("not_exists", ' '));
 		cmd_add_outredirect(command, ft_strdup("output.txt"), false);
 
+		remove("output.txt");
 		int status = cmd_exec_commands(command);
 		CHECK(status != 0);
 		CHECK(system("ls -l output.txt") == 0);
