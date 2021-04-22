@@ -45,10 +45,10 @@ int						cmd_wait_pid_lst(t_list *lst);
 t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args);
 t_command_invocation	*cmd_cmdinvo_add_pipcmd(t_command_invocation **cmds,
 							t_command_invocation *newcmd);
-int	cmd_add_inredirect(t_command_invocation *command,
-	const char *filepath);
-int	cmd_add_outredirect(t_command_invocation *command,
-	const char *filepath, bool is_append);
+int						cmd_add_inredirect(t_command_invocation *command,
+							const char *filepath);
+int						cmd_add_outredirect(t_command_invocation *command,
+							const char *filepath, bool is_append);
 void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
 
