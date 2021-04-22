@@ -49,6 +49,21 @@ int main(){
 		remove("output.txt");
     }
 
+    TEST_SECTION("echo abc > actual.txt ; echo def >> actual.txt  追記リダイレクト");
+    {
+		system("echo abc > actual.txt");
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("echo def", ' '));
+		cmd_add_outredirect(command, ft_strdup("actual.txt"), true);
+
+		int status = cmd_exec_commands(command);
+		CHECK_EQ(status, 0);
+		CHECK(system("echo abc > expected.txt ; echo def >> expected.txt" " && "
+				"diff --color -u expected.txt actual.txt") == 0);
+		cmd_free_cmdinvo(command);
+		remove("actual.txt");
+		remove("expected.txt");
+    }
+
     TEST_SECTION("cat < Makefile");
     {
 		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
