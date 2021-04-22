@@ -6,6 +6,12 @@ void	**ptrarr_merge(void **ptrarr_first, void **ptrarr_last)
 	size_t	first_len;
 	size_t	last_len;
 
+	if (!ptrarr_first && !ptrarr_last)
+		return (NULL);
+	if (!ptrarr_first)
+		return (ptrarr_last);
+	if (!ptrarr_last)
+		return (ptrarr_first);
 	first_len = ptrarr_len(ptrarr_first);
 	last_len = ptrarr_len(ptrarr_last);
 	ptrarr_new = ft_calloc(first_len + last_len + 1, sizeof(void *));
