@@ -107,6 +107,58 @@ int main(){
 		remove("output.txt");
     }
 
+    TEST_SECTION("cat Makefile > a > b  出力リダイレクトが複数");
+    {
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat Makefile", ' '));
+		cmd_add_outredirect(command, ft_strdup("acutual_a"), false);
+		cmd_add_outredirect(command, ft_strdup("acutual_b"), false);
+
+		int status = cmd_exec_commands(command);
+		CHECK_EQ(status, 0);
+		CHECK(system("cat Makefile > expected_a > expected_b" " && "
+			  "diff --color -u expected_a actual_a && diff --color -u expected_b acutual_b") == 0);
+		cmd_free_cmdinvo(command);
+		remove("actual_a");
+		remove("actual_b");
+		remove("expected_a");
+		remove("expected_b");
+    }
+
+    TEST_SECTION("cat < Makefile < test.h > output.txt  入力リダイレクトが複数");
+    {
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
+		cmd_add_inredirect(command, ft_strdup("Makefile"));
+		cmd_add_inredirect(command, ft_strdup("test.h"));
+		cmd_add_outredirect(command, ft_strdup("output.txt"), false);
+
+		int status = cmd_exec_commands(command);
+		CHECK_EQ(status, 0);
+		CHECK(system("cat < Makefile < test.h > expected.txt" " && "
+			  "diff --color -u expected.txt output.txt") == 0);
+		cmd_free_cmdinvo(command);
+		remove("expected.txt");
+		remove("output.txt");
+    }
+
+	TEST_SECTION("cat Makefile >> a >> b 追記リダイレクションの時は途中のファイルは上書きされない");
+    {
+		system("echo ThisIsA > actual_a ; echo ThisIsB > actual_b");
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat Makefile", ' '));
+		cmd_add_outredirect(command, ft_strdup("acutual_a"), true);
+		cmd_add_outredirect(command, ft_strdup("acutual_b"), true);
+
+		int status = cmd_exec_commands(command);
+		CHECK_EQ(status, 0);
+		system("echo ThisIsA > expected_a ; echo ThisIsB > expected_b");
+		CHECK(system("cat Makefile >> expected_a >> expected_b" " && "
+			  "diff --color -u expected_a actual_a && diff --color -u expected_b acutual_b") == 0);
+		cmd_free_cmdinvo(command);
+		remove("actual_a");
+		remove("actual_b");
+		remove("expected_a");
+		remove("expected_b");
+    }
+
     TEST_SECTION("cat /etc/passwd | wc > output.txt  パイプが1つの場合");
     {
 		t_command_invocation *first_command = cmd_init_cmdinvo((const char**)ft_split("cat /etc/passwd", ' '));
@@ -198,6 +250,18 @@ int main(){
 		int status = cmd_exec_commands(command);
 		CHECK(status != 0);
 		cmd_free_cmdinvo(command);
+    }
+
+    TEST_SECTION("存在しないコマンドを実行してもリダイレクト先のファイルは作成される");
+    {
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("not_exists", ' '));
+		cmd_add_outredirect(command, ft_strdup("output.txt"), false);
+
+		int status = cmd_exec_commands(command);
+		CHECK(status != 0);
+		CHECK(system("ls -l output.txt") == 0);
+		cmd_free_cmdinvo(command);
+		remove("output.txt");
     }
 
 	int fail_count = print_result();
