@@ -49,6 +49,7 @@ int	cmd_add_inredirect(t_command_invocation *command,
 	const char *filepath);
 int	cmd_add_outredirect(t_command_invocation *command,
 	const char *filepath, bool is_append);
+void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
 
 #endif
