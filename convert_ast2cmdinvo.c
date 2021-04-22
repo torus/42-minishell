@@ -1,5 +1,28 @@
 #include "minishell.h"
 
+/*
+ * return splitted environment variable's value.
+ *
+ * env_key: keyname of environment variable without '$'
+ *
+ * return: splitted value of environment variable with space.
+ *         If env_key isn't found, return ft_split("", ' ').
+ */
+char	**cmd_expand_env_var(char *env_key)
+{
+	char	*env_val;
+	char	**splitted_val;
+
+	env_val = get_env_val(env_key);
+	if (!env_val)
+		return (ft_split("", ' '));
+	splitted_val = ft_split(env_val, ' ');
+	free(env_val);
+	if (!splitted_val)
+		return (NULL);
+	return (splitted_val);
+}
+
 /* set values of command->exec_and_args based on string_node
 **
 ** string ::=
@@ -16,11 +39,23 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 	const char	**strarr;
 	const char	*text;
 
-	text = ft_strdup(string_node->text);
-	if (!text)
-		return (ERROR);
-	strarr = (const char **)ptrarr_add_ptr((void **)command->exec_and_args,
+	// 環境変数の展開
+	if (string_node->type != TOKTYPE_NON_EXPANDABLE
+			&& (string_node->text[0] == '$' && ft_strlen(string_node->text) > 1))
+	{
+		char **splitted_env_val = cmd_expand_env_var(string_node->text + 1);
+		strarr = (const char **)ptrarr_merge((void **)command->exec_and_args,
+			(void **)splitted_env_val);
+		free(splitted_env_val);
+	}
+	else
+	{
+		text = ft_strdup(string_node->text);
+		if (!text)
+			return (ERROR);
+		strarr = (const char **)ptrarr_add_ptr((void **)command->exec_and_args,
 			(void *)text);
+	}
 	if (!strarr)
 		return (ERROR);
 	free((void **)command->exec_and_args);
