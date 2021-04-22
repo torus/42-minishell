@@ -27,7 +27,8 @@ int	cmd_add_inredirect(t_command_invocation *command,
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
 	redirection->filepath = filepath;
-	if (!redirection || !ft_lstadd_back_new(&command->input_redirections, (void *)redirection))
+	if (!redirection || !ft_lstadd_back_new(
+			&command->input_redirections, (void *)redirection))
 	{
 		free(redirection);
 		return (ERROR);
@@ -46,7 +47,8 @@ int	cmd_add_outredirect(t_command_invocation *command,
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
 	redirection->filepath = filepath;
 	redirection->is_append = is_append;
-	if (!redirection || !ft_lstadd_back_new(&command->output_redirections, (void *)redirection))
+	if (!redirection || !ft_lstadd_back_new(
+			&command->output_redirections, (void *)redirection))
 	{
 		free(redirection);
 		return (ERROR);
