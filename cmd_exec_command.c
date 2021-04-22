@@ -14,8 +14,8 @@ int	cmd_set_input_file(t_command_invocation *command)
 	t_list				*current;
 	t_cmd_redirection	*red;
 
-	current = command->input_rediretctions;
-	if (current)
+	current = command->input_redirections;
+	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
 		fd = open(red->filepath, O_RDONLY);
@@ -43,7 +43,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 	int					flag_open;
 
 	current = command->output_redirections;
-	if (current)
+	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
 		flag_open = 0;
