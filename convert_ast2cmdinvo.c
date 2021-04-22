@@ -22,7 +22,9 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 		text = get_env_val(string_node->text + 1);
 	else
 		text = ft_strdup(string_node->text);
-	splitted_env_val = ft_split(text, ' ');
+	splitted_env_val = NULL;
+	if (text)
+		splitted_env_val = ft_split(text, ' ');
 	strarr = (const char **)ptrarr_merge((void **)command->exec_and_args,
 		(void **)splitted_env_val);
 	free((void *)text);
