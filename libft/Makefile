@@ -52,6 +52,7 @@ SRCS =	ft_strlen.c \
 		error_utils.c \
 		free_utils.c \
 		ptrarr_utils.c \
+		ptrarr_utils2.c \
 		malloc_wrapper.c
 OBJS = $(SRCS:.c=.o)
 
