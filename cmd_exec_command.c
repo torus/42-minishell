@@ -55,7 +55,6 @@ int	cmd_set_output_file(t_command_invocation *command)
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error open()"));
-		// 最後のリダイレクトのみ繋げる
 		if (!current->next && dup2(fd, STDOUT_FILENO) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDOUT_NO)"));
 		current = current->next;
