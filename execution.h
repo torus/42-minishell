@@ -27,7 +27,7 @@ typedef struct s_command_invocation
 {
 	t_list						*output_redirections;
 	struct s_command_invocation	*piped_command;
-	t_list						*input_rediretctions;
+	t_list						*input_redirections;
 	const char					**exec_and_args;
 }	t_command_invocation;
 

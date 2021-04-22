@@ -11,7 +11,7 @@ t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args)
 	if (!cmdinvo)
 		return (NULL);
 	cmdinvo->exec_and_args = exec_and_args;
-	cmdinvo->input_rediretctions = NULL;
+	cmdinvo->input_redirections = NULL;
 	cmdinvo->output_redirections = NULL;
 	cmdinvo->piped_command = NULL;
 	return (cmdinvo);
@@ -27,7 +27,7 @@ int	cmd_add_inredirect(t_command_invocation *command,
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
 	redirection->filepath = filepath;
-	if (!redirection || !ft_lstadd_back_new(&command->input_rediretctions, (void *)redirection))
+	if (!redirection || !ft_lstadd_back_new(&command->input_redirections, (void *)redirection))
 	{
 		free(redirection);
 		return (ERROR);
@@ -103,7 +103,7 @@ void	cmd_free_cmdinvo(t_command_invocation *cmds)
 		current_cmd = cmds;
 		while (current_cmd)
 		{
-			ft_lstclear(&current_cmd->input_rediretctions, del_redirection);
+			ft_lstclear(&current_cmd->input_redirections, del_redirection);
 			ft_lstclear(&current_cmd->output_redirections, del_redirection);
 			free_ptrarr((void **)current_cmd->exec_and_args);
 			prev_cmd = current_cmd;

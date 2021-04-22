@@ -25,10 +25,10 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 {
 	while (actual_cmdinvo && expected_invo)
 	{
-		if (actual_cmdinvo->input_rediretctions || expected_invo->input_rediretctions)
+		if (actual_cmdinvo->input_redirections || expected_invo->input_redirections)
 		{
-			t_list	*current_actual = actual_cmdinvo->input_rediretctions;
-			t_list	*current_expected = expected_invo->input_rediretctions;
+			t_list	*current_actual = actual_cmdinvo->input_redirections;
+			t_list	*current_expected = expected_invo->input_redirections;
 			while (current_actual || current_expected)
 			{
 				t_cmd_redirection	*red_actual = (t_cmd_redirection *)current_actual->content;
