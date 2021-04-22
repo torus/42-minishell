@@ -52,7 +52,7 @@ void	cmd_free_cmdinvo(t_command_invocation *cmds)
 	else
 	{
 		current_cmd = cmds;
-		while (current_cmd->piped_command)
+		while (current_cmd)
 		{
 			free((void *)current_cmd->input_file_path);
 			free((void *)current_cmd->output_file_path);

@@ -29,12 +29,14 @@ t_list	*cmd_lstadd_back_pid(t_list **lst, int pid)
  */
 int	cmd_wait_pid_lst(t_list *lst)
 {
-	int	status;
+	int		status;
+	t_list	*current_lst;
 
-	while (lst)
+	current_lst = lst;
+	while (current_lst)
 	{
-		waitpid(*((int *)lst->content), &status, 0);
-		lst = lst->next;
+		waitpid(*((int *)current_lst->content), &status, 0);
+		current_lst = current_lst->next;
 	}
 	ft_lstclear(&lst, free);
 	return (status);

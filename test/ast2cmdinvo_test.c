@@ -105,7 +105,7 @@ int main()
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		t_command_invocation *expected = cmd_init_cmdinvo(NULL, "abc", (const char **)ft_split("file", ' '), 0);
+		t_command_invocation *expected = cmd_init_cmdinvo(NULL, ft_strdup("abc"), (const char **)ft_split("file", ' '), 0);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -127,7 +127,7 @@ int main()
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		t_command_invocation *expected = cmd_init_cmdinvo("abc", NULL, (const char **)ft_split("file", ' '), CMD_REDIRECT_WRITE);
+		t_command_invocation *expected = cmd_init_cmdinvo(ft_strdup("abc"), NULL, (const char **)ft_split("file", ' '), CMD_REDIRECT_WRITE);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -149,7 +149,7 @@ int main()
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		t_command_invocation *expected = cmd_init_cmdinvo("abc", NULL, (const char **)ft_split("file", ' '), CMD_REDIRECT_APPEND);
+		t_command_invocation *expected = cmd_init_cmdinvo(ft_strdup("abc"), NULL, (const char **)ft_split("file", ' '), CMD_REDIRECT_APPEND);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -215,7 +215,7 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_pipcmds2cmdinvo(node->content.piped_commands);
 		t_command_invocation *expected_first = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("abc", ' '), 0);
-		t_command_invocation *expected_second = cmd_init_cmdinvo(NULL, "abc", (const char **)ft_split("file", ' '), 0);
+		t_command_invocation *expected_second = cmd_init_cmdinvo(NULL, ft_strdup("abc"), (const char **)ft_split("file", ' '), 0);
 		expected_first->piped_command = expected_second;
 
 		CHECK(actual);
@@ -239,7 +239,7 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_pipcmds2cmdinvo(node->content.piped_commands);
 		t_command_invocation *expected_first = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("abc", ' '), 0);
-		t_command_invocation *expected_second = cmd_init_cmdinvo("abc", NULL, (const char **)ft_split("file", ' '), 0);
+		t_command_invocation *expected_second = cmd_init_cmdinvo(ft_strdup("abc"), NULL, (const char **)ft_split("file", ' '), 0);
 		expected_first->piped_command = expected_second;
 
 		CHECK(actual);
@@ -249,6 +249,7 @@ int main()
 		cmd_free_cmdinvo(expected_first);
 	}
 
+	parse_free_all_ast();
 	int fail_count = print_result();
 	return (fail_count);
 }
