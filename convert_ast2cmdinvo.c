@@ -89,7 +89,7 @@ t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 	t_command_invocation	*command;
 	t_parse_node_arguments	*args_node;
 
-	command = cmd_init_cmdinvo(NULL, NULL, NULL);
+	command = cmd_init_cmdinvo(NULL);
 	if (!command)
 		return (NULL);
 	args_node = cmd_node->arguments_node->content.arguments;
