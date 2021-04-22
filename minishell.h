@@ -5,6 +5,7 @@
 # include <unistd.h>
 # include <stdio.h>
 # include "execution.h"
+# include "env.h"
 # include "path.h"
 # include "lexer.h"
 # include "parse.h"
