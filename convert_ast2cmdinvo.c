@@ -1,28 +1,5 @@
 #include "minishell.h"
 
-/*
- * return splitted environment variable's value.
- *
- * env_key: keyname of environment variable without '$'
- *
- * return: splitted value of environment variable with space.
- *         If env_key isn't found, return ft_split("", ' ').
- */
-char	**cmd_expand_env_var(char *env_key)
-{
-	char	*env_val;
-	char	**splitted_val;
-
-	env_val = get_env_val(env_key);
-	if (!env_val)
-		return (ft_split("", ' '));
-	splitted_val = ft_split(env_val, ' ');
-	free(env_val);
-	if (!splitted_val)
-		return (NULL);
-	return (splitted_val);
-}
-
 /* set values of command->exec_and_args based on string_node
 **
 ** string ::=
