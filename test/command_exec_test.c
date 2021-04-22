@@ -84,6 +84,16 @@ int main(){
 		cmd_free_cmdinvo(command);
     }
 
+    TEST_SECTION("cat < not_exists  存在しないファイルを入力リダイレクトするとエラー");
+    {
+		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
+		cmd_add_inredirect(command, ft_strdup("not_exists"));
+
+		int status = cmd_exec_commands(command);
+		CHECK(status != 0);
+		cmd_free_cmdinvo(command);
+    }
+
     TEST_SECTION("cat < test.h > output.txt");
     {
 		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat", ' '));
