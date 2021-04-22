@@ -55,17 +55,11 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	if (!text)
 		return (ERROR);
 	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
-		command->input_file_path = text;
+		cmd_add_inredirect(command, text);
 	else if (redirection_type == TOKTYPE_OUTPUT_REDIRECTION)
-	{
-		command->output_file_path = text;
-		command->flags |= CMD_REDIRECT_WRITE;
-	}
+		cmd_add_outredirect(command, text, false);
 	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
-	{
-		command->output_file_path = text;
-		command->flags |= CMD_REDIRECT_APPEND;
-	}
+		cmd_add_outredirect(command, text, true);
 	return (0);
 }
 
@@ -103,7 +97,7 @@ t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 	t_command_invocation	*command;
 	t_parse_node_arguments	*args_node;
 
-	command = cmd_init_cmdinvo(NULL, NULL, NULL, 0);
+	command = cmd_init_cmdinvo(NULL);
 	if (!command)
 		return (NULL);
 	args_node = cmd_node->arguments_node->content.arguments;
@@ -136,7 +130,7 @@ t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 	while (pipcmds)
 	{
 		command = cmd_ast_cmd2cmdinvo(pipcmds->command_node->content.command);
-		cmd_add_cmdinvo(&commands, command);
+		cmd_cmdinvo_add_pipcmd(&commands, command);
 		if (pipcmds->next)
 			pipcmds = pipcmds->next->content.piped_commands;
 		else

@@ -9,19 +9,21 @@
 # include <fcntl.h>
 # include <signal.h>
 # include <dirent.h>
+# include <stdbool.h>
 # include "libft/libft.h"
 # include "path.h"
 
-// 書き込みOR追記
-# define CMD_REDIRECT_WRITE  01
-# define CMD_REDIRECT_APPEND 02
+typedef struct s_cmd_redirection
+{
+	const char	*filepath;
+	bool		is_append;
+}	t_cmd_redirection;
 
 typedef struct s_command_invocation
 {
-	const char					*output_file_path;
+	t_list						*output_redirections;
 	struct s_command_invocation	*piped_command;
-	const char					*input_file_path;
-	unsigned int				flags;
+	t_list						*input_redirections;
 	const char					**exec_and_args;
 }	t_command_invocation;
 
@@ -40,12 +42,14 @@ void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 void					cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
 t_list					*cmd_lstadd_back_pid(t_list **lst, int pid);
 int						cmd_wait_pid_lst(t_list *lst);
-t_command_invocation	*cmd_init_cmdinvo(const char *output_file_path,
-							const char *input_file_path,
-							const char **exec_and_args,
-							unsigned int flags);
-t_command_invocation	*cmd_add_cmdinvo(t_command_invocation **cmds,
+t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args);
+t_command_invocation	*cmd_cmdinvo_add_pipcmd(t_command_invocation **cmds,
 							t_command_invocation *newcmd);
+int						cmd_add_inredirect(t_command_invocation *command,
+							const char *filepath);
+int						cmd_add_outredirect(t_command_invocation *command,
+							const char *filepath, bool is_append);
+void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
 
 #endif

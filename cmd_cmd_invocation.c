@@ -3,63 +3,75 @@
 /*
 ** Malloc and initialize t_command_invocation
 */
-t_command_invocation	*cmd_init_cmdinvo(const char *output_file_path,
-	const char *input_file_path, const char **exec_and_args, unsigned int flags)
+t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args)
 {
 	t_command_invocation	*cmdinvo;
 
 	cmdinvo = malloc(sizeof(t_command_invocation));
 	if (!cmdinvo)
 		return (NULL);
-	cmdinvo->input_file_path = input_file_path;
-	cmdinvo->output_file_path = output_file_path;
 	cmdinvo->exec_and_args = exec_and_args;
+	cmdinvo->input_redirections = NULL;
+	cmdinvo->output_redirections = NULL;
 	cmdinvo->piped_command = NULL;
-	cmdinvo->flags = flags;
 	return (cmdinvo);
 }
 
 /*
-** cmd->pipe_command にコマンドを追加
+ * add input redirection
+ */
+int	cmd_add_inredirect(t_command_invocation *command,
+	const char *filepath)
+{
+	t_cmd_redirection	*redirection;
+
+	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
+	redirection->filepath = filepath;
+	if (!redirection || !ft_lstadd_back_new(
+			&command->input_redirections, (void *)redirection))
+	{
+		free(redirection);
+		return (ERROR);
+	}
+	return (0);
+}
+
+/*
+ * add output redirection
+ */
+int	cmd_add_outredirect(t_command_invocation *command,
+	const char *filepath, bool is_append)
+{
+	t_cmd_redirection	*redirection;
+
+	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
+	redirection->filepath = filepath;
+	redirection->is_append = is_append;
+	if (!redirection || !ft_lstadd_back_new(
+			&command->output_redirections, (void *)redirection))
+	{
+		free(redirection);
+		return (ERROR);
+	}
+	return (0);
+}
+
+/*
+** add command to cmd->pipe_command
 */
-t_command_invocation	*cmd_add_cmdinvo(t_command_invocation **cmds,
-	t_command_invocation *newcmd)
+t_command_invocation	*cmd_cmdinvo_add_pipcmd(t_command_invocation **cmds,
+	t_command_invocation *pipcmd)
 {
 	t_command_invocation	*current_cmd;
 
 	if (!*cmds)
-		*cmds = newcmd;
+		*cmds = pipcmd;
 	else
 	{
 		current_cmd = *cmds;
 		while (current_cmd->piped_command)
 			current_cmd = current_cmd->piped_command;
-		current_cmd->piped_command = newcmd;
+		current_cmd->piped_command = pipcmd;
 	}
-	return (newcmd);
-}
-
-/*
-** free command_invocation recursively
-*/
-void	cmd_free_cmdinvo(t_command_invocation *cmds)
-{
-	t_command_invocation	*current_cmd;
-	t_command_invocation	*prev_cmd;
-
-	if (!cmds)
-		return ;
-	else
-	{
-		current_cmd = cmds;
-		while (current_cmd)
-		{
-			free((void *)current_cmd->input_file_path);
-			free((void *)current_cmd->output_file_path);
-			free_ptrarr((void **)current_cmd->exec_and_args);
-			prev_cmd = current_cmd;
-			current_cmd = current_cmd->piped_command;
-			free(prev_cmd);
-		}
-	}
+	return (pipcmd);
 }
