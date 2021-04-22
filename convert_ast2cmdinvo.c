@@ -18,7 +18,7 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 	const char	*text;
 
 	if (string_node->type != TOKTYPE_NON_EXPANDABLE
-			&& string_node->text[0] == '$' && ft_strlen(string_node->text) > 1)
+		&& string_node->text[0] == '$' && ft_strlen(string_node->text) > 1)
 		text = get_env_val(string_node->text + 1);
 	else
 		text = ft_strdup(string_node->text);
@@ -26,7 +26,7 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 	if (text)
 		splitted_env_val = ft_split(text, ' ');
 	strarr = (const char **)ptrarr_merge((void **)command->exec_and_args,
-		(void **)splitted_env_val);
+			(void **)splitted_env_val);
 	free((void *)text);
 	free(splitted_env_val);
 	if (!strarr)
