@@ -10,7 +10,7 @@
  */
 int	cmd_set_input_file(t_command_invocation *command)
 {
-	int	fd;
+	int					fd;
 	t_list				*current;
 	t_cmd_redirection	*red;
 
@@ -23,6 +23,7 @@ int	cmd_set_input_file(t_command_invocation *command)
 			return (put_err_msg_and_ret("error open()"));
 		if (!current->next && dup2(fd, STDIN_FILENO) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
+		current = current->next;
 	}
 	return (0);
 }
