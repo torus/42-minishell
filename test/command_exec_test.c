@@ -110,13 +110,13 @@ int main(){
     TEST_SECTION("cat Makefile > a > b  出力リダイレクトが複数");
     {
 		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat Makefile", ' '));
-		cmd_add_outredirect(command, ft_strdup("acutual_a"), false);
-		cmd_add_outredirect(command, ft_strdup("acutual_b"), false);
+		cmd_add_outredirect(command, ft_strdup("actual_a"), false);
+		cmd_add_outredirect(command, ft_strdup("actual_b"), false);
 
 		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
 		CHECK(system("cat Makefile > expected_a > expected_b" " && "
-			  "diff --color -u expected_a actual_a && diff --color -u expected_b acutual_b") == 0);
+			  "diff --color -u expected_a actual_a && diff --color -u expected_b actual_b") == 0);
 		cmd_free_cmdinvo(command);
 		remove("actual_a");
 		remove("actual_b");
@@ -144,14 +144,14 @@ int main(){
     {
 		system("echo ThisIsA > actual_a ; echo ThisIsB > actual_b");
 		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("cat Makefile", ' '));
-		cmd_add_outredirect(command, ft_strdup("acutual_a"), true);
-		cmd_add_outredirect(command, ft_strdup("acutual_b"), true);
+		cmd_add_outredirect(command, ft_strdup("actual_a"), true);
+		cmd_add_outredirect(command, ft_strdup("actual_b"), true);
 
 		int status = cmd_exec_commands(command);
 		CHECK_EQ(status, 0);
 		system("echo ThisIsA > expected_a ; echo ThisIsB > expected_b");
 		CHECK(system("cat Makefile >> expected_a >> expected_b" " && "
-			  "diff --color -u expected_a actual_a && diff --color -u expected_b acutual_b") == 0);
+			  "diff --color -u expected_a actual_a && diff --color -u expected_b actual_b") == 0);
 		cmd_free_cmdinvo(command);
 		remove("actual_a");
 		remove("actual_b");
