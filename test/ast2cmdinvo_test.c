@@ -157,6 +157,68 @@ int main()
 		cmd_free_cmdinvo(expected);
 	}
 
+	TEST_SECTION("cmd_ast_cmd2cmdinvo 環境変数");
+	{
+		/* 準備 */
+		setenv("ABC", "abc", 0);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo $ABC \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "$ABC");
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
+		t_command_invocation *expected = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("echo abc", ' '), 0);
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("cmd_ast_cmd2cmdinvo スペースが含まれている環境変数");
+	{
+		/* 準備 */
+		setenv("ABC", "abc def", 0);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo $ABC \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "$ABC");
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
+		t_command_invocation *expected = cmd_init_cmdinvo(NULL, NULL, (const char **)ft_split("echo abc def", ' '), 0);
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+		unsetenv("ABC");
+	}
+
 	TEST_SECTION("cmd_ast_pipcmds2cmdinvo 文字列1つ");
 	{
 		/* 準備 */
