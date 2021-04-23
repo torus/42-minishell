@@ -436,6 +436,109 @@ int main()
 		unsetenv("ABC");
 	}
 
+	TEST_SECTION("cmd_ast_cmd2cmdinvo 文字列と環境変数");
+	{
+		/* 準備 */
+		setenv("ABC", "abc def", 0);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo hoge$ABC \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "hoge$ABC");
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
+		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo hogeabc def", ' '));
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+		unsetenv("ABC");
+	}
+
+
+	TEST_SECTION("cmd_ast_cmd2cmdinvo スペースが含まれている環境変数とダブルクオーテーション");
+	{
+		/* 準備 */
+		setenv("ABC", "abc def", 0);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo $ABC\"ghi jkl\" \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+		args_node = args_node->rest_node->content.arguments;
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "$ABC");
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "ghi jkl");
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
+		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo abc", ' '));
+		const char **strarr = (const char**)ptrarr_add_ptr((void **)expected->exec_and_args, ft_strdup("defghi jkl"));
+		free(expected->exec_and_args);
+		expected->exec_and_args = strarr;
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("cmd_ast_cmd2cmdinvo 環境変数が複数");
+	{
+		/* 準備 */
+		setenv("ABC", "abc def", 0);
+		setenv("DEF", "ABC DEF", 0);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo $ABC$DEF \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "$ABC$DEF");
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
+		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo abc defABC DEF", ' '));
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+		unsetenv("ABC");
+		unsetenv("DEF");
+	}
+
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 存在しない環境変数");
 	{
 		/* 準備 */
