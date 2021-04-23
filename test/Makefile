@@ -15,6 +15,7 @@ SRCS = ../env.c \
 	   ../cmd_pipe.c \
 	   ../cmd_pid.c \
 	   ../cmd_cmd_invocation.c \
+	   ../cmd_cmd_invocation2.c \
 	   ../convert_ast2cmdinvo.c
 HEADERS = ../env.h \
 		  ../parse.h \

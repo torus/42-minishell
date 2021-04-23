@@ -10,15 +10,20 @@
  */
 int	cmd_set_input_file(t_command_invocation *command)
 {
-	int	fd;
+	int					fd;
+	t_list				*current;
+	t_cmd_redirection	*red;
 
-	if (command->input_file_path)
+	current = command->input_redirections;
+	while (current)
 	{
-		fd = open(command->input_file_path, O_RDONLY);
+		red = (t_cmd_redirection *)current->content;
+		fd = open(red->filepath, O_RDONLY);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error open()"));
-		if (dup2(fd, STDIN_FILENO) == -1)
+		if (!current->next && dup2(fd, STDIN_FILENO) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
+		current = current->next;
 	}
 	return (0);
 }
@@ -32,16 +37,27 @@ int	cmd_set_input_file(t_command_invocation *command)
  */
 int	cmd_set_output_file(t_command_invocation *command)
 {
-	int	fd;
+	int					fd;
+	t_list				*current;
+	t_cmd_redirection	*red;
+	int					flag_open;
 
-	if (command->output_file_path)
+	current = command->output_redirections;
+	while (current)
 	{
-		fd = open(command->output_file_path, O_WRONLY | O_CREAT | O_TRUNC,
+		red = (t_cmd_redirection *)current->content;
+		flag_open = 0;
+		if (red->is_append)
+			flag_open |= O_APPEND;
+		else
+			flag_open |= O_TRUNC;
+		fd = open(red->filepath, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error open()"));
-		if (dup2(fd, STDOUT_FILENO) == -1)
+		if (!current->next && dup2(fd, STDOUT_FILENO) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDOUT_NO)"));
+		current = current->next;
 	}
 	return (0);
 }
