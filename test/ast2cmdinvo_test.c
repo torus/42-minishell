@@ -68,6 +68,48 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 
 int main()
 {
+	TEST_CHAPTER("expand_env_var");
+
+	TEST_SECTION("expand_env_var(hoge)");
+	{
+		char *input = ft_strdup("hoge");
+		char *actual = expand_env_var(input);
+		char *expected = "hoge";
+		CHECK_EQ_STR(actual, expected);
+	}
+
+	TEST_SECTION("expand_env_var($ABC)");
+	{
+		setenv("ABC", "abc def", 0);
+		char *input = ft_strdup("$ABC");
+		char *actual = expand_env_var(input);
+		char *expected = "abc def";
+		CHECK_EQ_STR(actual, expected);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("expand_env_var(hoge$ABC)");
+	{
+		setenv("ABC", "abc def", 0);
+		char *input = ft_strdup("$ABC");
+		char *actual = expand_env_var(input);
+		char *expected = "hogeabc def";
+		CHECK_EQ_STR(actual, expected);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("expand_env_var(hoge$ABC-abc)");
+	{
+		setenv("ABC", "abc def", 0);
+		char *input = ft_strdup("$ABC");
+		char *actual = expand_env_var(input);
+		char *expected = "hogeabc def-abc";
+		CHECK_EQ_STR(actual, expected);
+		unsetenv("ABC");
+	}
+
+
+
 	TEST_CHAPTER("AST to command_invocation");
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 文字列1つ");
