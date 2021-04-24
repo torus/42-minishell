@@ -1,5 +1,56 @@
 #include "minishell.h"
 
+/*
+ * 環境変数を展開してresultに連結させる
+ */
+static	char *expand_and_join_env(char *result, char *str, int env_start_idx, int env_len)
+{
+	char	*keyname;
+	char	*keyval;
+	char	*tmp_result;
+
+	keyname = ft_substr(str, env_start_idx, env_len);
+	if (!keyname)
+		return (NULL);
+	keyval = get_env_val(keyname);
+	if (keyval)
+	{
+		if (result)
+		{
+			tmp_result = result;
+			result = ft_strjoin(result, keyval);
+			free(keyval);
+			free(tmp_result);
+		}
+		else
+			result = keyval;
+	}
+	free(keyname);
+	return (result);
+}
+
+/*
+ * 普通の文字列をresultに連結させる
+ */
+static	char *result_join_normal_str(char *result, char *str, int start_idx, int len)
+{
+	char *tmp;
+	// ここまでの文字列をresultに格納
+	tmp = ft_substr(str, start_idx, len);  // '$' を含まない
+	if (!tmp)
+		return (NULL);
+	if (!result)
+		result = tmp;
+	else
+	{
+		char *tmp2 = result;
+		result = ft_strjoin(result, tmp);
+		free(tmp);
+		free(tmp2);
+	}
+	return (result);
+}
+
 /* 環境変数を展開する
  */
 char	*expand_env_var(char *str)
@@ -17,37 +68,13 @@ char	*expand_env_var(char *str)
 	{
 		if (is_in_env && (!(ft_isalnum(str[i]) || str[i] == '_') || !str[i]))
 		{
-			char *keyname = ft_substr(str, start_idx, i - start_idx);
-			if (!keyname)
-				return (NULL);
-			char *tmp = get_env_val(keyname);
-			if (tmp)
-			{
-				char *tmp_result = result;
-				result = ft_strjoin(result, tmp);
-				free(tmp);
-				free(tmp_result);
-			}
-			free(keyname);
+			result = expand_and_join_env(result, str, start_idx, i - start_idx);
 			start_idx = i;  // ノーマル文字列が始まるidx
 			is_in_env = false;
 		}
 		else if ((str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_')) || !str[i])  // 環境変数名が始まる!
 		{
-			char *tmp;
-			// ここまでの文字列をresultに格納
-			tmp = ft_substr(str, start_idx, i - start_idx);  // '$' を含まない
-			if (!tmp)
-				return (NULL);
-			if (!result)
-			{
-				result = tmp;
-			}else{
-				char *tmp2 = result;
-				result = ft_strjoin(result, tmp);
-				free(tmp);
-				free(tmp2);
-			}
+			result = result_join_normal_str(result, str, start_idx, i - start_idx);
 			start_idx = i + 1;  // 環境変数名の始まるidx
 			is_in_env = true;
 		}
