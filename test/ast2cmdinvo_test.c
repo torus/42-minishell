@@ -91,9 +91,19 @@ int main()
 	TEST_SECTION("expand_env_var(hoge$ABC)");
 	{
 		setenv("ABC", "abc def", 0);
-		char *input = ft_strdup("$ABC");
+		char *input = ft_strdup("hoge$ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "hogeabc def";
+		CHECK_EQ_STR(actual, expected);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("expand_env_var($ABC-hoge)");
+	{
+		setenv("ABC", "abc def", 0);
+		char *input = ft_strdup("$ABC-hoge");
+		char *actual = expand_env_var(input);
+		char *expected = "abc def-hoge";
 		CHECK_EQ_STR(actual, expected);
 		unsetenv("ABC");
 	}
@@ -101,7 +111,7 @@ int main()
 	TEST_SECTION("expand_env_var(hoge$ABC-abc)");
 	{
 		setenv("ABC", "abc def", 0);
-		char *input = ft_strdup("$ABC");
+		char *input = ft_strdup("hoge$ABC-abc");
 		char *actual = expand_env_var(input);
 		char *expected = "hogeabc def-abc";
 		CHECK_EQ_STR(actual, expected);
