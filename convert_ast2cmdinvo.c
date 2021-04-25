@@ -1,5 +1,63 @@
 #include "minishell.h"
 
+
+/* 
+ * in: abc"x y""abc def"
+ * out: "abcx y abc def"
+ *
+ * $ABC="abc def"
+ * in: "x y"$ABC
+ * out: ["x yabc", "def"]
+ */
+char **expand_string_node(t_parse_node_string *string_node)
+{
+	char	**strarr;
+	char	*text;
+	char	**expanded_strarr;
+
+	while (string_node)
+	{
+		if (string_node->type == TOKTYPE_EXPANDABLE
+				|| string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
+		{
+			text = expand_env_var(string_node->text);  // $ABC => "abc def"
+			if (text && string_node->type == TOKTYPE_EXPANDABLE)
+			{
+				strarr = ft_split(text, ' ');
+				// expanded_strarrの最後とstrarrの最初をくっつける
+				char *tmp = expanded_strarr[ptrarr_len((void **)expanded_strarr) - 1];
+				char *tmp2 = strarr[0];
+				expanded_strarr[ptrarr_len((void **)expanded_strarr) - 1] = ft_strjoin(expanded_strarr[ptrarr_len((void **)expanded_strarr) - 1], strarr[0]);
+				free(tmp);
+				free(tmp2);
+				// strarrの残りの部分をexpanded_strarrに追加する
+				int i = 1;
+				while (strarr[i])
+				{
+					char **tmp = expanded_strarr;
+					expanded_strarr = (char **)ptrarr_add_ptr((void **)expanded_strarr, strarr[i++]);
+					free(tmp);
+				}
+				free(strarr);
+			}
+			else if (text && string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
+			{
+				expanded_strarr = (char **)ptrarr_add_ptr((void**)expanded_strarr, text);
+			}
+		}
+		else
+		{
+			text = ft_strdup(string_node->text);
+			expanded_strarr = (char **)ptrarr_add_ptr((void**)expanded_strarr, text);
+		}
+		if (string_node->next)
+			string_node = string_node->next->content.string;
+		else
+			break;
+	}
+	return (expanded_strarr);
+}
+
 /* set values of command->exec_and_args based on string_node
 **
 ** string ::=
@@ -15,19 +73,10 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 {
 	char		**splitted_env_val;
 	const char	**strarr;
-	const char	*text;
 
-	if (string_node->type != TOKTYPE_NON_EXPANDABLE
-		&& string_node->text[0] == '$' && ft_strlen(string_node->text) > 1)
-		text = get_env_val(string_node->text + 1);
-	else
-		text = ft_strdup(string_node->text);
-	splitted_env_val = NULL;
-	if (text)
-		splitted_env_val = ft_split(text, ' ');
+	splitted_env_val = expand_string_node(string_node);
 	strarr = (const char **)ptrarr_merge((void **)command->exec_and_args,
 			(void **)splitted_env_val);
-	free((void *)text);
 	free(splitted_env_val);
 	if (!strarr)
 		return (ERROR);
