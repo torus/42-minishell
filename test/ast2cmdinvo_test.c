@@ -98,6 +98,16 @@ int main()
 		unsetenv("ABC");
 	}
 
+	TEST_SECTION("expand_env_var(hoge$ABC) 環境変数の両端に空白がある");
+	{
+		setenv("ABC", " abc def ", 0);
+		char *input = ft_strdup("hoge$ABC");
+		char *actual = expand_env_var(input);
+		char *expected = "hoge abc def ";
+		CHECK_EQ_STR(actual, expected);
+		unsetenv("ABC");
+	}
+
 	TEST_SECTION("expand_env_var($ABC-hoge)");
 	{
 		setenv("ABC", "abc def", 0);
