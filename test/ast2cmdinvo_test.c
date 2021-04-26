@@ -209,12 +209,11 @@ int main()
 		for (int i = 0; expected[i]; i++)
 		{
 			CHECK_EQ_STR(actual[i], expected[i]);
-			printf("i: |%s| == |%s|\n", actual[i], expected[i]);
+			printf("%d: |%s| == |%s|\n", i, actual[i], expected[i]);
 		}
 		free_ptrarr((void **)actual);
 		free_ptrarr((void **)expected);
 	}
-	return 0;
 
 	TEST_CHAPTER("AST to command_invocation");
 
