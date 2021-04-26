@@ -45,6 +45,93 @@ char	*string_node2string(t_parse_node_string *string_node)
 	return (result);
 }
 
+/*
+ * in: abc"x y""abc def"  // abc: expandable, x y: expandable_quoted, abc def: expandable_quoted  // abc"x y""abc def"
+ * out: "abcx yabc def"
+ *
+ * $ABC="abc def"
+ * in: "x y"$ABC
+ * out: ["x yabc", "def"]
+ */
+// 一度文字列を全て展開した上でexpanded_strarrを生成する?
+char **expand_string_node(t_parse_node_string *string_node)
+{
+	char	*str;
+	char	*tmp;
+
+	// 元の文字列に戻す
+	tmp = string_node2string(string_node);  // out: "$ABC"'\\\'$ABC'
+	// 元に戻した文字列内の環境変数を展開する
+	str = expand_env_var(tmp);  // out: |" abc def "\\'\'$ABC'|
+	free(tmp);
+	printf("expanded str: %s\n", str);
+
+	// 展開された文字列を元にsplitする
+	int		i;
+	char	**result;
+	char	quote_char;  // ' or " or \0
+	int		start_idx;
+	char	*text;
+
+	i = 0;
+	quote_char = '\0';
+	result = NULL;
+	start_idx = 0;
+	text = NULL;
+	// " abc def"\\'\'$ABC'
+	// |     hogeabc def"hoge hoge"'$ABC'|
+	while (str[i])
+	{
+		// 空白飛ばし
+		while (!quote_char && str[i] && str[i] <= ' ' && str[i] > '~')
+			i++;
+		if (!str[i])
+			break;
+		start_idx = i;
+		if (str[i] == '\'' || str[i] == '\"')
+		{
+			i++;  // クオートの次の文字から
+			start_idx = i;
+			quote_char = str[i];
+		}
+		// 空白 か クオート にぶつかるまで  (クオートの中では空白飛ばさない)
+		while (!quote_char && str[i] && str[i] > ' ' && str[i] <= '~' && !(str[i] == '\'' || str[i] == '\"'))
+			i++;
+		if (str[i] == '\'' || str[i] == '\"')
+		{
+			i++;  // クオートの次の文字から
+			start_idx = i;
+			quote_char = str[i];
+		}
+		// クオートの中で次のクオートにぶつかるまで
+		while (str[i] && quote_char && (str[i] != quote_char || (str[i] == quote_char && str[i-1] != '\\')))
+			i++;
+		quote_char = '\0';
+		// 最後終わった時に空白じゃなかったら次の文字列と繋げる
+		if (str[i] > ' ' || str[i] <= '~')
+		{
+			char *tmp1 = text;
+			char *tmp2 = ft_substr(str, start_idx, i - start_idx);
+			if (text)
+				text = ft_strjoin(tmp1, tmp2);
+			else
+				text = ft_strdup(tmp2);
+			free(tmp1);
+			free(tmp2);
+		}
+		else
+		{
+			char **tmp1 = result;
+			char *tmp2 = ft_substr(str, start_idx, i - start_idx);
+			printf("add: %s\n", tmp2);
+			result = (char **)ptrarr_add_ptr((void**)tmp1, tmp2);
+			free(tmp1);
+		}
+		i++;
+	}
+	return (result);
+}
+
 /* set values of command->exec_and_args based on string_node
 **
 ** string ::=
