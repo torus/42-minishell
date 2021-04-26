@@ -65,10 +65,10 @@ char	**split_expanded_str(char *str)
 			break ;
 		int		len = 0;
 		char	*text = NULL;
-		while (str[len])
+		while (true)
 		{
 			// クオートの中じゃない時の空白は区切り
-			if (!quote_char && str[len] == ' ')
+			if ((!quote_char && str[len] == ' ') || !str[len])
 			{
 				char *tmp = text;
 				char *tmp2 = ft_substr(str, 0, len);
