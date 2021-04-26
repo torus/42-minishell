@@ -19,6 +19,7 @@ void check_strarr(const char **actual_strarr, const char **expected_strarr)
 		CHECK_EQ_STR(actual_strarr[i], expected_strarr[i]);
 		i++;
 	}
+	printf("%d: |%s| == |%s|\n", i, actual_strarr[i], expected_strarr[i]);
 	CHECK(!(actual_strarr[i] || expected_strarr[i]));  // 両方ともNULLだよね?
 }
 
@@ -83,7 +84,7 @@ int main()
 
 	TEST_SECTION("expand_env_var($ABC)");
 	{
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		char *input = ft_strdup("$ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "abc def";
@@ -93,7 +94,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(hoge$ABC)");
 	{
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		char *input = ft_strdup("hoge$ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "hogeabc def";
@@ -103,7 +104,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(hoge$ABC) 環境変数の両端に空白がある");
 	{
-		setenv("ABC", " abc def ", 0);
+		setenv("ABC", " abc def ", 1);
 		char *input = ft_strdup("hoge$ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "hoge abc def ";
@@ -113,7 +114,7 @@ int main()
 
 	TEST_SECTION("expand_env_var($ABC-hoge)");
 	{
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		char *input = ft_strdup("$ABC-hoge");
 		char *actual = expand_env_var(input);
 		char *expected = "abc def-hoge";
@@ -123,7 +124,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(hoge$ABC-abc)");
 	{
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		char *input = ft_strdup("hoge$ABC-abc");
 		char *actual = expand_env_var(input);
 		char *expected = "hogeabc def-abc";
@@ -133,7 +134,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(\"$ABC\"\'\\\'$ABC\') ダブルクオーテーションとシングルクオーテーション");
 	{
-		setenv("ABC", " abc def ", 0);
+		setenv("ABC", " abc def ", 1);
 		char *input = ft_strdup("\"$ABC\"\'\\\'$ABC\'");
 		char *actual = expand_env_var(input);
 		char *expected = "\" abc def \"\'\\\'$ABC\'";
@@ -146,7 +147,7 @@ int main()
 	TEST_SECTION("string_node2string()");
 	{
 		/* 準備 */
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hoge\"'$ABC' \n");
 		t_token	tok;
@@ -176,7 +177,7 @@ int main()
 	TEST_SECTION("expand_string_node() 環境変数とクオーテーションマーク");
 	{
 		/* 準備 */
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hoge\"'$ABC' \n");
 		t_token	tok;
@@ -463,7 +464,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 環境変数");
 	{
 		/* 準備 */
-		setenv("ABC", "abc", 0);
+		setenv("ABC", "abc", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC \n");
 		t_token	tok;
@@ -494,7 +495,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo ダブルクオーテーションで囲まれた環境変数");
 	{
 		/* 準備 */
-		setenv("ABC", "abc", 0);
+		setenv("ABC", "abc", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo \"$ABC\" \n");
 		t_token	tok;
@@ -525,7 +526,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo シングルクオーテーションで囲まれた環境変数");
 	{
 		/* 準備 */
-		setenv("ABC", "abc", 0);
+		setenv("ABC", "abc", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo \'$ABC\' \n");
 		t_token	tok;
@@ -557,7 +558,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo スペースが含まれている環境変数");
 	{
 		/* 準備 */
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC \n");
 		t_token	tok;
@@ -588,7 +589,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 文字列と環境変数");
 	{
 		/* 準備 */
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC \n");
 		t_token	tok;
@@ -620,7 +621,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo スペースが含まれている環境変数とダブルクオーテーション");
 	{
 		/* 準備 */
-		setenv("ABC", "abc def", 0);
+		setenv("ABC", "abc def", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC\"ghi jkl\" \n");
 		t_token	tok;
@@ -658,8 +659,8 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 環境変数が複数");
 	{
 		/* 準備 */
-		setenv("ABC", "abc def", 0);
-		setenv("DEF", "ABC DEF", 0);
+		setenv("ABC", "abc def", 1);
+		setenv("DEF", "ABC DEF", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC$DEF \n");
 		t_token	tok;
