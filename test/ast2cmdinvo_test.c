@@ -128,12 +128,13 @@ int main()
 		unsetenv("ABC");
 	}
 
-	TEST_SECTION("expand_env_var(\"$ABC\"\'$ABC\') ダブルクオーテーションとシングルクオーテーション");
+	TEST_SECTION("expand_env_var(\"$ABC\"\'\\\'$ABC\') ダブルクオーテーションとシングルクオーテーション");
 	{
 		setenv("ABC", " abc def ", 0);
-		char *input = ft_strdup("hoge$ABC");
+		char *input = ft_strdup("\"$ABC\"\'\\\'$ABC\'");
 		char *actual = expand_env_var(input);
-		char *expected = " abc def $ABC";
+		char *expected = "\" abc def \"\'\\\'$ABC\'";
+		printf("actual: %s\n", actual);
 		CHECK_EQ_STR(actual, expected);
 		unsetenv("ABC");
 	}
