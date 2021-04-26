@@ -1,61 +1,48 @@
 #include "minishell.h"
 
-
-/* 
- * in: abc"x y""abc def"
- * out: "abcx y abc def"
- *
- * $ABC="abc def"
- * in: "x y"$ABC
- * out: ["x yabc", "def"]
- */
-char **expand_string_node(t_parse_node_string *string_node)
+// string_nodeを文字列に戻す
+// うまくいけばASTの時点でこの文字列になるように依頼する
+char	*string_node2string(t_parse_node_string *string_node)
 {
-	char	**strarr;
-	char	*text;
-	char	**expanded_strarr;
+	char	*result;
+	char	*tmp;
 
+	result = ft_strdup("");
 	while (string_node)
 	{
-		if (string_node->type == TOKTYPE_EXPANDABLE
-				|| string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
+		if (string_node->type == TOKTYPE_NON_EXPANDABLE)
 		{
-			text = expand_env_var(string_node->text);  // $ABC => "abc def"
-			if (text && string_node->type == TOKTYPE_EXPANDABLE)
-			{
-				strarr = ft_split(text, ' ');
-				// expanded_strarrの最後とstrarrの最初をくっつける
-				char *tmp = expanded_strarr[ptrarr_len((void **)expanded_strarr) - 1];
-				char *tmp2 = strarr[0];
-				expanded_strarr[ptrarr_len((void **)expanded_strarr) - 1] = ft_strjoin(expanded_strarr[ptrarr_len((void **)expanded_strarr) - 1], strarr[0]);
-				free(tmp);
-				free(tmp2);
-				// strarrの残りの部分をexpanded_strarrに追加する
-				int i = 1;
-				while (strarr[i])
-				{
-					char **tmp = expanded_strarr;
-					expanded_strarr = (char **)ptrarr_add_ptr((void **)expanded_strarr, strarr[i++]);
-					free(tmp);
-				}
-				free(strarr);
-			}
-			else if (text && string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
-			{
-				expanded_strarr = (char **)ptrarr_add_ptr((void**)expanded_strarr, text);
-			}
+			tmp = result;
+			result = ft_strjoin(result, "\'");
+			free(tmp);
 		}
-		else
+		else if (string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
 		{
-			text = ft_strdup(string_node->text);
-			expanded_strarr = (char **)ptrarr_add_ptr((void**)expanded_strarr, text);
+			tmp = result;
+			result = ft_strjoin(result, "\"");
+			free(tmp);
+		}
+		tmp = result;
+		result = ft_strjoin(result, string_node->text);
+		free(tmp);
+		if (string_node->type == TOKTYPE_NON_EXPANDABLE)
+		{
+			tmp = result;
+			result = ft_strjoin(result, "\'");
+			free(tmp);
+		}
+		else if (string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
+		{
+			tmp = result;
+			result = ft_strjoin(result, "\"");
+			free(tmp);
 		}
 		if (string_node->next)
 			string_node = string_node->next->content.string;
 		else
 			break;
 	}
-	return (expanded_strarr);
+	return (result);
 }
 
 /* set values of command->exec_and_args based on string_node

@@ -128,7 +128,29 @@ int main()
 		unsetenv("ABC");
 	}
 
+	// TODO: これでargs_nodeのコマンド引数展開がうまくいけそうならこの処理はparser側でやってもらう
+	TEST_SECTION("string_node2string()");
+	{
+		/* 準備 */
+		setenv("ABC", "abc def", 0);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hgoe\"'$ABC' \n");
+		t_token	tok;
 
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "hoge$ABC");
+
+		CHECK_EQ_STR(string_node2string(args_node->string_node->content.string), "hoge$ABC\"hoge hgoe\"'$ABC'");
+	}
 
 	TEST_CHAPTER("AST to command_invocation");
 
