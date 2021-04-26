@@ -52,6 +52,11 @@ static	char *result_join_normal_str(char *result, char *str, int start_idx, int 
 }
 
 /* 環境変数を展開する
+ *
+ * エスケープされたクオートなどはそのままなので, この後別の関数で処理してちょ
+ * ex:
+ *   in($ABC=" abc def "):  |"$ABC"'\'$ABC'|
+ *   out:                   |" abc def "'\' abc def '|
  */
 char	*expand_env_var(char *str)
 {
