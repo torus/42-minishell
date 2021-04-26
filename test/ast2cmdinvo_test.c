@@ -15,6 +15,7 @@ void check_strarr(const char **actual_strarr, const char **expected_strarr)
 	int i = 0 ;
 	while (actual_strarr[i] && expected_strarr[i])
 	{
+		printf("%d: |%s| == |%s|\n", i, actual_strarr[i], expected_strarr[i]);
 		CHECK_EQ_STR(actual_strarr[i], expected_strarr[i]);
 		i++;
 	}
@@ -35,6 +36,7 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
 
 				CHECK(red_actual->filepath && red_expected->filepath);
+				printf("|%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
 
 				current_actual = current_actual->next;
@@ -51,6 +53,7 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
 
 				CHECK(red_actual->filepath && red_expected->filepath);
+				printf("|%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
 				CHECK(red_actual->is_append == red_expected->is_append);
 
@@ -206,11 +209,7 @@ int main()
 		expected = (char **)ptrarr_add_ptr((void **)expected, ft_strdup("defhoge hoge$ABC"));
 		free(tmp);
 
-		for (int i = 0; expected[i]; i++)
-		{
-			CHECK_EQ_STR(actual[i], expected[i]);
-			printf("%d: |%s| == |%s|\n", i, actual[i], expected[i]);
-		}
+		check_strarr((const char **)actual, (const char **)expected);
 		free_ptrarr((void **)actual);
 		free_ptrarr((void **)expected);
 	}
@@ -228,6 +227,9 @@ int main()
 
 		t_parse_ast *node = parse_command(&buf, &tok);
         CHECK_EQ(node->type, ASTNODE_COMMAND);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+		CHECK_EQ_STR(string_node->text, "abc");
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
@@ -726,6 +728,9 @@ int main()
 
 		t_parse_ast *node = parse_piped_commands(&buf, &tok);
         CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
+		t_parse_node_arguments *args_node = node->content.piped_commands->command_node->content.command->arguments_node->content.arguments;
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+		CHECK_EQ_STR(string_node->text, "abc");
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_pipcmds2cmdinvo(node->content.piped_commands);
