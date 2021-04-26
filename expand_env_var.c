@@ -59,20 +59,30 @@ char	*expand_env_var(char *str)
 	int		start_idx;
 	char	*result;
 	bool	is_in_env;
+	bool	is_in_noexpand;  // 'の中にいるか?
+	bool	is_escaped;
 
 	i = 0;
 	start_idx = 0;
 	result = NULL;
 	is_in_env = false;
+	is_in_noexpand = false;
+	is_escaped = false;
 	while (i <= (int)ft_strlen(str))
 	{
+		if (str[i] == '\\')
+			is_escaped = true;
+		else
+			is_escaped = false;
+		if (!is_escaped && str[i] == '\'')  // シングルクオートで囲まれた中は環境変数展開しない
+			is_in_noexpand = !is_in_noexpand;
 		if (is_in_env && (!(ft_isalnum(str[i]) || str[i] == '_') || !str[i]))
 		{
 			result = expand_and_join_env(result, str, start_idx, i - start_idx);
 			start_idx = i;  // ノーマル文字列が始まるidx
 			is_in_env = false;
 		}
-		else if ((str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_')) || !str[i])  // 環境変数名が始まる!
+		else if ((!is_in_noexpand && str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_')) || !str[i])  // 環境変数名が始まる!
 		{
 			result = result_join_normal_str(result, str, start_idx, i - start_idx);
 			start_idx = i + 1;  // 環境変数名の始まるidx
