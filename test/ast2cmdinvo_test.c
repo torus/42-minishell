@@ -144,7 +144,7 @@ int main()
 		/* 準備 */
 		setenv("ABC", "abc def", 0);
 		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "echo hoge$ABC\"hoge \\\"hoge\"'$ABC' \n");
+		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hoge\"'$ABC' \n");
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -161,12 +161,12 @@ int main()
 		CHECK_EQ_STR(string_node->text, "hoge$ABC");
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
-		CHECK_EQ_STR(string_node->text, "hoge \\\"hoge");
+		CHECK_EQ_STR(string_node->text, "hoge hoge");
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
 		CHECK_EQ_STR(string_node->text, "$ABC");
-
-		CHECK_EQ_STR(string_node2string(args_node->string_node->content.string), "hoge$ABC\"hoge hgoe\"'$ABC'");
+		printf("expanded: %s\n", string_node2string(args_node->string_node->content.string));
+		CHECK_EQ_STR(string_node2string(args_node->string_node->content.string), "hoge$ABC\"hoge hoge\"'$ABC'");
 	}
 
 	TEST_CHAPTER("AST to command_invocation");
