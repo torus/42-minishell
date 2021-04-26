@@ -128,13 +128,23 @@ int main()
 		unsetenv("ABC");
 	}
 
+	TEST_SECTION("expand_env_var(\"$ABC\"\'$ABC\') ダブルクオーテーションとシングルクオーテーション");
+	{
+		setenv("ABC", " abc def ", 0);
+		char *input = ft_strdup("hoge$ABC");
+		char *actual = expand_env_var(input);
+		char *expected = " abc def $ABC";
+		CHECK_EQ_STR(actual, expected);
+		unsetenv("ABC");
+	}
+
 	// TODO: これでargs_nodeのコマンド引数展開がうまくいけそうならこの処理はparser側でやってもらう
 	TEST_SECTION("string_node2string()");
 	{
 		/* 準備 */
 		setenv("ABC", "abc def", 0);
 		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hgoe\"'$ABC' \n");
+		init_buf_with_string(&buf, "echo hoge$ABC\"hoge \\\"hoge\"'$ABC' \n");
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -146,8 +156,15 @@ int main()
 		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
 		args_node = args_node->rest_node->content.arguments;
-		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "hoge$ABC");
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "hoge$ABC");
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "hoge \\\"hoge");
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "$ABC");
 
 		CHECK_EQ_STR(string_node2string(args_node->string_node->content.string), "hoge$ABC\"hoge hgoe\"'$ABC'");
 	}
