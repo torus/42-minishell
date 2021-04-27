@@ -56,11 +56,10 @@ static char	*result_join_normal_str(char *result,
 
 static bool	will_start_env_var(bool is_in_noexpand, char *str, int len)
 {
-	return ((!is_in_noexpand
-				&& str[len] == '$'
-				&& (len < (int)ft_strlen(str) && (ft_isalnum(str[len + 1])
-				|| str[len + 1] == '_')))
-				|| !str[len]);
+	return ((!is_in_noexpand && str[len] == '$'
+			&& (len < (int)ft_strlen(str)
+				&& (ft_isalnum(str[len + 1]) || str[len + 1] == '_')))
+		|| !str[len]);
 }
 
 /* 環境変数を展開する
