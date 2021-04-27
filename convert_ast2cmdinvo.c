@@ -124,27 +124,20 @@ char	**split_expanded_str(char *str)
 }
 
 /*
- * in: abc"x y""abc def"  // abc: expandable, x y: expandable_quoted, abc def: expandable_quoted  // abc"x y""abc def"
- * out: "abcx yabc def"
- *
- * $ABC="abc def"
- * in: "x y"$ABC
- * out: ["x yabc", "def"]
+ * 一度文字列を全て展開した上でexpanded_strarrを生成する
  */
-// 一度文字列を全て展開した上でexpanded_strarrを生成する?
-char **expand_string_node(t_parse_node_string *string_node)
+char	**expand_string_node(t_parse_node_string *string_node)
 {
-	char	*str;
-	char	*tmp;
+	char	*restored_str;
+	char	*expanded_str;
+	char	**splitted_expanded_str;
 
-	// 元の文字列に戻す
-	tmp = string_node2string(string_node);  // out: "$ABC"'\\\'$ABC'
-	// 元に戻した文字列内の環境変数を展開する
-	str = expand_env_var(tmp);  // out: |" abc def "\\'\'$ABC'|
-	free(tmp);
-	char **splitted_env_val = split_expanded_str(str);
-	free(str);
-	return (splitted_env_val);
+	restored_str = string_node2string(string_node);
+	expanded_str = expand_env_var(restored_str);
+	free(restored_str);
+	splitted_expanded_str = split_expanded_str(expanded_str);
+	free(expanded_str);
+	return (splitted_expanded_str);
 }
 
 /* set values of command->exec_and_args based on string_node
