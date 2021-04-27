@@ -20,16 +20,55 @@ static char	*substr_and_join(char *dst, char *from, int len)
 }
 
 /*
- * 環境変数展開した文字列を分解して返す
+ * 環境変数展開された文字列から空白区切りされた文字列の1単位をstrdupする
+ *
+ * in: |abc def"ghi jkl"| だとしたら
+ * out: |abc| を返し, *str を d まで進める
+ * 次の呼び出しでは |defghi jkl| を返し, *str を \0 まで進める
  */
-char	**split_expanded_str(char *str)
+static char	*get_str_from_expanded_str(char **str)
 {
-	char	**result;
 	char	quote_char;
 	int		len;
 	char	*text;
 
 	quote_char = '\0';
+	len = 0;
+	text = NULL;
+	while (true)
+	{
+		// クオートの中じゃない時の空白は区切り
+		if ((!quote_char && (*str)[len] == ' ') || !(*str)[len])
+		{
+			text = substr_and_join(text, *str, len);
+			*str += len;
+			break;
+		}
+		if (((*str)[len] == '\'' || (*str)[len] == '\"') && !(len > 0 && (*str)[len - 1] == '\\'))
+		{
+			if (quote_char)
+				quote_char = '\0';
+			else
+				quote_char = (*str)[len];
+			text = substr_and_join(text, *str, len);
+			*str += len + 1;  // クオートの次の文字
+			len = 0;
+		}
+		else
+			len++;
+	}
+	return (text);
+}
+
+/*
+ * 環境変数展開した文字列を分解して返す
+ */
+char	**split_expanded_str(char *str)
+{
+	char	**result;
+	char	*text;
+	char	**tmp;
+
 	result = NULL;
 	while (*str)
 	{
@@ -38,33 +77,13 @@ char	**split_expanded_str(char *str)
 			str++;
 		if (!*str)
 			break ;
-		len = 0;
-		text = NULL;
-		while (true)
+		text = get_str_from_expanded_str(&str);
+		if (text)
 		{
-			// クオートの中じゃない時の空白は区切り
-			if ((!quote_char && str[len] == ' ') || !str[len])
-			{
-				text = substr_and_join(text, str, len);
-				str += len;
-				break;
-			}
-			if ((str[len] == '\'' || str[len] == '\"') && !(len > 0 && str[len - 1] == '\\'))
-			{
-				if (quote_char)
-					quote_char = '\0';
-				else
-					quote_char = str[len];
-				text = substr_and_join(text, str, len);
-				str += len + 1;  // クオートの次の文字
-				len = 0;
-			}
-			else
-				len++;
+			tmp = result;
+			result = (char **)ptrarr_add_ptr((void **)tmp, text);
+			free(tmp);
 		}
-		char	**tmp = result;
-		result = (char **)ptrarr_add_ptr((void **)tmp, text);
-		free(tmp);
 	}
 	return (result);
 }
