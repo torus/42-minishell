@@ -3,7 +3,8 @@
 /*
  * 環境変数を展開してresultに連結させる
  */
-static	char *expand_and_join_env(char *result, char *str, int env_start_idx, int env_len)
+static char	*expand_and_join_env(char *result,
+	char *str, int env_start_idx, int env_len)
 {
 	char	*keyname;
 	char	*keyval;
@@ -32,7 +33,8 @@ static	char *expand_and_join_env(char *result, char *str, int env_start_idx, int
 /*
  * 普通の文字列をresultに連結させる
  */
-static char	*result_join_normal_str(char *result, char *str, int start_idx, int len)
+static char	*result_join_normal_str(char *result,
+	char *str, int start_idx, int len)
 {
 	char	*tmp;
 	char	*tmp2;
@@ -65,7 +67,7 @@ char	*expand_env_var(char *str)
 	int		start_idx;
 	char	*result;
 	bool	is_in_env;
-	bool	is_in_noexpand;  // 'の中にいるか?
+	bool	is_in_noexpand;
 
 	i = 0;
 	start_idx = 0;
@@ -74,18 +76,18 @@ char	*expand_env_var(char *str)
 	is_in_noexpand = false;
 	while (i <= (int)ft_strlen(str))
 	{
-		if (str[i] == '\'' && !(i > 0 && str[i - 1] == '\\'))  // シングルクオートで囲まれた中は環境変数展開しない
+		if (str[i] == '\'' && !(i > 0 && str[i - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
 		if (is_in_env && (!(ft_isalnum(str[i]) || str[i] == '_') || !str[i]))
 		{
 			result = expand_and_join_env(result, str, start_idx, i - start_idx);
-			start_idx = i;  // ノーマル文字列が始まるidx
+			start_idx = i;
 			is_in_env = false;
 		}
-		else if ((!is_in_noexpand && str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_')) || !str[i])  // 環境変数名が始まる!
+		else if ((!is_in_noexpand && str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_')) || !str[i])
 		{
 			result = result_join_normal_str(result, str, start_idx, i - start_idx);
-			start_idx = i + 1;  // 環境変数名の始まるidx
+			start_idx = i + 1;
 			is_in_env = true;
 			i++;
 		}
