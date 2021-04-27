@@ -1,46 +1,40 @@
 #include "minishell.h"
 
-// string_nodeを文字列に戻す
-// うまくいけばASTの時点でこの文字列になるように依頼する
+/*
+ * result に str を繋げて, resultだけfreeする
+ */
+static char	*strjoin_result_and_free_result(char *result, char *str)
+{
+	char	*tmp;
+
+	tmp = result;
+	result = ft_strjoin(result, str);
+	free(tmp);
+	return (result);
+}
+
+/* string_nodeを文字列に戻す
+ *うまくいけばASTの時点でこの文字列になるように依頼する
+ */
 char	*string_node2string(t_parse_node_string *string_node)
 {
 	char	*result;
-	char	*tmp;
 
 	result = ft_strdup("");
 	while (string_node)
 	{
 		if (string_node->type == TOKTYPE_NON_EXPANDABLE)
-		{
-			tmp = result;
-			result = ft_strjoin(result, "\'");
-			free(tmp);
-		}
+			result = strjoin_result_and_free_result(result, "\'");
 		else if (string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
-		{
-			tmp = result;
-			result = ft_strjoin(result, "\"");
-			free(tmp);
-		}
-		tmp = result;
-		result = ft_strjoin(result, string_node->text);
-		free(tmp);
+			result = strjoin_result_and_free_result(result, "\"");
+		result = strjoin_result_and_free_result(result, string_node->text);
 		if (string_node->type == TOKTYPE_NON_EXPANDABLE)
-		{
-			tmp = result;
-			result = ft_strjoin(result, "\'");
-			free(tmp);
-		}
+			result = strjoin_result_and_free_result(result, "\'");
 		else if (string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
-		{
-			tmp = result;
-			result = ft_strjoin(result, "\"");
-			free(tmp);
-		}
+			result = strjoin_result_and_free_result(result, "\"");
 		if (string_node->next)
 			string_node = string_node->next->content.string;
-		else
-			break;
+		else break;
 	}
 	return (result);
 }
