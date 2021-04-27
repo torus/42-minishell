@@ -92,8 +92,10 @@ char	*expand_env_var(char *str)
 			result = result_join_normal_str(result, str, start_idx, i - start_idx);
 			start_idx = i + 1;  // 環境変数名の始まるidx
 			is_in_env = true;
+			i++;
 		}
-		i++;
+		else
+			i++;
 	}
 	return (result);
 }
