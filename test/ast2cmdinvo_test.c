@@ -80,6 +80,8 @@ int main()
 		char *actual = expand_env_var(input);
 		char *expected = "hoge";
 		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
 	}
 
 	TEST_SECTION("expand_env_var($ABC)");
@@ -89,6 +91,8 @@ int main()
 		char *actual = expand_env_var(input);
 		char *expected = "abc def";
 		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
 		unsetenv("ABC");
 	}
 
@@ -99,6 +103,8 @@ int main()
 		char *actual = expand_env_var(input);
 		char *expected = "hogeabc def";
 		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
 		unsetenv("ABC");
 	}
 
@@ -109,6 +115,8 @@ int main()
 		char *actual = expand_env_var(input);
 		char *expected = "hoge abc def ";
 		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
 		unsetenv("ABC");
 	}
 
@@ -119,6 +127,8 @@ int main()
 		char *actual = expand_env_var(input);
 		char *expected = "abc def-hoge";
 		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
 		unsetenv("ABC");
 	}
 
@@ -129,6 +139,8 @@ int main()
 		char *actual = expand_env_var(input);
 		char *expected = "hogeabc def-abc";
 		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
 		unsetenv("ABC");
 	}
 
@@ -140,6 +152,8 @@ int main()
 		char *expected = "\" abc def \"\'\\\'$ABC\'";
 		printf("actual: %s\n", actual);
 		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
 		unsetenv("ABC");
 	}
 
@@ -170,8 +184,10 @@ int main()
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
 		CHECK_EQ_STR(string_node->text, "$ABC");
-		printf("expanded: %s\n", string_node2string(args_node->string_node->content.string));
-		CHECK_EQ_STR(string_node2string(args_node->string_node->content.string), "hoge$ABC\"hoge hoge\"'$ABC'");
+		char *expanded_str = string_node2string(args_node->string_node->content.string);
+		printf("expanded: %s\n", expanded_str);
+		CHECK_EQ_STR(expanded_str, "hoge$ABC\"hoge hoge\"'$ABC'");
+		free(expanded_str);
 	}
 
 	TEST_SECTION("expand_string_node() 環境変数とクオーテーションマーク");
