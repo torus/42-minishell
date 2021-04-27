@@ -17,7 +17,9 @@ SRCS = ../env.c \
 	   ../cmd_cmd_invocation.c \
 	   ../cmd_cmd_invocation2.c \
 	   ../convert_ast2cmdinvo.c \
-	   ../expand_env_var.c
+	   ../expand_env_var.c \
+	   ../split_expanded_str.c \
+	   ../string_node2string.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h \
