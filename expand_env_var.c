@@ -32,9 +32,11 @@ static	char *expand_and_join_env(char *result, char *str, int env_start_idx, int
 /*
  * 普通の文字列をresultに連結させる
  */
-static	char *result_join_normal_str(char *result, char *str, int start_idx, int len)
+static char	*result_join_normal_str(char *result, char *str, int start_idx, int len)
 {
-	char *tmp;
+	char	*tmp;
+	char	*tmp2;
+
 	// ここまでの文字列をresultに格納
 	tmp = ft_substr(str, start_idx, len);  // '$' を含まない
 	if (!tmp)
@@ -43,7 +45,7 @@ static	char *result_join_normal_str(char *result, char *str, int start_idx, int 
 		result = tmp;
 	else
 	{
-		char *tmp2 = result;
+		tmp2 = result;
 		result = ft_strjoin(result, tmp);
 		free(tmp);
 		free(tmp2);
@@ -53,7 +55,7 @@ static	char *result_join_normal_str(char *result, char *str, int start_idx, int 
 
 /* 環境変数を展開する
  *
- * エスケープされたクオートなどはそのままなので, この後別の関数で処理してちょ
+ * エスケープされたクオートなどはそのままなので, この後別の関数で処理してください
  * ex:
  *   in($ABC=" abc def "):  |"$ABC"'\'$ABC'|
  *   out:                   |" abc def "'\' abc def '|
