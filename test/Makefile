@@ -19,7 +19,8 @@ SRCS = ../env.c \
 	   ../convert_ast2cmdinvo.c \
 	   ../expand_env_var.c \
 	   ../split_expanded_str.c \
-	   ../string_node2string.c
+	   ../string_node2string.c \
+	   ../expand_string_node.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h \
