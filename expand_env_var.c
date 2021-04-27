@@ -3,7 +3,7 @@
 /*
  * 環境変数を展開してresultに連結させる
  */
-static char	*expand_and_join_env(char *result,
+static char	*expand_env_and_join(char *result,
 	char *str, int env_start_idx, int env_len)
 {
 	char	*keyname;
@@ -78,7 +78,7 @@ char	*expand_env_var(char *str)
 			is_in_noexpand = !is_in_noexpand;
 		if (is_in_env && (!(ft_isalnum(str[len]) || str[len] == '_') || !str[len]))   // 環境変数終了
 		{
-			result = expand_and_join_env(result, str, 0, len);
+			result = expand_env_and_join(result, str, 0, len);
 			if (!str[len])
 				break;
 			str += len;
