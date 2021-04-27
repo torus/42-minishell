@@ -54,6 +54,15 @@ static char	*result_join_normal_str(char *result,
 	return (result);
 }
 
+static bool	will_start_env_var(bool is_in_noexpand, char *str, int len)
+{
+	return ((!is_in_noexpand
+				&& str[len] == '$'
+				&& (len < (int)ft_strlen(str) && (ft_isalnum(str[len + 1])
+				|| str[len + 1] == '_')))
+				|| !str[len]);
+}
+
 /* 環境変数を展開する
  *
  * エスケープされたクオートなどはそのままなので, この後別の関数で処理してください
@@ -85,10 +94,7 @@ char	*expand_env_var(char *str)
 			len = 0;
 			is_in_env = false;
 		}
-		else if ((!is_in_noexpand
-				&& str[len] == '$'
-				&& (len < (int)ft_strlen(str) && (ft_isalnum(str[len + 1]) || str[len + 1] == '_')))
-				|| !str[len])  // 環境変数開始
+		else if (will_start_env_var(is_in_noexpand, str, len))  // 環境変数開始
 		{
 			result = result_join_normal_str(result, str, 0, len);
 			if (!str[len])
