@@ -5,8 +5,8 @@
  */
 static char	*substr_and_join(char *dst, char *from, int len)
 {
-	char *tmp_dst;
-	char *tmp_substr;
+	char	*tmp_dst;
+	char	*tmp_substr;
 
 	tmp_dst = dst;
 	tmp_substr = ft_substr(from, 0, len);
@@ -17,6 +17,36 @@ static char	*substr_and_join(char *dst, char *from, int len)
 	free(tmp_dst);
 	free(tmp_substr);
 	return (dst);
+}
+
+/*
+ * get_str_from_expanded_str() 内でのクオートが見つかった場合の
+ *   text, str, len の更新処理.
+ * Normの行数対策で切り分けた.
+ *
+ * quote_char: 文字列ではなく,
+ *   呼び出し元でのchar型変数のポインタ.
+ *   クオーテーションの文字( ' or " )もしくは\0が入ってる
+ * text: 空白で区切られた文字.
+ *   str から取り出した部分文字列をくっつけて返す.
+ * str: 変数展開された文字列.
+ *   この関数内で len+1 ポインタが進む
+ * len: strからlen文字strdupする 時に使う
+ *   この関数内で 0 が代入される.
+ *
+ * return: strからlen文字strdupしたものをくっつけたtext
+ */
+static char	*update_text_and_str(char *quote_char,
+	char *text, char **str, int *len)
+{
+	if (*quote_char)
+		*quote_char = '\0';
+	else
+		*quote_char = (*str)[*len];
+	text = substr_and_join(text, *str, *len);
+	*str += *len + 1;
+	*len = 0;
+	return (text);
 }
 
 /*
@@ -37,23 +67,15 @@ static char	*get_str_from_expanded_str(char **str)
 	text = NULL;
 	while (true)
 	{
-		// クオートの中じゃない時の空白は区切り
 		if ((!quote_char && (*str)[len] == ' ') || !(*str)[len])
 		{
 			text = substr_and_join(text, *str, len);
 			*str += len;
-			break;
+			break ;
 		}
-		if (((*str)[len] == '\'' || (*str)[len] == '\"') && !(len > 0 && (*str)[len - 1] == '\\'))
-		{
-			if (quote_char)
-				quote_char = '\0';
-			else
-				quote_char = (*str)[len];
-			text = substr_and_join(text, *str, len);
-			*str += len + 1;  // クオートの次の文字
-			len = 0;
-		}
+		if (((*str)[len] == '\'' || (*str)[len] == '\"')
+				&& !(len > 0 && (*str)[len - 1] == '\\'))
+			text = update_text_and_str(&quote_char, text, str, &len);
 		else
 			len++;
 	}
@@ -72,7 +94,6 @@ char	**split_expanded_str(char *str)
 	result = NULL;
 	while (*str)
 	{
-		// 空白飛ばし
 		while (*str && *str == ' ')
 			str++;
 		if (!*str)
