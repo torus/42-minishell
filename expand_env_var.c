@@ -65,22 +65,16 @@ char	*expand_env_var(char *str)
 	char	*result;
 	bool	is_in_env;
 	bool	is_in_noexpand;  // 'の中にいるか?
-	bool	is_escaped;
 
 	i = 0;
 	start_idx = 0;
 	result = NULL;
 	is_in_env = false;
 	is_in_noexpand = false;
-	is_escaped = false;
 	while (i <= (int)ft_strlen(str))
 	{
-		if (!is_escaped && str[i] == '\'')  // シングルクオートで囲まれた中は環境変数展開しない
+		if (str[i] == '\'' && !(i > 0 && str[i - 1] == '\\'))  // シングルクオートで囲まれた中は環境変数展開しない
 			is_in_noexpand = !is_in_noexpand;
-		if (str[i] == '\\')
-			is_escaped = true;
-		else
-			is_escaped = false;
 		if (is_in_env && (!(ft_isalnum(str[i]) || str[i] == '_') || !str[i]))
 		{
 			result = expand_and_join_env(result, str, start_idx, i - start_idx);
