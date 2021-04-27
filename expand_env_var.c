@@ -37,8 +37,7 @@ static char	*result_join_normal_str(char *result, char *str, int start_idx, int 
 	char	*tmp;
 	char	*tmp2;
 
-	// ここまでの文字列をresultに格納
-	tmp = ft_substr(str, start_idx, len);  // '$' を含まない
+	tmp = ft_substr(str, start_idx, len);
 	if (!tmp)
 		return (NULL);
 	if (!result)
