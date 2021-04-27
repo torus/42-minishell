@@ -1,16 +1,16 @@
 #include "minishell.h"
 
 /*
- * result に str を繋げて, resultだけfreeする
+ * first に second を繋げて, firstだけfreeする
  */
-static char	*strjoin_result_and_free_result(char *result, char *str)
+static char	*strjoin_and_free_first(char *first, char *second)
 {
 	char	*tmp;
 
-	tmp = result;
-	result = ft_strjoin(result, str);
+	tmp = first;
+	first = ft_strjoin(first, second);
 	free(tmp);
-	return (result);
+	return (first);
 }
 
 /* string_nodeを文字列に戻す
@@ -24,14 +24,14 @@ char	*string_node2string(t_parse_node_string *string_node)
 	while (string_node)
 	{
 		if (string_node->type == TOKTYPE_NON_EXPANDABLE)
-			result = strjoin_result_and_free_result(result, "\'");
+			result = strjoin_and_free_first(result, "\'");
 		else if (string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
-			result = strjoin_result_and_free_result(result, "\"");
-		result = strjoin_result_and_free_result(result, string_node->text);
+			result = strjoin_and_free_first(result, "\"");
+		result = strjoin_and_free_first(result, string_node->text);
 		if (string_node->type == TOKTYPE_NON_EXPANDABLE)
-			result = strjoin_result_and_free_result(result, "\'");
+			result = strjoin_and_free_first(result, "\'");
 		else if (string_node->type == TOKTYPE_EXPANDABLE_QUOTED)
-			result = strjoin_result_and_free_result(result, "\"");
+			result = strjoin_and_free_first(result, "\"");
 		if (string_node->next)
 			string_node = string_node->next->content.string;
 		else
@@ -68,8 +68,6 @@ char	**split_expanded_str(char *str)
 	char	quote_char;
 	int		len;
 	char	*text;
-	char	*tmp;
-	char	*tmp2;
 
 	quote_char = '\0';
 	result = NULL;
@@ -87,16 +85,8 @@ char	**split_expanded_str(char *str)
 			// クオートの中じゃない時の空白は区切り
 			if ((!quote_char && str[len] == ' ') || !str[len])
 			{
-				tmp = text;
-				tmp2 = ft_substr(str, 0, len);
+				text = substr_and_join(text, str, len);
 				str += len;
-				len = 0;
-				if (tmp)
-					text = ft_strjoin(tmp, tmp2);
-				else
-					text = ft_strdup(tmp2);
-				free(tmp);
-				free(tmp2);
 				break;
 			}
 			if ((str[len] == '\'' || str[len] == '\"') && !(len > 0 && str[len - 1] == '\\'))
