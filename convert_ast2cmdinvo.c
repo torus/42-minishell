@@ -34,7 +34,8 @@ char	*string_node2string(t_parse_node_string *string_node)
 			result = strjoin_result_and_free_result(result, "\"");
 		if (string_node->next)
 			string_node = string_node->next->content.string;
-		else break;
+		else
+			break ;
 	}
 	return (result);
 }
