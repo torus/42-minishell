@@ -142,7 +142,6 @@ char **expand_string_node(t_parse_node_string *string_node)
 	// 元に戻した文字列内の環境変数を展開する
 	str = expand_env_var(tmp);  // out: |" abc def "\\'\'$ABC'|
 	free(tmp);
-	printf("expanded str: |%s|\n", str);
 	return (split_expanded_str(str));
 }
 
