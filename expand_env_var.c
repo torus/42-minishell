@@ -59,40 +59,46 @@ static char	*result_join_normal_str(char *result,
  * エスケープされたクオートなどはそのままなので, この後別の関数で処理してください
  * ex:
  *   in($ABC=" abc def "):  |"$ABC"'\'$ABC'|
- *   out:                   |" abc def "'\' abc def '|
+ *   out:                   |" abc def "'\'$ABC'|
  */
 char	*expand_env_var(char *str)
 {
-	int		i;
-	int		start_idx;
+	int		len;
 	char	*result;
 	bool	is_in_env;
 	bool	is_in_noexpand;
 
-	i = 0;
-	start_idx = 0;
+	len = 0;
 	result = NULL;
 	is_in_env = false;
 	is_in_noexpand = false;
-	while (i <= (int)ft_strlen(str))
+	while (true)
 	{
-		if (str[i] == '\'' && !(i > 0 && str[i - 1] == '\\'))
+		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
-		if (is_in_env && (!(ft_isalnum(str[i]) || str[i] == '_') || !str[i]))
+		if (is_in_env && (!(ft_isalnum(str[len]) || str[len] == '_') || !str[len]))   // 環境変数終了
 		{
-			result = expand_and_join_env(result, str, start_idx, i - start_idx);
-			start_idx = i;
+			result = expand_and_join_env(result, str, 0, len);
+			if (!str[len])
+				break;
+			str += len;
+			len = 0;
 			is_in_env = false;
 		}
-		else if ((!is_in_noexpand && str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_')) || !str[i])
+		else if ((!is_in_noexpand
+				&& str[len] == '$'
+				&& (len < (int)ft_strlen(str) && (ft_isalnum(str[len + 1]) || str[len + 1] == '_')))
+				|| !str[len])  // 環境変数開始
 		{
-			result = result_join_normal_str(result, str, start_idx, i - start_idx);
-			start_idx = i + 1;
+			result = result_join_normal_str(result, str, 0, len);
+			if (!str[len])
+				break;
+			str += len + 1;
 			is_in_env = true;
-			i++;
+			len = 0;
 		}
 		else
-			i++;
+			len++;
 	}
 	return (result);
 }
