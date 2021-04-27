@@ -99,8 +99,8 @@ char	*expand_env_var(char *str)
 			if (!str[len])
 				break;
 			str += len + 1;
-			is_in_env = true;
 			len = 0;
+			is_in_env = true;
 		}
 		else
 			len++;
