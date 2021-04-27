@@ -142,7 +142,9 @@ char **expand_string_node(t_parse_node_string *string_node)
 	// 元に戻した文字列内の環境変数を展開する
 	str = expand_env_var(tmp);  // out: |" abc def "\\'\'$ABC'|
 	free(tmp);
-	return (split_expanded_str(str));
+	char **splitted_env_val = split_expanded_str(str);
+	free(str);
+	return (splitted_env_val);
 }
 
 /* set values of command->exec_and_args based on string_node
