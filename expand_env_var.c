@@ -71,7 +71,8 @@ static bool	will_start_env_var(bool is_in_noexpand, char *str, int len)
  *
  * return: 文字列解析処理を続けるかどうか (is_continue)
  */
-static bool	join_str_or_env(char **result, char **str, int *len, bool *is_in_env)
+static bool	join_str_or_env(char **result,
+	char **str, int *len, bool *is_in_env)
 {
 	if (*is_in_env)
 	{
@@ -119,8 +120,8 @@ char	*expand_env_var(char *str)
 		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
 		if ((is_in_env && (!(ft_isalnum(str[len]) || str[len] == '_')
-				|| !str[len]))
-				|| will_start_env_var(is_in_noexpand, str, len))
+					|| !str[len]))
+			|| will_start_env_var(is_in_noexpand, str, len))
 			is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
 		else
 			len++;
