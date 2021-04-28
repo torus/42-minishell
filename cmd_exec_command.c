@@ -79,7 +79,7 @@ void	cmd_exec_command(t_command_invocation *command,
 			put_err_msg_and_exit("error child dup2()");
 		close(pipe_prev_fd[0]);
 	}
-	if (pipe_fd)
+	if (command->piped_command)  // 次のコマンドがある時のみ標準出力をpipe[1]にする
 	{
 		close(pipe_fd[0]);
 		if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
