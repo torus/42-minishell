@@ -62,6 +62,38 @@ static bool	will_start_env_var(bool is_in_noexpand, char *str, int len)
 		|| !str[len]);
 }
 
+/*
+ * 文字列(or 環境変数)を連結する
+ *
+ * is_in_env の値によって処理が変わる.
+ *   is_in_env == true: 環境変数展開して連結する.
+ *   is_in_env == false: 普通に連結する.
+ *
+ * return: 文字列解析処理を続けるかどうか (is_continue)
+ */
+static bool	join_str_or_env(char **result, char **str, int *len, bool *is_in_env)
+{
+	if (*is_in_env)
+	{
+		*result = expand_env_and_join(*result, *str, *len);
+		if (!(*str)[*len] || !result)
+			return (false);
+		*str += *len;
+		*len = 0;
+		*is_in_env = false;
+	}
+	else
+	{
+		*result = result_join_normal_str(*result, *str, *len);
+		if (!(*str)[*len] || !result)
+			return (false);
+		*str += *len + 1;
+		*len = 0;
+		*is_in_env = true;
+	}
+	return (true);
+}
+
 /* 環境変数を展開する
  *
  * エスケープされたクオートなどはそのままなので, この後別の関数で処理してください
@@ -75,34 +107,21 @@ char	*expand_env_var(char *str)
 	char	*result;
 	bool	is_in_env;
 	bool	is_in_noexpand;
+	bool	is_continue;
 
 	len = 0;
+	is_continue = true;
 	result = NULL;
 	is_in_env = false;
 	is_in_noexpand = false;
-	while (true)
+	while (is_continue)
 	{
 		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
-		if (is_in_env && (!(ft_isalnum(str[len]) || str[len] == '_')
+		if ((is_in_env && (!(ft_isalnum(str[len]) || str[len] == '_')
 				|| !str[len]))
-		{
-			result = expand_env_and_join(result, str, len);
-			if (!str[len] || !result)
-				break ;
-			str += len;
-			len = 0;
-			is_in_env = false;
-		}
-		else if (will_start_env_var(is_in_noexpand, str, len))
-		{
-			result = result_join_normal_str(result, str, len);
-			if (!str[len] || !result)
-				break ;
-			str += len + 1;
-			len = 0;
-			is_in_env = true;
-		}
+				|| will_start_env_var(is_in_noexpand, str, len))
+			is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
 		else
 			len++;
 	}
