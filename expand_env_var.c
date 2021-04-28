@@ -88,7 +88,7 @@ char	*expand_env_var(char *str)
 				|| !str[len]))
 		{
 			result = expand_env_and_join(result, str, 0, len);
-			if (!str[len])
+			if (!str[len] || !result)
 				break ;
 			str += len;
 			len = 0;
@@ -97,7 +97,7 @@ char	*expand_env_var(char *str)
 		else if (will_start_env_var(is_in_noexpand, str, len))
 		{
 			result = result_join_normal_str(result, str, 0, len);
-			if (!str[len])
+			if (!str[len] || !result)
 				break ;
 			str += len + 1;
 			len = 0;
