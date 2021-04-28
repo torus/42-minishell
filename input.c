@@ -1,4 +1,5 @@
 #include <termios.h>
+#include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdarg.h>
