@@ -63,7 +63,8 @@ int	cmd_set_output_file(t_command_invocation *command)
 }
 
 /*
- * execute one command.
+ * Execute a command.
+ * This function is supposed to be called in child process.
  *
  * command: command
  * pipe_prev_fd[2]: A pipe that connects the previous and current process.
@@ -79,7 +80,7 @@ void	cmd_exec_command(t_command_invocation *command,
 			put_err_msg_and_exit("error child dup2()");
 		close(pipe_prev_fd[0]);
 	}
-	if (command->piped_command)  // 次のコマンドがある時のみ標準出力をpipe[1]にする
+	if (command->piped_command)
 	{
 		close(pipe_fd[0]);
 		if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
