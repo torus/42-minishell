@@ -84,11 +84,12 @@ char	*expand_env_var(char *str)
 	{
 		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
-		if (is_in_env && (!(ft_isalnum(str[len]) || str[len] == '_') || !str[len]))
+		if (is_in_env && (!(ft_isalnum(str[len]) || str[len] == '_')
+				|| !str[len]))
 		{
 			result = expand_env_and_join(result, str, 0, len);
 			if (!str[len])
-				break;
+				break ;
 			str += len;
 			len = 0;
 			is_in_env = false;
@@ -97,7 +98,7 @@ char	*expand_env_var(char *str)
 		{
 			result = result_join_normal_str(result, str, 0, len);
 			if (!str[len])
-				break;
+				break ;
 			str += len + 1;
 			len = 0;
 			is_in_env = true;
