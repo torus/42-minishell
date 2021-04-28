@@ -1,7 +1,7 @@
 #include "minishell.h"
 
 /*
- * 環境変数を展開してresultに連結させる
+ * 環境変数を展開してresultに連結させて引数をfreeする
  */
 static char	*expand_env_and_join(char *result,
 	char *str, int env_start_idx, int env_len)
@@ -31,7 +31,7 @@ static char	*expand_env_and_join(char *result,
 }
 
 /*
- * 普通の文字列をresultに連結させる
+ * 普通の文字列をresultに連結させて引数をfreeする
  */
 static char	*result_join_normal_str(char *result,
 	char *str, int start_idx, int len)
