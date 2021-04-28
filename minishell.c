@@ -2,7 +2,7 @@
 #include "minishell.h"
 #include "parse.h"
 
-void	die()
+void	die(void)
 {
 	int	*nullpo;
 
@@ -23,12 +23,12 @@ void	invoke_sequential_commands(t_parse_ast *seqcmd)
 
 	while (seqcmd && seqcmd->content.sequential_commands->pipcmd_node)
 	{
-		if(seqcmd->type != ASTNODE_SEQ_COMMANDS)
+		if (seqcmd->type != ASTNODE_SEQ_COMMANDS)
 			die();
 		inv = cmd_ast_pipcmds2cmdinvo(
-			seqcmd->content.sequential_commands->pipcmd_node
-			->content.piped_commands);
-		if(!inv)
+				seqcmd->content.sequential_commands->pipcmd_node
+				->content.piped_commands);
+		if (!inv)
 			die();
 		status = cmd_exec_commands(inv);
 		seqcmd = seqcmd->content.sequential_commands->rest_node;
