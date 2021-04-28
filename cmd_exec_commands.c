@@ -28,8 +28,6 @@ int	cmd_exec_commands(t_command_invocation *command)
 	pid_lst = NULL;
 	while (command)
 	{
-		if (!command->piped_command)
-			pipe_fd[1] = STDOUT_FILENO;
 		if (pipe(pipe_fd) == -1)
 			return (put_err_msg_and_ret("error pipe()"));
 		pid = fork();
