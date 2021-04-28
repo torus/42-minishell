@@ -75,23 +75,14 @@ static bool	join_str_or_env(char **result,
 	char **str, int *len, bool *is_in_env)
 {
 	if (*is_in_env)
-	{
 		*result = expand_env_and_join(*result, *str, *len);
-		if (!(*str)[*len] || !result)
-			return (false);
-		*str += *len;
-		*len = 0;
-		*is_in_env = false;
-	}
 	else
-	{
 		*result = result_join_normal_str(*result, *str, *len);
-		if (!(*str)[*len] || !result)
-			return (false);
-		*str += *len + 1;
-		*len = 0;
-		*is_in_env = true;
-	}
+	if (!(*str)[*len] || !result)
+		return (false);
+	*str += *len + !*is_in_env;
+	*len = 0;
+	*is_in_env = !*is_in_env;
 	return (true);
 }
 
