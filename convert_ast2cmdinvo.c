@@ -43,14 +43,15 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	char		**splitted_env_val;
 
 	redirection_type = redirection_node->type;
-	splitted_env_val = expand_string_node(redirection_node->string_node->content.string);
+	splitted_env_val = expand_string_node(
+			redirection_node->string_node->content.string);
 	if (!splitted_env_val || ptrarr_len((void **)splitted_env_val) != 1)
 	{
-		free_ptrarr((void**)splitted_env_val);
+		free_ptrarr((void **)splitted_env_val);
 		return (ERROR);
 	}
 	text = ft_strdup(splitted_env_val[0]);
-	free_ptrarr((void**)splitted_env_val);
+	free_ptrarr((void **)splitted_env_val);
 	if (!text)
 		return (ERROR);
 	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
