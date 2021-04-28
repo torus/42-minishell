@@ -4,13 +4,13 @@
  * 環境変数を展開してresultに連結させて引数をfreeする
  */
 static char	*expand_env_and_join(char *result,
-	char *str, int env_start_idx, int env_len)
+	char *str, int env_len)
 {
 	char	*keyname;
 	char	*keyval;
 	char	*tmp_result;
 
-	keyname = ft_substr(str, env_start_idx, env_len);
+	keyname = ft_substr(str, 0, env_len);
 	if (!keyname)
 		return (NULL);
 	keyval = get_env_val(keyname);
@@ -34,12 +34,12 @@ static char	*expand_env_and_join(char *result,
  * 普通の文字列をresultに連結させて引数をfreeする
  */
 static char	*result_join_normal_str(char *result,
-	char *str, int start_idx, int len)
+	char *str, int len)
 {
 	char	*tmp;
 	char	*tmp2;
 
-	tmp = ft_substr(str, start_idx, len);
+	tmp = ft_substr(str, 0, len);
 	if (!tmp)
 		return (NULL);
 	if (!result)
@@ -87,7 +87,7 @@ char	*expand_env_var(char *str)
 		if (is_in_env && (!(ft_isalnum(str[len]) || str[len] == '_')
 				|| !str[len]))
 		{
-			result = expand_env_and_join(result, str, 0, len);
+			result = expand_env_and_join(result, str, len);
 			if (!str[len] || !result)
 				break ;
 			str += len;
@@ -96,7 +96,7 @@ char	*expand_env_var(char *str)
 		}
 		else if (will_start_env_var(is_in_noexpand, str, len))
 		{
-			result = result_join_normal_str(result, str, 0, len);
+			result = result_join_normal_str(result, str, len);
 			if (!str[len] || !result)
 				break ;
 			str += len + 1;
