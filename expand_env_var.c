@@ -114,7 +114,7 @@ char	*expand_env_var(char *str)
 		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
 		if ((is_in_env
-				&& (!(ft_isalnum(str[len]) || str[len] == '_' || str[len] == '?') || (len == 1 && str[len - 1] == '?') || !str[len]))
+				&& (!(ft_isalnum(str[len]) || str[len] == '_' || (len == 0 && str[len] == '?')) || !str[len]))
 			|| will_start_env_var(is_in_noexpand, str, len))
 			is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
 		else
