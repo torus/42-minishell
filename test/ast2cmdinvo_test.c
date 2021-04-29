@@ -158,7 +158,7 @@ int main()
 	TEST_SECTION("expand_env_var(\"$?\") 終了ステータス (0)\n");
 	{
 		set_status(0);
-		char	*input = ft_strdup("$?");
+		char *input = ft_strdup("$?");
 		char *actual = expand_env_var(input);
 		char *expected = "0";
 		CHECK_EQ_STR(actual, expected);
