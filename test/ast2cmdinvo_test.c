@@ -157,6 +157,78 @@ int main()
 		unsetenv("ABC");
 	}
 
+	TEST_SECTION("expand_env_var(\"$?\") 終了ステータス (0)\n");
+	{
+		set_status(0);
+		char	*input = ft_strdup("$?");
+		char *actual = expand_env_var(input);
+		char *expected = "0";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+	}
+
+	TEST_SECTION("expand_env_var(\"$?\") 終了ステータス (-10)\n");
+	{
+		set_status(-10);
+		char	*input = ft_strdup("$?");
+		char *actual = expand_env_var(input);
+		char *expected = "-10";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+	}
+
+	TEST_SECTION("expand_env_var(\"$?ABC\") 終了ステータスと文字列\n");
+	{
+		setenv("ABC", "abc def", 1);
+		set_status(0);
+		char	*input = ft_strdup("$?ABC");
+		char *actual = expand_env_var(input);
+		char *expected = "0ABC";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("expand_env_var(\"ABC$?\") 文字列と終了ステータス\n");
+	{
+		set_status(0);
+		char	*input = ft_strdup("ABC$?");
+		char *actual = expand_env_var(input);
+		char *expected = "ABC0";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+	}
+
+	TEST_SECTION("expand_env_var(\"$ABC?\") 終了ステータスは表示されない\n");
+	{
+		setenv("ABC", "abc def", 1);
+		set_status(0);
+		char	*input = ft_strdup("$ABC?");
+		char *actual = expand_env_var(input);
+		char *expected = "abc def?";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("expand_env_var(\"$?$ABC\") 終了ステータスと環境変数\n");
+	{
+		setenv("ABC", "abc def", 1);
+		set_status(0);
+		char	*input = ft_strdup("$?$ABC");
+		char *actual = expand_env_var(input);
+		char *expected = "0abc def";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+		unsetenv("ABC");
+	}
+
 	// TODO: これでargs_nodeのコマンド引数展開がうまくいけそうならこの処理はparser側でやってもらう
 	TEST_SECTION("string_node2string()");
 	{
