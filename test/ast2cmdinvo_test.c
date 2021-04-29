@@ -15,7 +15,7 @@ void check_strarr(const char **actual_strarr, const char **expected_strarr)
 	int i = 0 ;
 	while (actual_strarr[i] && expected_strarr[i])
 	{
-		printf("%d: |%s| == |%s|\n", i, actual_strarr[i], expected_strarr[i]);
+		printf("%d:\n", i);
 		CHECK_EQ_STR(actual_strarr[i], expected_strarr[i]);
 		i++;
 	}
@@ -37,7 +37,6 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
 
 				CHECK(red_actual->filepath && red_expected->filepath);
-				printf("|%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
 
 				current_actual = current_actual->next;
@@ -54,7 +53,6 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
 
 				CHECK(red_actual->filepath && red_expected->filepath);
-				printf("|%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
 				CHECK(red_actual->is_append == red_expected->is_append);
 
