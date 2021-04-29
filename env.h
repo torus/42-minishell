@@ -11,4 +11,8 @@ char	*get_val_from_kvstr(const char *kvstr, char key);
 char	*get_env_val(char *env_key);
 char	*expand_env_var(char *str);
 
+// コマンドの終了ステータス
+int		get_status();
+void	set_status(int status_value);
+
 #endif
