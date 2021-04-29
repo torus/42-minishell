@@ -1,6 +1,6 @@
 #include "env.h"
 
-static int	*get_status_ptr()
+static int	*get_status_ptr(void)
 {
 	static int	status;
 
@@ -10,7 +10,7 @@ static int	*get_status_ptr()
 /*
  * コマンドの終了ステータスを取得する
  */
-int	get_status()
+int	get_status(void)
 {
 	return (*get_status_ptr());
 }
