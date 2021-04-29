@@ -26,7 +26,7 @@ tty_reset(int fd)		/* restore terminal's mode */
 static void
 sig_catch(int signo)
 {
-	printf("signal caught\n");
+	printf("signal caught %d\n", signo);
 	tty_reset(STDIN_FILENO);
 	exit(0);
 }
@@ -81,23 +81,13 @@ tty_cbreak(int fd)	/* put terminal into a cbreak mode */
 		return(-1);
 	save_termios = buf;	/* structure copy */
 
-	/*
-	 * Echo off, canonical mode off.
-	 */
 	buf.c_lflag &= ~(ECHO | ICANON);
 
-	/*
-	 * Case B: 1 byte at a time, no timer.
-	 */
 	buf.c_cc[VMIN] = 1;
 	buf.c_cc[VTIME] = 0;
 	if (tcsetattr(fd, TCSAFLUSH, &buf) < 0)
 		return(-1);
 
-	/*
-	 * Verify that the changes stuck.  tcsetattr can return 0 on
-	 * partial success.
-	 */
 	if (tcgetattr(fd, &buf) < 0) {
 		err = errno;
 		tcsetattr(fd, TCSAFLUSH, &save_termios);
@@ -106,10 +96,6 @@ tty_cbreak(int fd)	/* put terminal into a cbreak mode */
 	}
 	if ((buf.c_lflag & (ECHO | ICANON)) || buf.c_cc[VMIN] != 1 ||
 	  buf.c_cc[VTIME] != 0) {
-		/*
-		 * Only some of the changes were made.  Restore the
-		 * original settings.
-		 */
 		tcsetattr(fd, TCSAFLUSH, &save_termios);
 		errno = EINVAL;
 		return(-1);
@@ -138,7 +124,13 @@ main(void)
 	printf("\nEnter cbreak mode characters, terminate with SIGINT\n");
 	while ((i = read(STDIN_FILENO, &c, 1)) == 1) {
 		c &= 255;
-		printf("%x\n", c);
+        if (c >= 0x20 && c < 0x7f)
+            printf("%c", c);
+        else if (c == '\n')
+            printf("\n");
+        else
+            printf("\\x%02x", c);
+        fflush(stdout);
 	}
 	if (tty_reset(STDIN_FILENO) < 0)
 		err_sys("tty_reset error");
