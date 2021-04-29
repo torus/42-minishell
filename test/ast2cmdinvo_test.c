@@ -731,7 +731,7 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo hello", ' '));
-		cmd_add_outredirect(expected, "$ABC", false);
+		cmd_add_outredirect(expected, ft_strdup("$ABC"), false);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -766,7 +766,7 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo hello", ' '));
-		cmd_add_outredirect(expected, "hoge$ABC", false);
+		cmd_add_outredirect(expected, ft_strdup("hoge$ABC"), false);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
