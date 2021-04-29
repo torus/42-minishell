@@ -11,7 +11,7 @@
  * return: 環境変数展開などが完了した文字列.
  *   展開した結果文字列が2つ以上の場合はエラーなのでNULLを返す.
  */
-char *expand_redirect_filepath(char *red_target)
+char	*expand_redirect_filepath(char *red_target)
 {
 	char	*expanded_str;
 	char	**splitted_expanded_str;
@@ -21,7 +21,8 @@ char *expand_redirect_filepath(char *red_target)
 	expanded_str = expand_env_var(red_target);
 	splitted_expanded_str = split_expanded_str(expanded_str);
 	free(expanded_str);
-	if (!splitted_expanded_str || ptrarr_len((void **)splitted_expanded_str) != 1)
+	if (!splitted_expanded_str
+		|| ptrarr_len((void **)splitted_expanded_str) != 1)
 	{
 		errmsg = ft_strjoin(red_target, ": ambiguous redirect\n");
 		if (errmsg)
@@ -88,11 +89,9 @@ int	cmd_set_output_file(t_command_invocation *command)
 		filepath = expand_redirect_filepath((char *)red->filepath);
 		if (!filepath)
 			return (ERROR);
-		flag_open = 0;
+		flag_open = O_TRUNC;
 		if (red->is_append)
-			flag_open |= O_APPEND;
-		else
-			flag_open |= O_TRUNC;
+			flag_open = O_APPEND;
 		fd = open(filepath, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
