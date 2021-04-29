@@ -54,11 +54,14 @@ static char	*result_join_normal_str(char *result,
 	return (result);
 }
 
+/*
+ * str[len] から環境変数が開始するかどうか
+ */
 static bool	will_start_env_var(bool is_in_noexpand, char *str, int len)
 {
 	return ((!is_in_noexpand && str[len] == '$'
 			&& (len < (int)ft_strlen(str)
-				&& (ft_isalnum(str[len + 1]) || str[len + 1] == '_')))
+				&& (ft_isalnum(str[len + 1]) || str[len + 1] == '_' || str[len + 1] == '?')))
 		|| !str[len]);
 }
 
@@ -111,7 +114,7 @@ char	*expand_env_var(char *str)
 		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
 		if ((is_in_env
-				&& (!(ft_isalnum(str[len]) || str[len] == '_') || !str[len]))
+				&& (!(ft_isalnum(str[len]) || str[len] == '_' || str[len] == '?') || (len == 1 && str[len - 1] == '?') || !str[len]))
 			|| will_start_env_var(is_in_noexpand, str, len))
 			is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
 		else
