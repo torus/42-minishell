@@ -169,7 +169,7 @@ int main()
 	TEST_SECTION("expand_env_var(\"$?\") 終了ステータス (-10)\n");
 	{
 		set_status(-10);
-		char	*input = ft_strdup("$?");
+		char *input = ft_strdup("$?");
 		char *actual = expand_env_var(input);
 		char *expected = "-10";
 		CHECK_EQ_STR(actual, expected);
@@ -181,7 +181,7 @@ int main()
 	{
 		setenv("ABC", "abc def", 1);
 		set_status(0);
-		char	*input = ft_strdup("$?ABC");
+		char *input = ft_strdup("$?ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "0ABC";
 		CHECK_EQ_STR(actual, expected);
@@ -193,7 +193,7 @@ int main()
 	TEST_SECTION("expand_env_var(\"ABC$?\") 文字列と終了ステータス\n");
 	{
 		set_status(0);
-		char	*input = ft_strdup("ABC$?");
+		char *input = ft_strdup("ABC$?");
 		char *actual = expand_env_var(input);
 		char *expected = "ABC0";
 		CHECK_EQ_STR(actual, expected);
@@ -205,7 +205,7 @@ int main()
 	{
 		setenv("ABC", "abc def", 1);
 		set_status(0);
-		char	*input = ft_strdup("$ABC?");
+		char *input = ft_strdup("$ABC?");
 		char *actual = expand_env_var(input);
 		char *expected = "abc def?";
 		CHECK_EQ_STR(actual, expected);
@@ -218,7 +218,7 @@ int main()
 	{
 		setenv("ABC", "abc def", 1);
 		set_status(0);
-		char	*input = ft_strdup("$?$ABC");
+		char *input = ft_strdup("$?$ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "0abc def";
 		CHECK_EQ_STR(actual, expected);
