@@ -38,9 +38,6 @@ void	free_ptrarr_and_assign_null(void ***ptrarr)
 	*ptrarr = NULL;
 }
 
-/*
-** strarr add str みたいに使う
-*/
 void	**ptrarr_add_ptr(void **ptrarr, void *ptr)
 {
 	size_t	arr_size;

@@ -16,7 +16,11 @@ SRCS = ../env.c \
 	   ../cmd_pid.c \
 	   ../cmd_cmd_invocation.c \
 	   ../cmd_cmd_invocation2.c \
-	   ../convert_ast2cmdinvo.c
+	   ../convert_ast2cmdinvo.c \
+	   ../expand_env_var.c \
+	   ../split_expanded_str.c \
+	   ../string_node2string.c \
+	   ../expand_string_node.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h \
@@ -63,11 +67,11 @@ norm:
 	docker-compose run --rm norm norminette ../*.[ch]
 
 fclean:
-	rm ./parse_test
-	rm ./env_test
-	rm ./path_test
-	rm ./exec_test
-	rm ./command_exec_test
-	rm ./ast2cmdinvo_test
+	rm -f ./parse_test
+	rm -f ./env_test
+	rm -f ./path_test
+	rm -f ./exec_test
+	rm -f ./command_exec_test
+	rm -f ./ast2cmdinvo_test
 
 re: fclean run

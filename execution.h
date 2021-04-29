@@ -51,5 +51,6 @@ int						cmd_add_outredirect(t_command_invocation *command,
 							const char *filepath, bool is_append);
 void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
+char					*expand_env_var(char *str);
 
 #endif
