@@ -55,14 +55,28 @@ static char	*result_join_normal_str(char *result,
 }
 
 /*
- * str[len] から環境変数が開始するかどうか
+ * 環境変数が開始, または終了するかどうかを判定する.
+ *
+ * 例: 以下のような場合にtrueを返す.
+ *   - is_in_env == true で str[len] が環境変数として不正な文字.
+ *   - is_in_env == false で str[len] がstr[len]が'$'で,
+ *       str[len+1]が環境変数として適切な文字.
+ *   - 文字列の終端に達した.
  */
-static bool	will_start_env_var(bool is_in_noexpand, char *str, int len)
+static bool	will_toggle_env(bool is_in_env, bool is_in_noexpand, char *str, int len)
 {
-	return ((!is_in_noexpand && str[len] == '$'
-			&& (len < (int)ft_strlen(str)
-				&& (ft_isalnum(str[len + 1]) || str[len + 1] == '_' || str[len + 1] == '?')))
-		|| !str[len]);
+	bool	will_start_env;
+	bool	will_end_env;
+
+	// 環境変数がこれから始まるか?
+	will_start_env = !is_in_noexpand && str[len] == '$'
+		&& (len < (int)ft_strlen(str)
+			&& (ft_isalnum(str[len + 1]) || str[len + 1] == '_' || str[len + 1] == '?'));
+	// 環境変数が終わるか?
+	will_end_env = is_in_env
+		&& (!(ft_isalnum(str[len]) || str[len] == '_' || (len == 0 && str[len] == '?')) || (len == 1 && str[len-1] == '?'));
+	// 文字列の終端に達した場合もtrueを返す
+	return (will_start_env || will_end_env || !str[len]);
 }
 
 /*
@@ -113,9 +127,7 @@ char	*expand_env_var(char *str)
 	{
 		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
-		if ((is_in_env
-				&& (!(ft_isalnum(str[len]) || str[len] == '_' || (len == 0 && str[len] == '?')) || (len == 1 && str[len-1] == '?') || !str[len]))
-			|| will_start_env_var(is_in_noexpand, str, len))
+		if (will_toggle_env(is_in_env, is_in_noexpand, str, len))
 			is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
 		else
 			len++;
