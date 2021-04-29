@@ -731,7 +731,7 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo hello", ' '));
-		cmd_add_outredirect(expected, "abc", false);
+		cmd_add_outredirect(expected, "$ABC", false);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -740,12 +740,12 @@ int main()
 		unsetenv("ABC");
 	}
 
-	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数両端空白あり");
+	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数と文字列");
 	{
 		/* 準備 */
-		setenv("ABC", " abc ", 1);
+		setenv("ABC", "abc", 1);
 		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "echo hello > $ABC \n");
+		init_buf_with_string(&buf, "echo hello > hoge$ABC \n");
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
@@ -761,103 +761,18 @@ int main()
 		CHECK_EQ_STR(args_node->string_node->content.string->text, "hello");
 		args_node = args_node->rest_node->content.arguments;
 		CHECK_EQ(args_node->redirection_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
-		CHECK_EQ_STR(args_node->redirection_node->content.redirection->string_node->content.string->text, "$ABC");
+		CHECK_EQ_STR(args_node->redirection_node->content.redirection->string_node->content.string->text, "hoge$ABC");
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo hello", ' '));
-		cmd_add_outredirect(expected, "abc", false);
+		cmd_add_outredirect(expected, "hoge$ABC", false);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
-	}
-
-	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数途中空白あり");
-	{
-		/* 準備 */
-		setenv("ABC", "abc def", 1);
-		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "echo hello > $ABC \n");
-		t_token	tok;
-
-		lex_get_token(&buf, &tok);
-
-		t_parse_ast *node = parse_command(&buf, &tok);
-        CHECK_EQ(node->type, ASTNODE_COMMAND);
-		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
-		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
-		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
-		args_node = args_node->rest_node->content.arguments;
-		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "hello");
-		args_node = args_node->rest_node->content.arguments;
-		CHECK_EQ(args_node->redirection_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
-		CHECK_EQ_STR(args_node->redirection_node->content.redirection->string_node->content.string->text, "$ABC");
-
-		/* テスト */
-		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		CHECK(!actual);  // エラー
-		unsetenv("ABC");
-	}
-
-	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数空文字列");
-	{
-		/* 準備 */
-		setenv("ABC", "", 1);
-		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "echo hello > $ABC \n");
-		t_token	tok;
-
-		lex_get_token(&buf, &tok);
-
-		t_parse_ast *node = parse_command(&buf, &tok);
-        CHECK_EQ(node->type, ASTNODE_COMMAND);
-		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
-		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
-		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
-		args_node = args_node->rest_node->content.arguments;
-		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "hello");
-		args_node = args_node->rest_node->content.arguments;
-		CHECK_EQ(args_node->redirection_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
-		CHECK_EQ_STR(args_node->redirection_node->content.redirection->string_node->content.string->text, "$ABC");
-
-		/* テスト */
-		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		CHECK(!actual);  // エラー
-		unsetenv("ABC");
-	}
-
-	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 存在しない環境変数");
-	{
-		/* 準備 */
-		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "echo hello > $DONTEXISTS \n");
-		t_token	tok;
-
-		lex_get_token(&buf, &tok);
-
-		t_parse_ast *node = parse_command(&buf, &tok);
-        CHECK_EQ(node->type, ASTNODE_COMMAND);
-		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
-		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
-		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
-		args_node = args_node->rest_node->content.arguments;
-		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "hello");
-		args_node = args_node->rest_node->content.arguments;
-		CHECK_EQ(args_node->redirection_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
-		CHECK_EQ_STR(args_node->redirection_node->content.redirection->string_node->content.string->text, "$DONTEXISTS");
-
-		/* テスト */
-		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
-		CHECK(!actual);  // エラー
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 存在しない環境変数");
