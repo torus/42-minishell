@@ -73,7 +73,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 void	cmd_exec_command(t_command_invocation *command,
 	int pipe_prev_fd[2], int pipe_fd[2])
 {
-	if (pipe_prev_fd)
+	if (pipe_prev_fd[1] >= 0)  // 最初のコマンド時, pipe_prev_fd[1]は-1
 	{
 		close(pipe_prev_fd[1]);
 		if (dup2(pipe_prev_fd[0], STDIN_FILENO) == -1)
