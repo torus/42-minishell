@@ -30,6 +30,8 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 /* set values of command->input_file_path or output_file_path
 ** based on redirection_node
 **
+** bashの挙動に合わせるため環境変数展開はここで行わず, 実行する直前のタイミングで行う
+**
 ** redirection ::=
 **       "<" string
 **     | ">" string
@@ -40,18 +42,9 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 {
 	int			redirection_type;
 	const char	*text;
-	char		**splitted_env_val;
 
 	redirection_type = redirection_node->type;
-	splitted_env_val = expand_string_node(
-			redirection_node->string_node->content.string);
-	if (!splitted_env_val || ptrarr_len((void **)splitted_env_val) != 1)
-	{
-		free_ptrarr((void **)splitted_env_val);
-		return (ERROR);
-	}
-	text = ft_strdup(splitted_env_val[0]);
-	free_ptrarr((void **)splitted_env_val);
+	text = string_node2string(redirection_node->string_node->content.string);
 	if (!text)
 		return (ERROR);
 	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
