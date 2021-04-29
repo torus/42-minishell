@@ -63,19 +63,20 @@ static char	*result_join_normal_str(char *result,
  *       str[len+1]が環境変数として適切な文字.
  *   - 文字列の終端に達した.
  */
-static bool	will_toggle_env(bool is_in_env, bool is_in_noexpand, char *str, int len)
+static bool	will_toggle_env(bool is_in_env,
+	bool is_in_noexpand, char *str, int len)
 {
 	bool	will_start_env;
 	bool	will_end_env;
 
-	// 環境変数がこれから始まるか?
 	will_start_env = !is_in_noexpand && str[len] == '$'
 		&& (len < (int)ft_strlen(str)
-			&& (ft_isalnum(str[len + 1]) || str[len + 1] == '_' || str[len + 1] == '?'));
-	// 環境変数が終わるか?
+			&& (ft_isalnum(str[len + 1])
+				|| str[len + 1] == '_' || str[len + 1] == '?'));
 	will_end_env = is_in_env
-		&& (!(ft_isalnum(str[len]) || str[len] == '_' || (len == 0 && str[len] == '?')) || (len == 1 && str[len-1] == '?'));
-	// 文字列の終端に達した場合もtrueを返す
+		&& (!(ft_isalnum(str[len]) || str[len] == '_'
+				|| (len == 0 && str[len] == '?'))
+			|| (len == 1 && str[len - 1] == '?'));
 	return (will_start_env || will_end_env || !str[len]);
 }
 
