@@ -35,6 +35,7 @@ int	invoke_sequential_commands(t_parse_ast *seqcmd)
 		if (!inv)
 			die();
 		status = cmd_exec_commands(inv);
+		cmd_free_cmdinvo(inv);
 		seqcmd = seqcmd->content.sequential_commands->rest_node;
 	}
 	return (status);
@@ -89,6 +90,7 @@ int	main(int argc, char **argv)
 		{
 			seqcmd = cmdline->content.command_line->seqcmd_node;
 			invoke_sequential_commands(seqcmd);
+			parse_free_all_ast();
 		}
 		else
 			put_err_msg("Parse error.");
