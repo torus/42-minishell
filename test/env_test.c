@@ -96,6 +96,16 @@ int main(){
 		free(val_str);
 	}
 
+	TEST_SECTION("exit_status");
+	{
+		set_status(0);
+		CHECK_EQ(get_status(), 0);
+		set_status(1);
+		CHECK_EQ(get_status(), 1);
+		set_status(-1);
+		CHECK_EQ(get_status(), -1);
+	}
+
 	int fail_count = print_result();
 	return (fail_count);
 }

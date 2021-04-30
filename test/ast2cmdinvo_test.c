@@ -15,7 +15,7 @@ void check_strarr(const char **actual_strarr, const char **expected_strarr)
 	int i = 0 ;
 	while (actual_strarr[i] && expected_strarr[i])
 	{
-		printf("%d: |%s| == |%s|\n", i, actual_strarr[i], expected_strarr[i]);
+		printf("%d:\n", i);
 		CHECK_EQ_STR(actual_strarr[i], expected_strarr[i]);
 		i++;
 	}
@@ -37,7 +37,6 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
 
 				CHECK(red_actual->filepath && red_expected->filepath);
-				printf("|%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
 
 				current_actual = current_actual->next;
@@ -54,7 +53,6 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
 
 				CHECK(red_actual->filepath && red_expected->filepath);
-				printf("|%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
 				CHECK(red_actual->is_append == red_expected->is_append);
 
@@ -151,6 +149,78 @@ int main()
 		char *actual = expand_env_var(input);
 		char *expected = "\" abc def \"\'\\\'$ABC\'";
 		printf("actual: %s\n", actual);
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("expand_env_var(\"$?\") 終了ステータス (0)\n");
+	{
+		set_status(0);
+		char *input = ft_strdup("$?");
+		char *actual = expand_env_var(input);
+		char *expected = "0";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+	}
+
+	TEST_SECTION("expand_env_var(\"$?\") 終了ステータス (-10)\n");
+	{
+		set_status(-10);
+		char *input = ft_strdup("$?");
+		char *actual = expand_env_var(input);
+		char *expected = "-10";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+	}
+
+	TEST_SECTION("expand_env_var(\"$?ABC\") 終了ステータスと文字列\n");
+	{
+		setenv("ABC", "abc def", 1);
+		set_status(0);
+		char *input = ft_strdup("$?ABC");
+		char *actual = expand_env_var(input);
+		char *expected = "0ABC";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("expand_env_var(\"ABC$?\") 文字列と終了ステータス\n");
+	{
+		set_status(0);
+		char *input = ft_strdup("ABC$?");
+		char *actual = expand_env_var(input);
+		char *expected = "ABC0";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+	}
+
+	TEST_SECTION("expand_env_var(\"$ABC?\") 終了ステータスは表示されない\n");
+	{
+		setenv("ABC", "abc def", 1);
+		set_status(0);
+		char *input = ft_strdup("$ABC?");
+		char *actual = expand_env_var(input);
+		char *expected = "abc def?";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("expand_env_var(\"$?$ABC\") 終了ステータスと環境変数\n");
+	{
+		setenv("ABC", "abc def", 1);
+		set_status(0);
+		char *input = ft_strdup("$?$ABC");
+		char *actual = expand_env_var(input);
+		char *expected = "0abc def";
 		CHECK_EQ_STR(actual, expected);
 		free(input);
 		free(actual);
@@ -703,6 +773,76 @@ int main()
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
 		unsetenv("DEF");
+	}
+
+	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数");
+	{
+		/* 準備 */
+		setenv("ABC", "abc", 1);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo hello > $ABC \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "hello");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->redirection_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
+		CHECK_EQ_STR(args_node->redirection_node->content.redirection->string_node->content.string->text, "$ABC");
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
+		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo hello", ' '));
+		cmd_add_outredirect(expected, ft_strdup("$ABC"), false);
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数と文字列");
+	{
+		/* 準備 */
+		setenv("ABC", "abc", 1);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo hello > hoge$ABC \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "hello");
+		args_node = args_node->rest_node->content.arguments;
+		CHECK_EQ(args_node->redirection_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
+		CHECK_EQ_STR(args_node->redirection_node->content.redirection->string_node->content.string->text, "hoge$ABC");
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
+		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("echo hello", ' '));
+		cmd_add_outredirect(expected, ft_strdup("hoge$ABC"), false);
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+		unsetenv("ABC");
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 存在しない環境変数");
