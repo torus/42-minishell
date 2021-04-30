@@ -82,7 +82,7 @@ int	main(int argc, char **argv)
 	printf("Welcome to Minishell\n");
 	while (1)
 	{
-		printf("minish > ");
+		printf(PROMPT);
 		fflush(stdout);
 		lex_get_token(&buf, &tok);
 		cmdline = parse_command_line(&buf, &tok);
