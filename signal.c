@@ -2,7 +2,8 @@
 
 static void sigint_sighandler(int sig)
 {
-	printf("receive SIGINT\n");
+	write(STDIN_FILENO, "\n", 1);
+	set_status(128 + sig);
 }
 
 int	setup_signal_handlers(void)
