@@ -15,6 +15,9 @@ SRCS = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c	\
 
 OBJS = $(SRCS:.c=.o)
 
+input: input.c
+	$(CC) -g -Wall -Wextra -o $@ $^
+
 all: $(NAME)
 
 $(NAME): ${HEADER_FILES} ${OBJS}

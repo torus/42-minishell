@@ -12,8 +12,7 @@ static struct termios		save_termios;
 static int					ttysavefd = -1;
 static enum { RESET, RAW, CBREAK }	ttystate = RESET;
 
-int
-tty_reset(int fd)		/* restore terminal's mode */
+int	tty_reset(int fd)		/* restore terminal's mode */
 {
 	if (ttystate == RESET)
 		return(0);
@@ -23,8 +22,7 @@ tty_reset(int fd)		/* restore terminal's mode */
 	return(0);
 }
 
-static void
-sig_catch(int signo)
+static void	sig_catch(int signo)
 {
 	printf("signal caught %d\n", signo);
 	tty_reset(STDIN_FILENO);
@@ -37,8 +35,7 @@ sig_catch(int signo)
  * Print a message and return to caller.
  * Caller specifies "errnoflag".
  */
-static void
-err_doit(int errnoflag, int error, const char *fmt, va_list ap)
+static void	err_doit(int errnoflag, int error, const char *fmt, va_list ap)
 {
 	char	buf[MAXLINE];
 
@@ -67,8 +64,7 @@ err_sys(const char *fmt, ...)
 	exit(1);
 }
 
-int
-tty_cbreak(int fd)	/* put terminal into a cbreak mode */
+int	tty_cbreak(int fd)
 {
 	int				err;
 	struct termios	buf;
@@ -106,8 +102,15 @@ tty_cbreak(int fd)	/* put terminal into a cbreak mode */
 	return(0);
 }
 
-int
-main(void)
+#define LINE_BUFFER_SIZE 128
+typedef struct	s_
+
+typedef struct	s_line_buffer
+{
+    char	**buffers;
+}	t_line_buffer;
+
+int	main(void)
 {
 	int		i;
 	unsigned char	c;
