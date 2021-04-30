@@ -6,7 +6,7 @@ static void	sigint_sighandler(int sig)
 	set_status(128 + sig);
 }
 
-void	set_signal_handlers(__sighandler_t sighandler)
+void	set_sighandlers(__sighandler_t sighandler)
 {
 	if (signal(SIGQUIT, sighandler) == SIG_ERR)
 		exit(1);
