@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-static void sigint_sighandler(int sig)
+static void	sigint_sighandler(int sig)
 {
 	ft_putstr_fd("\n\r"PROMPT, STDOUT_FILENO);
 	set_status(128 + sig);
@@ -28,4 +28,3 @@ void	set_shell_sighandlers(void)
 	if (signal(SIGINT, sigint_sighandler) == SIG_ERR)
 		exit(1);
 }
-
