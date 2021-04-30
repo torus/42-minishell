@@ -77,7 +77,7 @@ int	main(int argc, char **argv)
 	if (argc == 3
 		&& argv[1][0] == '-' && argv[1][1] == 'c' && argv[1][2] == '\0')
 		return (do_command(argv[2]));
-	setup_signal_handlers();
+	set_shell_sighandlers();
 	init_buffer_with_string(&buf, "");
 	printf("Welcome to Minishell\n");
 	while (1)

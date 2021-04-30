@@ -19,6 +19,7 @@ char					*string_node2string(t_parse_node_string *string_node);
 char					**expand_string_node(t_parse_node_string *string_node);
 char					**split_expanded_str(char *str);
 char					**expand_string_node(t_parse_node_string *string_node);
-void					setup_signal_handlers(void);
+void					set_shell_sighandlers(void);
+void					set_signal_handlers(__sighandler_t sighandler);
 
 #endif
