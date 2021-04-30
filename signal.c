@@ -6,12 +6,11 @@ static void sigint_sighandler(int sig)
 	set_status(128 + sig);
 }
 
-int	setup_signal_handlers(void)
+void	setup_signal_handlers(void)
 {
 	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
-		return (-1);
+		exit(1);
 	if (signal(SIGINT, sigint_sighandler) == SIG_ERR)
-		return (-1);
-	return (0);
+		exit(1);
 }
 
