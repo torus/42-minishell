@@ -43,6 +43,8 @@ int	main(int argc, char **argv)
 	t_parse_ast				*seqcmd;
 
 	init_buffer(&buf);
+	if (setup_signal_handlers())
+		return (put_err_msg_and_ret("signal() failed"));
 	printf("Welcome Minishell\n");
 	while (1)
 	{
