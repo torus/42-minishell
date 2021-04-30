@@ -20,7 +20,8 @@ SRCS = ../env.c \
 	   ../expand_env_var.c \
 	   ../split_expanded_str.c \
 	   ../string_node2string.c \
-	   ../expand_string_node.c
+	   ../expand_string_node.c \
+	   ../cmd_status.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h \

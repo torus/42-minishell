@@ -1,4 +1,5 @@
 #include "execution.h"
+#include "env.h"
 
 /*
  * Add pid in list.
@@ -38,6 +39,7 @@ int	cmd_wait_pid_lst(t_list *lst)
 		waitpid(*((int *)current_lst->content), &status, 0);
 		current_lst = current_lst->next;
 	}
+	set_status(status);
 	ft_lstclear(&lst, free);
 	return (status);
 }

@@ -104,6 +104,8 @@ char	*get_env_val(char *env_key)
 	char	*path_env_kv;
 	char	*path_env_val;
 
+	if (ft_strncmp(env_key, "?", 2) == 0)
+		return (ft_itoa(get_status()));
 	path_env_kv = get_env(env_key);
 	if (!path_env_kv)
 		return (NULL);
