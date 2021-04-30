@@ -2,7 +2,7 @@
 
 static void sigint_sighandler(int sig)
 {
-	write(STDIN_FILENO, "\n", 1);
+	ft_putstr_fd("\n\bminish > ", STDOUT_FILENO);
 	set_status(128 + sig);
 }
 
