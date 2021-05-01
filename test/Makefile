@@ -21,7 +21,8 @@ SRCS = ../env.c \
 	   ../split_expanded_str.c \
 	   ../string_node2string.c \
 	   ../expand_string_node.c \
-	   ../cmd_status.c
+	   ../cmd_status.c \
+	   ../signal.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h \

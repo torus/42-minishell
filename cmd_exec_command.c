@@ -114,6 +114,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 void	cmd_exec_command(t_command_invocation *command,
 	int pipe_prev_fd[2], int pipe_fd[2])
 {
+	set_sighandlers(SIG_DFL);
 	if (pipe_prev_fd[1] >= 0)
 	{
 		close(pipe_prev_fd[1]);
