@@ -9,6 +9,7 @@
 # include "path.h"
 # include "lexer.h"
 # include "parse.h"
+# include "builtin.h"
 
 // AST to command_invocation
 t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds);
