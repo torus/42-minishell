@@ -14,6 +14,6 @@ bool	is_builtin_command(char *cmd_name)
 t_builtin_cmd	*get_builtin_func(char *cmd_name)
 {
 	if (ft_strncmp(cmd_name, "echo", 5) == 0)
-		return (echo);
+		return (builtin_echo);
 	return (NULL);
 }

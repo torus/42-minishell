@@ -4,7 +4,7 @@
  * builtin echo command
  * argv: ["echo", "-n", "hello"]
  */
-int echo(char **argv)
+int builtin_echo(char **argv)
 {
 	int		len;
 	int		i;
