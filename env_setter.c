@@ -14,11 +14,18 @@ static char	*generate_kvstr(const char *key, const char *value)
 	return (kvstr);
 }
 
-/*既に環境変数が存在している場合
- *  rewrite=1 なら書き換える.
- *  rewrite=0 なら書き換えない
+/* 既に環境変数が存在している場合
+ *   rewrite=1 なら書き換える.
+ *   rewrite=0 なら書き換えない
+ *
+ * name: 環境変数のキー名
+ * value: 環境変数の値
+ * rewrite: 環境変数が存在していた場合に置き換えるかどうか
+ * has_updated: 環境変数の更新が行われたらtrueが入る.
+ *
+ * return: 正常なら0. それ以外なら-1.
  */
-static int	update_env(const char *name, const char *value, int rewrite)
+static int	update_env(const char *name, const char *value, int rewrite, bool *has_updated)
 {
 	extern char	**environ;
 	int			idx;
@@ -27,17 +34,19 @@ static int	update_env(const char *name, const char *value, int rewrite)
 	// 既に環境変数が存在している場合
 	//   rewrite=1 なら書き換える.
 	//   rewrite=0 なら書き換えない
+	*has_updated = false;
 	idx = 0;
 	while (environ[idx])
 	{
 		if (ft_strcmp(environ[idx], name) == 0)
 		{
 			if (!rewrite)
-				return (0);
+				return (ERROR);
 			kvstr = generate_kvstr(name, value);
 			if (!kvstr)
 				return (ERROR);
 			environ[idx] = kvstr;
+			*has_updated = true;
 			return (0);
 		}
 		idx++;
@@ -47,6 +56,11 @@ static int	update_env(const char *name, const char *value, int rewrite)
 
 /*
  * environ より+2大きい配列を確保して環境変数を追加する.
+ *
+ * name: 環境変数のキー名
+ * value: 環境変数の値
+ *
+ * return: 正常なら0. それ以外なら-1.
  */
 static int	expand_and_add_env(const char *name, const char *value)
 {
@@ -78,9 +92,14 @@ static int	expand_and_add_env(const char *name, const char *value)
  */
 int	setenv(const char *name, const char *value, int rewrite)
 {
-	update_env(name, value, rewrite);  // TODO: update_env() が成功したら return (0) する
-	// 環境変数が存在していない場合, sizeof(environ) + 1 確保して追加. environの指す先のポインタを変更する
-	expand_and_add_env(name, value);
+	bool	has_updated;
+
+	if (update_env(name, value, rewrite, &has_updated) == ERROR)
+		return (ERROR);
+	
+	// 存在しない環境変数の場合は新規追加する
+	if (!has_updated && expand_and_add_env(name, value) == ERROR)
+		return (ERROR);
 	return (0);
 }
 
