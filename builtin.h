@@ -16,5 +16,6 @@ t_builtin_cmd	*get_builtin_func(char *cmd_name);
 int				builtin_echo(char **argv);
 int				builtin_cd(char **argv);
 int				builtin_pwd(char **argv);
+int				builtin_env(char **argv);
 
 #endif
