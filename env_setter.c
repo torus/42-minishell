@@ -90,7 +90,7 @@ static int	expand_and_add_env(const char *name, const char *value)
 /*
  * 標準ライブラリの setenv() と同じ動作をする
  */
-int	setenv(const char *name, const char *value, int rewrite)
+int	ft_setenv(const char *name, const char *value, int rewrite)
 {
 	bool	has_updated;
 
@@ -107,7 +107,7 @@ int	setenv(const char *name, const char *value, int rewrite)
  * name で指定された環境変数が存在刷る場合, それを削除する.
  * 標準ライブラリの unsetenv() と同じ動作をする.
  */
-int	unsetenv(const char *name)
+int	ft_unsetenv(const char *name)
 {
 	extern char	**environ;
 	int			idx;
