@@ -18,7 +18,7 @@ int echo(char **argv)
 	while (i < len)
 	{
 		ft_putstr_fd(argv[i], STDOUT_FILENO);
-		if (i <= len - 1)
+		if (i < len - 1)
 			ft_putchar_fd(' ', STDOUT_FILENO);
 		i++;
 	}
