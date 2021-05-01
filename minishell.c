@@ -74,14 +74,14 @@ int	main(int argc, char **argv)
 	t_token					tok;
 	t_parse_ast				*seqcmd;
 
-	if (argc == 3
-		&& argv[1][0] == '-' && argv[1][1] == 'c' && argv[1][2] == '\0')
+	if (argc == 3 && ft_strncmp(argv[1], "-c", 3) == 0)
 		return (do_command(argv[2]));
+	set_shell_sighandlers();
 	init_buffer_with_string(&buf, "");
 	printf("Welcome to Minishell\n");
 	while (1)
 	{
-		printf("minish > ");
+		printf("\r"PROMPT);
 		fflush(stdout);
 		lex_get_token(&buf, &tok);
 		cmdline = parse_command_line(&buf, &tok);
