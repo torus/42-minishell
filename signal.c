@@ -8,10 +8,12 @@ static void	sigint_sighandler(int sig)
 
 void	set_sighandlers(__sighandler_t sighandler)
 {
-	if (signal(SIGQUIT, sighandler) == SIG_ERR)
+	if (signal(SIGQUIT, sighandler) == SIG_ERR
+		|| signal(SIGINT, sighandler) == SIG_ERR)
+	{
+		printf("signal() failed\n");
 		exit(1);
-	if (signal(SIGINT, sighandler) == SIG_ERR)
-		exit(1);
+	}
 }
 
 /*
@@ -23,8 +25,10 @@ void	set_sighandlers(__sighandler_t sighandler)
  */
 void	set_shell_sighandlers(void)
 {
-	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
+	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR
+		|| signal(SIGINT, sigint_sighandler) == SIG_ERR)
+	{
+		printf("signal() failed\n");
 		exit(1);
-	if (signal(SIGINT, sigint_sighandler) == SIG_ERR)
-		exit(1);
+	}
 }
