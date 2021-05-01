@@ -1,14 +1,48 @@
 #include "env.h"
 
-static bool	is_env_exists(const char *name)
+/*
+ * keyname, value を元に "key=value" の文字列を作成する
+ */
+static char	*generate_kvstr(const char *key, const char *value)
 {
-	char	*env_val;
+	char	*tmp;
+	char	*kvstr;
 
-	env_val = get_env_val((char *)name);
-	free(env_val);
-	if (!env_val)
-		return (false);
-	return (true);
+	tmp = ft_strjoin(key, "=");
+	kvstr = ft_strjoin(tmp, value);
+	free(tmp);
+	return (kvstr);
+}
+
+/*既に環境変数が存在している場合
+ *  rewrite=1 なら書き換える.
+ *  rewrite=0 なら書き換えない
+ */
+static int	update_env(const char *name, const char *value, int rewrite)
+{
+	extern char	**environ;
+	int			idx;
+	char		*kvstr;
+
+	// 既に環境変数が存在している場合
+	//   rewrite=1 なら書き換える.
+	//   rewrite=0 なら書き換えない
+	idx = 0;
+	while (environ[idx])
+	{
+		if (ft_strcmp(environ[idx], name) == 0)
+		{
+			if (!rewrite)
+				return (0);
+			kvstr = generate_kvstr(name, value);
+			if (!kvstr)
+				return (ERROR);
+			environ[idx] = kvstr;
+			return (0);
+		}
+		idx++;
+	}
+	return (0);
 }
 
 /*
@@ -16,10 +50,7 @@ static bool	is_env_exists(const char *name)
  */
 int	setenv(const char *name, const char *value, int rewrite)
 {
-	// 既に環境変数が存在している場合
-	//   rewrite=1 なら書き換える.
-	//   rewrite=0 なら書き換えない
-
+	update_env(name, value, rewrite);  // TODO: update_env() が成功したら return (0) する
 	// 環境変数が存在していない場合, sizeof(environ) + 1 確保して追加. environの指す先のポインタを変更する
 	return (0);
 }
