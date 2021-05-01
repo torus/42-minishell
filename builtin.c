@@ -15,5 +15,7 @@ t_builtin_cmd	*get_builtin_func(char *cmd_name)
 {
 	if (ft_strncmp(cmd_name, "echo", 5) == 0)
 		return (builtin_echo);
+	if (ft_strncmp(cmd_name, "cd", 3) == 0)
+		return (builtin_cd);
 	return (NULL);
 }

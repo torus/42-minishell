@@ -13,5 +13,6 @@ typedef int t_builtin_cmd(char**);
 bool			is_builtin_command(char *cmd_name);
 t_builtin_cmd	*get_builtin_func(char *cmd_name);
 int				builtin_echo(char **argv);
+int				builtin_cd(char **argv);
 
 #endif
