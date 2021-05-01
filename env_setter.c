@@ -104,9 +104,26 @@ int	setenv(const char *name, const char *value, int rewrite)
 }
 
 /*
- * 標準ライブラリの unsetenv() と同じ動作をする
+ * name で指定された環境変数が存在刷る場合, それを削除する.
+ * 標準ライブラリの unsetenv() と同じ動作をする.
  */
 int	unsetenv(const char *name)
 {
-	// 環境変数が存在しない場合は何もせずに0を返す
+	extern char	**environ;
+	int			idx;
+	int			env_len;
+	
+	idx = 0;
+	env_len = ptrarr_len((void **)environ);
+	while (environ[idx])
+	{
+		if (ft_strcmp(environ[idx], name) == 0)
+		{
+			ft_memmove(environ + idx, environ + idx + 1, sizeof(char *) * (env_len - idx));
+			environ[env_len - 2] = NULL;
+			return (0);
+		}
+		idx++;
+	}
+	return (0);
 }
