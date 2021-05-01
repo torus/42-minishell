@@ -30,6 +30,7 @@ int	cmd_exec_commands(t_command_invocation *command)
 	{
 		if (pipe(pipe_fd) == -1)
 			return (put_err_msg_and_ret("error pipe()"));
+		// TODO: ビルドインコマンドだった場合はforkせずに親プロセスで実行
 		pid = fork();
 		if (pid < 0)
 			return (put_err_msg_and_ret("error fork()"));
