@@ -161,6 +161,11 @@ int main(){
 		unsetenv("ABC");
 	}
 
+	// environ が heap領域 に配置されている時はfreeする
+	char c;
+	if ((void *)environ < (void *)&c)
+		free(environ);
+
 	int fail_count = print_result();
 	return (fail_count);
 }
