@@ -107,31 +107,39 @@ int main(){
 	}
 
 	TEST_CHAPTER("env_setter");
+	/* env_setter関連のテストケースでは
+	 * 標準ライブラリ関数である setenv() や unsetenv() などは
+	 * 使っていません.
+	 * なぜなら, 標準ライブラリ関数では内部でrealloc()などを使っているのですが,
+	 * それが ft_setenv() と上手く噛み合わず, ダブルフリーすることになります.
+	 * だからといって ft_setenv() 内でfreeしない場合はメモリリークになります.
+	 * なのでテストケース内で 標準ライブラリ関数の setenv() や unsetenv() は使ってません.
+	 */
 
 	TEST_SECTION("ft_setenv() update rewrite=0");
 	{
-		setenv("ABC", "setenv() update rewrite=0", 1);
+		ft_setenv("ABC", "ft_setenv() update rewrite=0", 1);
 		char	*prev = getenv("ABC");
 		CHECK(ft_setenv("ABC", "ft_setenv()", 0) == 0);
 		char	*new = getenv("ABC");
 		CHECK_EQ_STR(new, prev);
-		unsetenv("ABC");
+		ft_unsetenv("ABC");
 	}
 
 	TEST_SECTION("ft_setenv() update rewrite=1");
 	{
-		setenv("ABC", "setenv() update rewrite=1", 1);
+		ft_setenv("ABC", "ft_setenv() update rewrite=1", 1);
 		char	*prev = getenv("ABC");
 		CHECK(prev);
 		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
 		char	*new = getenv("ABC");
 		CHECK_EQ_STR(new, "ft_setenv()");
-		unsetenv("ABC");
+		ft_unsetenv("ABC");
 	}
 
 	TEST_SECTION("ft_setenv() expand_and_add_env");
 	{
-		unsetenv("ABC");
+		ft_unsetenv("ABC");
 		char	*prev = getenv("ABC");
 		CHECK(!prev);
 		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
@@ -141,28 +149,30 @@ int main(){
 
 	TEST_SECTION("ft_unsetenv() unset env");
 	{
-		setenv("ABC", "ft_unsetenv() unset env", 1);
+		ft_setenv("ABC", "ft_unsetenv() unset env", 1);
 		char	*prev = getenv("ABC");
 		CHECK(prev);
 		CHECK(ft_unsetenv("ABC") == 0);
 		char	*new = getenv("ABC");
 		CHECK(!new);
-		unsetenv("ABC");
+		ft_unsetenv("ABC");
 	}
 
 	TEST_SECTION("ft_unsetenv() unset env that doesn't exist");
 	{
-		unsetenv("ABC");
+		ft_unsetenv("ABC");
 		char	*prev = getenv("ABC");
 		CHECK(!prev);
 		CHECK(ft_unsetenv("ABC") == 0);
 		char	*new = getenv("ABC");
 		CHECK(!new);
-		unsetenv("ABC");
+		ft_unsetenv("ABC");
 	}
 
-	// environ が heap領域 に配置されている時はfreeする
 	char c;
+	printf("environ: %p\n", environ);
+	printf("stack:   %p\n", &c);
+	// environ が heap領域 に配置されている時はfreeする
 	if ((void *)environ < (void *)&c)
 		free(environ);
 
