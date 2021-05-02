@@ -2,6 +2,7 @@ LIBFT_PATH = ../libft
 LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
 LIBFT_LIB = ../libft/libft.a
 SRCS = ../env.c \
+	   ../env_setter.c \
 	   ../lexer1.c \
 	   ../lexer2.c \
 	   ../parse1.c \

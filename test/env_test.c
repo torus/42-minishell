@@ -106,6 +106,61 @@ int main(){
 		CHECK_EQ(get_status(), -1);
 	}
 
+	TEST_CHAPTER("env_setter");
+
+	TEST_SECTION("ft_setenv() update rewrite=0");
+	{
+		setenv("ABC", "setenv() update rewrite=0", 1);
+		char	*prev = getenv("ABC");
+		CHECK(ft_setenv("ABC", "ft_setenv()", 0) == 0);
+		char	*new = getenv("ABC");
+		CHECK_EQ_STR(new, prev);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("ft_setenv() update rewrite=1");
+	{
+		setenv("ABC", "setenv() update rewrite=1", 1);
+		char	*prev = getenv("ABC");
+		CHECK(prev);
+		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
+		char	*new = getenv("ABC");
+		CHECK_EQ_STR(new, "ft_setenv()");
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("ft_setenv() expand_and_add_env");
+	{
+		unsetenv("ABC");
+		char	*prev = getenv("ABC");
+		CHECK(!prev);
+		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
+		char	*new = getenv("ABC");
+		CHECK_EQ_STR(new, "ft_setenv()");
+	}
+
+	TEST_SECTION("ft_unsetenv() unset env");
+	{
+		setenv("ABC", "ft_unsetenv() unset env", 1);
+		char	*prev = getenv("ABC");
+		CHECK(prev);
+		CHECK(ft_unsetenv("ABC") == 0);
+		char	*new = getenv("ABC");
+		CHECK(!new);
+		unsetenv("ABC");
+	}
+
+	TEST_SECTION("ft_unsetenv() unset env that doesn't exist");
+	{
+		unsetenv("ABC");
+		char	*prev = getenv("ABC");
+		CHECK(!prev);
+		CHECK(ft_unsetenv("ABC") == 0);
+		char	*new = getenv("ABC");
+		CHECK(!new);
+		unsetenv("ABC");
+	}
+
 	int fail_count = print_result();
 	return (fail_count);
 }
