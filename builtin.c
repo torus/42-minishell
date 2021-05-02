@@ -30,5 +30,7 @@ t_builtin_cmd	*get_builtin_func(char *cmd_name)
 		return (builtin_export);
 	if (ft_strcmp(cmd_name, "unset") == 0)
 		return (builtin_unset);
+	if (ft_strcmp(cmd_name, "exit") == 0)
+		return (builtin_exit);
 	return (NULL);
 }

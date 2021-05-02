@@ -20,5 +20,7 @@ int				builtin_pwd(char **argv);
 int				builtin_env(char **argv);
 int				builtin_export(char **argv);
 int				builtin_unset(char **argv);
+int				builtin_exit(char **argv);
+
 
 #endif
