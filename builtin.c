@@ -6,6 +6,7 @@ bool	is_builtin_command(char *cmd_name)
 		|| ft_strcmp(cmd_name, "cd") == 0
 		|| ft_strcmp(cmd_name, "pwd") == 0
 		|| ft_strcmp(cmd_name, "env") == 0
+		|| ft_strcmp(cmd_name, "export") == 0
 		|| ft_strcmp(cmd_name, "unset") == 0)
 		return (true);
 	return (false);
@@ -25,6 +26,8 @@ t_builtin_cmd	*get_builtin_func(char *cmd_name)
 		return (builtin_pwd);
 	if (ft_strcmp(cmd_name, "env") == 0)
 		return (builtin_env);
+	if (ft_strcmp(cmd_name, "export") == 0)
+		return (builtin_export);
 	if (ft_strcmp(cmd_name, "unset") == 0)
 		return (builtin_unset);
 	return (NULL);
