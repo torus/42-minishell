@@ -32,6 +32,25 @@ static int	print_envs_with_declaration()
 }
 
 /*
+ * bashの挙動を見る限り,
+ * "key=value"  (valueは空文字列でもOK) の場合のみ
+ * 環境変数をセットしてるっぽい
+ *
+ * arg: "HOGE" とか "HOGE=" "HOGE=FUGA" とか
+ */
+static int	export_env(char *arg)
+{
+	char	**kvarr;
+
+	if (!ft_strchr(arg, '='))
+		return (0);
+	kvarr = split_first_c(arg, '=');
+	ft_setenv(kvarr[0], kvarr[1], 1);
+	free_ptrarr((void **)kvarr);
+	return (0);
+}
+
+/*
  * builtin export command
  *
  * argv: ["export", "ABC=abc"]
@@ -40,5 +59,11 @@ int	builtin_export(char **argv)
 {
 	if (ptrarr_len((void **)argv) < 2)
 		return (print_envs_with_declaration());
+	argv++;
+	while (*argv)
+	{
+		export_env(*argv);
+		argv++;
+	}
 	return (0);
 }
