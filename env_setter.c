@@ -41,7 +41,10 @@ static int	update_env(const char *name, const char *value, int rewrite, bool *ha
 		if (ft_strncmp(environ[idx], name, ft_strlen(name)) == 0)
 		{
 			if (!rewrite)
+			{
+				*has_updated = true;
 				return (0);
+			}
 			kvstr = generate_kvstr(name, value);
 			if (!kvstr)
 				return (ERROR);
