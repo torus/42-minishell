@@ -7,6 +7,7 @@
 # include <limits.h>
 # include <stdio.h>
 # include "libft/libft.h"
+# include "env.h"
 
 // ビルトインコマンドは argv を受け取って, ステータスを返す
 typedef int t_builtin_cmd(char**);
@@ -17,5 +18,6 @@ int				builtin_echo(char **argv);
 int				builtin_cd(char **argv);
 int				builtin_pwd(char **argv);
 int				builtin_env(char **argv);
+int				builtin_unset(char **argv);
 
 #endif
