@@ -38,10 +38,10 @@ static int	update_env(const char *name, const char *value, int rewrite, bool *ha
 	idx = 0;
 	while (environ[idx])
 	{
-		if (ft_strcmp(environ[idx], name) == 0)
+		if (ft_strncmp(environ[idx], name, ft_strlen(name)) == 0)
 		{
 			if (!rewrite)
-				return (ERROR);
+				return (0);
 			kvstr = generate_kvstr(name, value);
 			if (!kvstr)
 				return (ERROR);
