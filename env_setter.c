@@ -117,7 +117,7 @@ int	ft_unsetenv(const char *name)
 	env_len = ptrarr_len((void **)environ);
 	while (environ[idx])
 	{
-		if (ft_strcmp(environ[idx], name) == 0)
+		if (ft_strncmp(environ[idx], name, ft_strlen(name)) == 0)
 		{
 			ft_memmove(environ + idx, environ + idx + 1, sizeof(char *) * (env_len - idx));
 			environ[env_len - 2] = NULL;
