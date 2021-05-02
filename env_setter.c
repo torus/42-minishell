@@ -30,15 +30,17 @@ static int	update_env(const char *name, const char *value, int rewrite, bool *ha
 	extern char	**environ;
 	int			idx;
 	char		*kvstr;
+	int			name_len;
 
 	// 既に環境変数が存在している場合
 	//   rewrite=1 なら書き換える.
 	//   rewrite=0 なら書き換えない
 	*has_updated = false;
 	idx = 0;
+	name_len = ft_strlen(name);
 	while (environ[idx])
 	{
-		if (ft_strncmp(environ[idx], name, ft_strlen(name)) == 0)
+		if (!ft_strncmp(environ[idx], name, name_len) && environ[idx][name_len] == '=')
 		{
 			if (!rewrite)
 			{
