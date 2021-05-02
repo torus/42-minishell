@@ -89,6 +89,12 @@ static int	expand_and_add_env(const char *name, const char *value)
 
 /*
  * 標準ライブラリの setenv() と同じ動作をする
+ *
+ * name: 環境変数のキー名
+ * value: 環境変数の値
+ * rewrite: 環境変数が既に存在している場合に書き換えるかどうか
+ *
+ * return: 正常なら0. それ以外なら-1.
  */
 int	ft_setenv(const char *name, const char *value, int rewrite)
 {
@@ -104,8 +110,12 @@ int	ft_setenv(const char *name, const char *value, int rewrite)
 }
 
 /*
- * name で指定された環境変数が存在刷る場合, それを削除する.
+ * name で指定された環境変数が存在する場合, それを削除する.
  * 標準ライブラリの unsetenv() と同じ動作をする.
+ *
+ * name: 環境変数のキー名
+ *
+ * return: 正常なら0. それ以外なら-1.
  */
 int	ft_unsetenv(const char *name)
 {
