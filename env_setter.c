@@ -45,6 +45,8 @@ static int	update_env(const char *name, const char *value, int rewrite, bool *ha
 			*has_updated = true;
 			if (!rewrite)
 				return (0);
+			if ((void *)environ[idx] < (void *)&idx)
+				free((void *)environ[idx]);
 			kvstr = generate_kvstr(name, value);
 			if (!kvstr)
 				return (ERROR);
@@ -119,7 +121,6 @@ int	ft_setenv(const char *name, const char *value, int rewrite)
  *
  * return: 正常なら0. それ以外なら-1.
  */
-#include <stdio.h>
 int	ft_unsetenv(const char *name)
 {
 	extern char	**environ;
@@ -132,18 +133,9 @@ int	ft_unsetenv(const char *name)
 	{
 		if (ft_strncmp(environ[idx], name, ft_strlen(name)) == 0)
 		{
-			printf("name:       |%s|\n", name);
-			printf("environ[%d]: %s\n", idx, environ[idx]);
-			printf("environ[%d]: %p\n", idx, environ[idx]);
-			printf("stack        %p\n", &idx);
-			// if ((void *)environ[idx] < (void *)&idx)
-			// 	free(environ[idx]);
-			for (int i = 0; environ[i]; i++)
-				printf("environ[%d]: %p\n", i, environ[i]);
+			if ((void *)environ[idx] < (void *)&idx)
+				free(environ[idx]);
 			ft_memmove(environ + idx, environ + idx + 1, sizeof(char *) * (env_len - idx));
-			printf("\n-------------------  after memmove()  -------------------\n\n");
-			for (int i = 0; environ[i]; i++)
-				printf("environ[%d]: %p\n", i, environ[i]);
 			return (0);
 		}
 		idx++;
