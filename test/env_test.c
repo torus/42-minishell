@@ -26,6 +26,17 @@ int main(){
 		free_ptrarr((void **)str_arr);
 	}
 
+	TEST_SECTION("split_first_c() 最後に区切り文字\"key=\"");
+	{
+		char *input = "PATH=";
+		char **str_arr = split_first_c(input, '=');
+		CHECK_EQ_STR(str_arr[0], "PATH");
+		CHECK_EQ_STR(str_arr[1], "");
+		CHECK_EQ(str_arr[2], NULL);
+
+		free_ptrarr((void **)str_arr);
+	}
+
 	TEST_SECTION("get_env() 通常ケース");
 	{
 		char *original0 = environ[0];
