@@ -7,6 +7,10 @@ int	builtin_env(char **argv)
 
 	i = 0;
 	while (environ[i])
-		ft_putendl_fd(environ[i++], STDOUT_FILENO);
+	{
+		// 値の入っていない環境変数は表示しない
+		if (ft_strchr(environ[i], '='))
+			ft_putendl_fd(environ[i++], STDOUT_FILENO);
+	}
 	return (0);
 }
