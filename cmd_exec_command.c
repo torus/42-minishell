@@ -132,7 +132,9 @@ void	cmd_exec_command(t_command_invocation *command,
 	if (cmd_set_input_file(command) == ERROR
 		|| cmd_set_output_file(command) == ERROR)
 		put_err_msg_and_exit("error child input/output file");
-	// TODO: ビルトインコマンドの場合はビルトインコマンド関数を実行する
+	// ビルトインコマンドの場合はビルトインコマンド関数を実行する
+	if (is_builtin_command((char *)command->exec_and_args[0]))
+		exit(get_builtin_func((char *)command->exec_and_args[0])((char **)command->exec_and_args));
 	cmd_execvp((char *)command->exec_and_args[0],
 		(char **) command->exec_and_args);
 	put_err_msg_and_exit("error command execution");
