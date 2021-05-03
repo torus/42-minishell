@@ -75,13 +75,11 @@ static int	expand_and_add_env(const char *name, const char *value)
 		return (ERROR);
 	ft_memcpy(new_environ, environ, sizeof(char *) * environ_len);
 	new_environ[environ_len] = generate_kvstr(name, value);
-	// kvstrの生成に失敗
 	if (!new_environ[environ_len])
 	{
 		free_ptrarr((void **)new_environ);
 		return (ERROR);
 	}
-	// environ が heap領域 に配置されている時はfreeする
 	if ((void *)environ < (void *)&new_environ)
 		free(environ);
 	environ = new_environ;
@@ -104,7 +102,6 @@ int	ft_setenv(const char *name, const char *value, int rewrite)
 	has_updated = false;
 	if (update_env(name, value, rewrite, &has_updated) == ERROR)
 		return (ERROR);
-	// 存在しない環境変数の場合は新規追加する
 	if (!has_updated && expand_and_add_env(name, value) == ERROR)
 		return (ERROR);
 	return (0);
@@ -132,7 +129,8 @@ int	ft_unsetenv(const char *name)
 		{
 			if ((void *)environ[idx] < (void *)&idx)
 				free(environ[idx]);
-			ft_memmove(environ + idx, environ + idx + 1, sizeof(char *) * (env_len - idx));
+			ft_memmove(environ + idx, environ + idx + 1,
+				sizeof(char *) * (env_len - idx));
 			return (0);
 		}
 		idx++;
