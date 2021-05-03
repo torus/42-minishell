@@ -13,7 +13,7 @@ static int	put_cd_errmsg_and_ret(char **argv)
 		errmsg = ft_strjoin(argv[1], ": Not a directory");
 
 	if (!errmsg)
-		put_err_msg_and_exit("malloc() is failed!");
+		put_minish_err_msg_and_exit(1, argv[0], "malloc() is failed!");
 	put_minish_err_msg(argv[0], errmsg);
 	free(errmsg);
 	return (1);
