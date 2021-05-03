@@ -16,8 +16,8 @@ static int	cmd_connect_pipe(
  */
 int	cmd_exec_builtin(t_command_invocation *command)
 {
-	int		stdoutfd;
-	int		stdinfd;
+	int				stdoutfd;
+	int				stdinfd;
 	int				status;
 	t_builtin_cmd	*builtin_func;
 
@@ -46,7 +46,6 @@ int	cmd_wait_commands(t_command_invocation *command)
 	while (command)
 	{
 		waitpid(command->pid, &status, 0);
-		// 最後のコマンドの場合はステータスをセット
 		if (!command->piped_command)
 			set_status(status);
 		command = command->piped_command;
@@ -67,8 +66,8 @@ int	cmd_exec_commands(t_command_invocation *command)
 	t_command_invocation	*current_cmd;
 
 	current_cmd = command;
-	// ビルトインコマンドで且つパイプじゃなかったら親プロセスで実行
-	if (!command->piped_command && is_builtin_command((char *)command->exec_and_args[0]))
+	if (!command->piped_command
+		&& is_builtin_command((char *)command->exec_and_args[0]))
 		return (cmd_exec_builtin(current_cmd));
 	cmd_init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);
 	while (current_cmd)
@@ -80,8 +79,7 @@ int	cmd_exec_commands(t_command_invocation *command)
 			return (put_err_msg_and_ret("error fork()"));
 		else if (pid == 0)
 			cmd_exec_command(current_cmd, pipe_prev_fd, pipe_fd);
-		else
-			current_cmd->pid = pid;
+		current_cmd->pid = pid;
 		if (cmd_connect_pipe(pipe_prev_fd, pipe_fd) != 0)
 			return (put_err_msg_and_ret("error cmd_connect_pipe()"));
 		current_cmd = current_cmd->piped_command;
