@@ -7,13 +7,16 @@ static int	put_cd_errmsg_and_ret(char **argv)
 	char *errmsg;
 
 	// エラーメッセージの生成
+	errmsg = NULL;
 	if (errno == ENOENT)
 		errmsg = ft_strjoin(argv[1], ": No such file or directory");
 	else if (errno == ENOTDIR)
 		errmsg = ft_strjoin(argv[1], ": Not a directory");
+	else if (errno == EACCES)
+		errmsg = ft_strjoin(argv[1], ": Permission denied");
 
 	if (!errmsg)
-		put_minish_err_msg_and_exit(1, argv[0], "malloc() is failed!");
+		put_minish_err_msg_and_exit(1, argv[0], "generating errmsg is failed!");
 	put_minish_err_msg(argv[0], errmsg);
 	free(errmsg);
 	return (1);
