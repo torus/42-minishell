@@ -59,7 +59,7 @@ int	cmd_set_input_file(t_command_invocation *command)
 			return (ERROR);
 		fd = open(filepath, O_RDONLY);
 		if (fd == -1)
-			return (put_err_msg_and_ret("error open()"));
+			return (put_err_msg_and_ret("error input file open()"));
 		if (!current->next && dup2(fd, STDIN_FILENO) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
 		current = current->next;
@@ -95,7 +95,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 		fd = open(filepath, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
-			return (put_err_msg_and_ret("error open()"));
+			return (put_err_msg_and_ret("error output file open()"));
 		if (!current->next && dup2(fd, STDOUT_FILENO) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDOUT_NO)"));
 		current = current->next;
@@ -131,7 +131,8 @@ void	cmd_exec_command(t_command_invocation *command,
 	}
 	if (cmd_set_input_file(command) == ERROR
 		|| cmd_set_output_file(command) == ERROR)
-		put_err_msg_and_exit("error input/output file");
+		put_err_msg_and_exit("error child input/output file");
+	// TODO: ビルトインコマンドの場合はビルトインコマンド関数を実行する
 	cmd_execvp((char *)command->exec_and_args[0],
 		(char **) command->exec_and_args);
 	put_err_msg_and_exit("error command execution");
