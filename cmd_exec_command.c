@@ -58,6 +58,7 @@ int	cmd_set_input_file(t_command_invocation *command)
 		if (!filepath)
 			return (ERROR);
 		fd = open(filepath, O_RDONLY);
+		free(filepath);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error input file open()"));
 		if (!current->next && dup2(fd, STDIN_FILENO) == -1)
@@ -94,6 +95,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 			flag_open = O_APPEND;
 		fd = open(filepath, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+		free(filepath);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error output file open()"));
 		if (!current->next && dup2(fd, STDOUT_FILENO) == -1)
