@@ -4,7 +4,7 @@
  * builtin echo command
  * argv: ["echo", "-n", "hello"]
  */
-int builtin_echo(char **argv)
+int	builtin_echo(char **argv)
 {
 	int		len;
 	int		i;
@@ -23,7 +23,6 @@ int builtin_echo(char **argv)
 		i++;
 	}
 	if (!is_n_opt)
-		ft_putchar_fd('\n', STDOUT_FILENO);  // 改行を表示
+		ft_putchar_fd('\n', STDOUT_FILENO);
 	return (0);
 }
-
