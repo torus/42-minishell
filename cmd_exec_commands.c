@@ -26,8 +26,7 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	return (status);
 }
 
-/*
- * コマンドが実行完了するまでwaitする.
+/* コマンドが実行完了するまでwaitする.
  */
 int	cmd_wait_commands(t_command_invocation *command)
 {
@@ -57,23 +56,20 @@ int	cmd_exec_commands(t_command_invocation *command)
 	t_command_invocation	*current_cmd;
 
 	current_cmd = command;
+	// ビルトインコマンドで且つパイプじゃなかったら親プロセスで実行
+	if (!command->piped_command && is_builtin_command((char *)command->exec_and_args[0]))
+		return (cmd_exec_builtin(current_cmd));
 	cmd_init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);
 	while (current_cmd)
 	{
 		if (pipe(pipe_fd) == -1)
 			return (put_err_msg_and_ret("error pipe()"));
-		// ビルドインコマンドだった場合はforkせずに親プロセスで実行
-		if (is_builtin_command((char *)current_cmd->exec_and_args[0]))
-			cmd_exec_builtin(current_cmd, pipe_prev_fd, pipe_fd);
-		else
-		{
 			pid = fork();
-			if (pid < 0)
-				return (put_err_msg_and_ret("error fork()"));
-			else if (pid == 0)
-				cmd_exec_command(current_cmd, pipe_prev_fd, pipe_fd);
-			current_cmd->pid = pid;
-		}
+		if (pid < 0)
+			return (put_err_msg_and_ret("error fork()"));
+		else if (pid == 0)
+			cmd_exec_command(current_cmd, pipe_prev_fd, pipe_fd);
+		current_cmd->pid = pid;
 		if (cmd_connect_pipe(pipe_prev_fd, pipe_fd) != 0)
 			return (put_err_msg_and_ret("error cmd_connect_pipe()"));
 		current_cmd = current_cmd->piped_command;
