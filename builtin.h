@@ -6,6 +6,7 @@
 # include <unistd.h>
 # include <limits.h>
 # include <stdio.h>
+# include <errno.h>
 # include "libft/libft.h"
 # include "env.h"
 
