@@ -22,7 +22,6 @@ int	cmd_exec_builtin(t_command_invocation *command,
 	int	stdinfd;
 	int	status;
 
-	printf("Run builtin command: %s\n", command->exec_and_args[0]);
 	stdoutfd = dup(STDOUT_FILENO);
 	stdinfd = dup(STDIN_FILENO);
 	if (pipe_prev_fd[1] >= 0)
@@ -41,7 +40,7 @@ int	cmd_exec_builtin(t_command_invocation *command,
 	}
 	if (cmd_set_input_file(command) == ERROR
 		|| cmd_set_output_file(command) == ERROR)
-		return (put_err_msg_and_ret("error input/output file"));
+		return (put_err_msg_and_ret("error parent input/output file"));
 	status = get_builtin_func((char *)command->exec_and_args[0])((char **)command->exec_and_args);
 	if (dup2(stdoutfd, STDOUT_FILENO) == -1
 		|| dup2(stdinfd, STDIN_FILENO) == -1)
