@@ -43,6 +43,14 @@ int	cmd_exec_builtin(t_command_invocation *command,
 	if (dup2(stdoutfd, STDOUT_FILENO) == -1
 		|| dup2(stdinfd, STDIN_FILENO) == -1)
 		put_err_msg_and_exit("error parent revert stdio back");
+	// 最後のコマンドだった場合, ステータスをセットする
+	/* TODO:
+	 * このままだと wait_pid_lst で並列で走らせていた子プロセスのステータスで上書きされるから,
+	 * t_command_invocation に pid を持たせるなど設計を変更し,
+	 * 最後のコマンドか否かを判定できるようにしたほうが良さそう
+	 */
+	if (!command->piped_command)
+		set_status(status);
 	return (status);
 }
 
