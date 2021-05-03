@@ -51,7 +51,7 @@ int	cmd_wait_commands(t_command_invocation *command)
 			set_status(status);
 		command = command->piped_command;
 	}
-	return (0);
+	return (status);
 }
 
 /*
