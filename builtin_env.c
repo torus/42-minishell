@@ -5,6 +5,7 @@ int	builtin_env(char **argv)
 	int			i;
 	extern char	**environ;
 
+	(void)argv;
 	i = 0;
 	while (environ[i])
 	{

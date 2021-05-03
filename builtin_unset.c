@@ -6,8 +6,6 @@
  */
 int	builtin_unset(char **argv)
 {
-	extern char	**environ;
-
 	argv++;
 	while (*argv)
 	{
