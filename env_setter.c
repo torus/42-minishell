@@ -25,33 +25,30 @@ static char	*generate_kvstr(const char *key, const char *value)
  *
  * return: 正常なら0. それ以外なら-1.
  */
-static int	update_env(const char *name, const char *value, int rewrite, bool *has_updated)
+static int	update_env(const char *name,
+	const char *value, int rewrite, bool *has_updated)
 {
 	extern char	**environ;
 	int			idx;
 	char		*kvstr;
 	int			name_len;
 
-	// 既に環境変数が存在している場合
-	//   rewrite=1 なら書き換える.
-	//   rewrite=0 なら書き換えない
-	*has_updated = false;
 	idx = 0;
 	name_len = ft_strlen(name);
-	while (environ[idx])
+	while (!*has_updated && environ[idx])
 	{
-		if (!ft_strncmp(environ[idx], name, name_len) && environ[idx][name_len] == '=')
+		if (!ft_strncmp(environ[idx], name, name_len)
+			&& environ[idx][name_len] == '=')
 		{
 			*has_updated = true;
 			if (!rewrite)
 				return (0);
-			if ((void *)environ[idx] < (void *)&idx)
-				free((void *)environ[idx]);
 			kvstr = generate_kvstr(name, value);
 			if (!kvstr)
 				return (ERROR);
+			if ((void *)environ[idx] < (void *)&idx)
+				free((void *)environ[idx]);
 			environ[idx] = kvstr;
-			return (0);
 		}
 		idx++;
 	}
@@ -104,9 +101,9 @@ int	ft_setenv(const char *name, const char *value, int rewrite)
 {
 	bool	has_updated;
 
+	has_updated = false;
 	if (update_env(name, value, rewrite, &has_updated) == ERROR)
 		return (ERROR);
-	
 	// 存在しない環境変数の場合は新規追加する
 	if (!has_updated && expand_and_add_env(name, value) == ERROR)
 		return (ERROR);
@@ -126,7 +123,7 @@ int	ft_unsetenv(const char *name)
 	extern char	**environ;
 	int			idx;
 	int			env_len;
-	
+
 	idx = 0;
 	env_len = ptrarr_len((void **)environ);
 	while (environ[idx])
