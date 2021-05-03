@@ -79,19 +79,18 @@ int	cmd_set_output_file(t_command_invocation *command)
 {
 	int					fd;
 	t_list				*current;
-	t_cmd_redirection	*red;
 	int					flag_open;
 	char				*filepath;
 
 	current = command->output_redirections;
 	while (current)
 	{
-		red = (t_cmd_redirection *)current->content;
-		filepath = expand_redirect_filepath((char *)red->filepath);
+		filepath = expand_redirect_filepath(
+				(char *)((t_cmd_redirection *)current->content)->filepath);
 		if (!filepath)
 			return (ERROR);
 		flag_open = O_TRUNC;
-		if (red->is_append)
+		if (((t_cmd_redirection *)current->content)->is_append)
 			flag_open = O_APPEND;
 		fd = open(filepath, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
@@ -106,17 +105,11 @@ int	cmd_set_output_file(t_command_invocation *command)
 }
 
 /*
- * Execute a command.
- * This function is supposed to be called in child process.
- *
- * command: command
- * pipe_prev_fd[2]: A pipe that connects the previous and current process.
- * pipe_fd[2]: A pipe that connects the current and next process.
+ * STDIN_FILENO, STDOUT_FILENO をdup2()で置き換える.
  */
-void	cmd_exec_command(t_command_invocation *command,
+static void	replace_stdio_with_pipe(t_command_invocation *command,
 	int pipe_prev_fd[2], int pipe_fd[2])
 {
-	set_sighandlers(SIG_DFL);
 	if (pipe_prev_fd[1] >= 0)
 	{
 		close(pipe_prev_fd[1]);
@@ -131,12 +124,29 @@ void	cmd_exec_command(t_command_invocation *command,
 			put_err_msg_and_exit("error child dup2()");
 		close(pipe_fd[1]);
 	}
+}
+
+/*
+ * Execute a command.
+ * This function is supposed to be called in child process.
+ *
+ * command: command
+ * pipe_prev_fd[2]: A pipe that connects the previous and current process.
+ * pipe_fd[2]: A pipe that connects the current and next process.
+ */
+void	cmd_exec_command(t_command_invocation *command,
+	int pipe_prev_fd[2], int pipe_fd[2])
+{
+	t_builtin_cmd	*builtin_func;
+
+	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
+	set_sighandlers(SIG_DFL);
+	replace_stdio_with_pipe(command, pipe_prev_fd, pipe_fd);
 	if (cmd_set_input_file(command) == ERROR
 		|| cmd_set_output_file(command) == ERROR)
 		put_err_msg_and_exit("error child input/output file");
-	// ビルトインコマンドの場合はビルトインコマンド関数を実行する
-	if (is_builtin_command((char *)command->exec_and_args[0]))
-		exit(get_builtin_func((char *)command->exec_and_args[0])((char **)command->exec_and_args));
+	if (builtin_func)
+		exit(builtin_func((char **)command->exec_and_args));
 	cmd_execvp((char *)command->exec_and_args[0],
 		(char **) command->exec_and_args);
 	put_err_msg_and_exit("error command execution");
