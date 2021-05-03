@@ -55,39 +55,56 @@ int	cmd_exec_builtin(t_command_invocation *command,
 }
 
 /*
+ * コマンドが実行完了するまでwaitする.
+ */
+int	cmd_wait_commands(t_command_invocation *command)
+{
+	int	status;
+
+	while (command)
+	{
+		waitpid(command->pid, &status, 0);
+		// 最後のコマンドの場合はステータスをセット
+		if (!command->piped_command)
+			set_status(status);
+		command = command->piped_command;
+	}
+	return (0);
+}
+
+/*
  * fork and execute commands.
  *
  * return: status of last command
  */
 int	cmd_exec_commands(t_command_invocation *command)
 {
-	pid_t	pid;
-	int		pipe_fd[2];
-	int		pipe_prev_fd[2];
-	t_list	*pid_lst;
+	pid_t					pid;
+	int						pipe_fd[2];
+	int						pipe_prev_fd[2];
+	t_command_invocation	*current_cmd;
 
+	current_cmd = command;
 	cmd_init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);
-	pid_lst = NULL;
-	while (command)
+	while (current_cmd)
 	{
 		if (pipe(pipe_fd) == -1)
 			return (put_err_msg_and_ret("error pipe()"));
 		// ビルドインコマンドだった場合はforkせずに親プロセスで実行
-		if (is_builtin_command((char *)command->exec_and_args[0]))
-			cmd_exec_builtin(command, pipe_prev_fd, pipe_fd);
+		if (is_builtin_command((char *)current_cmd->exec_and_args[0]))
+			cmd_exec_builtin(current_cmd, pipe_prev_fd, pipe_fd);
 		else
 		{
 			pid = fork();
 			if (pid < 0)
 				return (put_err_msg_and_ret("error fork()"));
 			else if (pid == 0)
-				cmd_exec_command(command, pipe_prev_fd, pipe_fd);
-			if (!cmd_lstadd_back_pid(&pid_lst, pid))
-				return (ERROR);
+				cmd_exec_command(current_cmd, pipe_prev_fd, pipe_fd);
+			current_cmd->pid = pid;
 		}
 		if (cmd_connect_pipe(pipe_prev_fd, pipe_fd) != 0)
 			return (put_err_msg_and_ret("error cmd_connect_pipe()"));
-		command = command->piped_command;
+		current_cmd = current_cmd->piped_command;
 	}
-	return (cmd_wait_pid_lst(pid_lst));
+	return (cmd_wait_commands(command));
 }
