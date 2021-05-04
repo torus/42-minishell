@@ -120,13 +120,15 @@ int	ft_unsetenv(const char *name)
 	extern char	**environ;
 	int			idx;
 	int			env_len;
+	int			name_len;
 
 	idx = 0;
+	name_len = ft_strlen(name);
 	env_len = ptrarr_len((void **)environ);
 	while (environ[idx])
 	{
-		if (ft_strncmp(environ[idx], name, ft_strlen(name)) == 0
-			&& environ[idx][ft_strlen(name)] == '=')
+		if (ft_strncmp(environ[idx], name, name_len) == 0
+			&& environ[idx][name_len] == '=')
 		{
 			if ((void *)environ[idx] < (void *)&idx)
 				free(environ[idx]);
