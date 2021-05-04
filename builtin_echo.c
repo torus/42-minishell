@@ -11,9 +11,9 @@ int	builtin_echo(char **argv)
 	bool	is_n_opt;
 
 	len = ptrarr_len((void **)argv);
-	if (len <= 1)
-		return (0);
-	is_n_opt = ft_strncmp(argv[1], "-n", 3) == 0;
+	is_n_opt = false;
+	if (len >= 2)
+		is_n_opt = ft_strncmp(argv[1], "-n", 3) == 0;
 	i = 1 + is_n_opt;
 	while (i < len)
 	{
