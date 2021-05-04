@@ -48,10 +48,11 @@ int	builtin_unset(char **argv)
 
 	i = 1;
 	is_all_key_ok = true;
-	// 全てのキーが正しいかどうかチェックする
 	while (argv[i])
 	{
-		if (!is_valid_key(argv[i]))
+		if (is_valid_key(argv[i]))
+			ft_unsetenv(argv[i]);
+		else
 		{
 			is_all_key_ok = false;
 			put_unset_errmsg(argv[0], argv[i]);
@@ -60,12 +61,5 @@ int	builtin_unset(char **argv)
 	}
 	if (!is_all_key_ok)
 		return (1);
-
-	i = 1;
-	while (*argv)
-	{
-		ft_unsetenv(*argv);
-		argv++;
-	}
 	return (0);
 }
