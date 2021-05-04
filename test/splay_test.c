@@ -134,13 +134,13 @@ void test_tree()
 			V(x),
 			splay_create(NULL, V(C), NULL));
 		t_splay_tree	*p = splay_create(
-			V(A),
+			splay_create(NULL, V(A), NULL),
 			V(p),
 			x);
 		t_splay_tree	*g = splay_create(
 			p,
 			V(g),
-			V(D));
+			splay_create(NULL, V(D), NULL));
 
 		t_splay_tree	*result = splay_zig_zag_right(x, p, g);
 
@@ -202,17 +202,17 @@ void test_tree()
 	TEST_SECTION("splay_zig_zag_left");
 	{
 		t_splay_tree	*x = splay_create(
-			splay_create(NULL, V(B), NULL),
+			splay_create(NULL, V(C), NULL),
 			V(x),
-			splay_create(NULL, V(C), NULL));
+			splay_create(NULL, V(B), NULL));
 		t_splay_tree	*p = splay_create(
-			V(A),
+			x,
 			V(p),
-			x);
+			splay_create(NULL, V(A), NULL));
 		t_splay_tree	*g = splay_create(
-			p,
+			splay_create(NULL, V(D), NULL),
 			V(g),
-			V(D));
+			p);
 
 		t_splay_tree	*result = splay_zig_zag_left(x, p, g);
 
