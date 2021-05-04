@@ -87,24 +87,27 @@ int	cmd_process_arguments_node(t_parse_node_arguments *args_node,
 */
 t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 {
-	t_command_invocation	*command;
+	t_command_invocation	*cmdinvo;
 	t_parse_node_arguments	*args_node;
 
-	command = cmd_init_cmdinvo(NULL);
-	if (!command)
+	cmdinvo = cmd_init_cmdinvo(NULL);
+	if (!cmdinvo)
 		return (NULL);
 	args_node = cmd_node->arguments_node->content.arguments;
 	while (args_node)
 	{
-		cmd_process_arguments_node(args_node, command);
+		cmd_process_arguments_node(args_node, cmdinvo);
 		if (args_node->rest_node)
 			args_node = args_node->rest_node->content.arguments;
 		else
 			args_node = NULL;
 	}
-	if (!command->exec_and_args)
+	if (!cmdinvo->exec_and_args)
+	{
+		cmd_free_cmdinvo(cmdinvo);
 		return (NULL);
-	return (command);
+	}
+	return (cmdinvo);
 }
 
 /* convert ast command_node to command_invocation object
