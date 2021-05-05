@@ -17,7 +17,8 @@ void	put_minish_err_msg(const char *cmd_name, const char *msg)
  * 以下の形式のエラーメッセージをstderrに出力して return(ret_val);
  * "minishell: {cmd_name}: {msg}\n"
  */
-int	put_minish_err_msg_and_ret(int ret_val, const char *cmd_name, const char *msg)
+int	put_minish_err_msg_and_ret(int ret_val,
+	const char *cmd_name, const char *msg)
 {
 	put_minish_err_msg(cmd_name, msg);
 	return (ret_val);
@@ -27,7 +28,8 @@ int	put_minish_err_msg_and_ret(int ret_val, const char *cmd_name, const char *ms
  * 以下の形式のエラーメッセージをstderrに出力して exit(status);
  * "minishell: {cmd_name}: {msg}\n"
  */
-void	put_minish_err_msg_and_exit(int status, const char *cmd_name, const char *msg)
+void	put_minish_err_msg_and_exit(int status,
+	const char *cmd_name, const char *msg)
 {
 	put_minish_err_msg(cmd_name, msg);
 	exit(status);
