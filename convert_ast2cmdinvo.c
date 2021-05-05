@@ -102,11 +102,6 @@ t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 		else
 			args_node = NULL;
 	}
-	if (!cmdinvo->exec_and_args)
-	{
-		cmd_free_cmdinvo(cmdinvo);
-		return (NULL);
-	}
 	return (cmdinvo);
 }
 

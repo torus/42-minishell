@@ -139,12 +139,14 @@ void	cmd_exec_command(t_command_invocation *command,
 {
 	t_builtin_cmd	*builtin_func;
 
-	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
 	set_sighandlers(SIG_DFL);
 	replace_stdio_with_pipe(command, pipe_prev_fd, pipe_fd);
 	if (cmd_set_input_file(command) == ERROR
 		|| cmd_set_output_file(command) == ERROR)
 		put_err_msg_and_exit("error child input/output file");
+	if (!command->exec_and_args)
+		exit(0);
+	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
 	if (builtin_func)
 		exit(builtin_func((char **)command->exec_and_args));
 	cmd_execvp((char *)command->exec_and_args[0],
