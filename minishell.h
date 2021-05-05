@@ -9,6 +9,7 @@
 # include "path.h"
 # include "lexer.h"
 # include "parse.h"
+# include "builtin.h"
 
 # define PROMPT "minish > "
 
@@ -21,5 +22,11 @@ char					**split_expanded_str(char *str);
 char					**expand_string_node(t_parse_node_string *string_node);
 void					set_shell_sighandlers(void);
 void					set_sighandlers(__sighandler_t sighandler);
+void					put_minish_err_msg(const char *cmd_name,
+							const char *msg);
+int						put_minish_err_msg_and_ret(int ret_val,
+							const char *cmd_name, const char *msg);
+void					put_minish_err_msg_and_exit(int status,
+							const char *cmd_name, const char *msg);
 
 #endif

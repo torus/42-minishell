@@ -25,6 +25,7 @@ typedef struct s_command_invocation
 	struct s_command_invocation	*piped_command;
 	t_list						*input_redirections;
 	const char					**exec_and_args;
+	pid_t						pid;
 }	t_command_invocation;
 
 char					*find_executable_file_in_dir(

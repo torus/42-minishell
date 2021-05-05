@@ -14,6 +14,7 @@ t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args)
 	cmdinvo->input_redirections = NULL;
 	cmdinvo->output_redirections = NULL;
 	cmdinvo->piped_command = NULL;
+	cmdinvo->pid = 0;
 	return (cmdinvo);
 }
 
