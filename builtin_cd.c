@@ -4,9 +4,8 @@
 
 static void	put_cd_errmsg(char *dest_path)
 {
-	char *errmsg;
+	char	*errmsg;
 
-	// エラーメッセージの生成
 	errmsg = NULL;
 	if (errno == ENOENT)
 		errmsg = ft_strjoin(dest_path, ": No such file or directory");
@@ -14,7 +13,6 @@ static void	put_cd_errmsg(char *dest_path)
 		errmsg = ft_strjoin(dest_path, ": Not a directory");
 	else if (errno == EACCES)
 		errmsg = ft_strjoin(dest_path, ": Permission denied");
-
 	if (!errmsg)
 		put_minish_err_msg_and_exit(1, "cd", "generating errmsg is failed!");
 	put_minish_err_msg("cd", errmsg);
