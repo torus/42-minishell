@@ -2,6 +2,28 @@
 #include "env.h"
 #include "minishell.h"
 
+char	*g_the_current_directory = NULL;
+
+/* - $OLDPWD に現在の $PWD の値を保存
+ * - $PWD に dest_path を保存
+ * - g_the_current_directory に dest_path を保存
+ */
+int	set_working_directory(char *dest_path)
+{
+}
+
+/* - This is `cd -', equivalent to `cd $OLDPWD'
+ *   dest_path == "-" だった場合, $OLDPWD に移動して,
+ *   $OLDPWD=$PWD にして, $PWDを更新する.
+ *   $OLDPWDに移動失敗した場合は移動しないし, $OLDPWD, $PWD を更新しない.
+ * - 絶対パス('/'から始まる)場合は $CDPATH から検索しない
+ * - ディレクトリがシンボリックリンクだった場合, chdir(dest_path)して,
+ *   the_current_directory=dest_path にする.
+ */
+static int	change_directory(char *dest_path)
+{
+}
+
 static void	put_cd_errmsg(char *dest_path)
 {
 	char	*errmsg;
