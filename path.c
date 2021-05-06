@@ -1,4 +1,23 @@
 #include "path.h"
+#include "env.h"
+
+char	*g_cwd = NULL;
+
+/* g_cwd に新しいパスをセットする.
+ * chdir() などはしない.
+ */
+int	set_current_working_directory(char *abs_path)
+{
+	char	*oldpwd;
+
+	oldpwd = get_env_val("PWD");
+	free(g_cwd);
+	g_cwd = ft_strdup(abs_path);
+	ft_setenv("OLDPWD", oldpwd, 1);
+	ft_setenv("PWD", abs_path, 1);
+	free(oldpwd);
+	return (0);
+}
 
 /*
  * concatenate dirpath, "/" and filename.
