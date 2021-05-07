@@ -132,6 +132,9 @@ static int	change_directory(char *dest_path)
 	// 相対パスの場合
 	else
 	{
+		// bashの仕様では, $CDPATH を調べてからカレントディレクトリを調べる
+		if (cd_cdpath(dest_path) == 0)
+			return (0);
 		// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
 		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
 		status = chdir(dest_path);
@@ -143,10 +146,6 @@ static int	change_directory(char *dest_path)
 			free(abs_path);
 			return (0);
 		}
-		// 絶対パスが渡された場合 $CDPATH から検索しない
-		// そうでなければ $CDPATH を起点として移動してみる.
-		if (cd_cdpath(dest_path) == 0)
-			return (0);
 	}
 	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
 	return (1);
