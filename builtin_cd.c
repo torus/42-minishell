@@ -123,19 +123,15 @@ static int	cd_home(void)
 
 int	builtin_cd(char **argv)
 {
-	char	*dest_path;
 	int		chdir_status;
 
 	if (ptrarr_len((void **)argv) > 2)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
-	if (ptrarr_len((void **)argv) == 2)
-		dest_path = ft_strdup(argv[1]);
-	else
+	else if (ptrarr_len((void **)argv) == 1)
 		return (cd_home());
-	chdir_status = change_directory(dest_path);
+	chdir_status = change_directory(argv[1]);
 	if (chdir_status < 0)
-		put_cd_errmsg(dest_path);
-	free(dest_path);
+		put_cd_errmsg(argv[1]);
 	if (chdir_status < 0)
 		return (1);
 	return (0);
