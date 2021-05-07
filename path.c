@@ -1,7 +1,7 @@
 #include "path.h"
 #include "env.h"
 
-char	*g_cwd = NULL;
+char	*g_cwd;
 
 /* g_cwd に新しいパスをセットする.
  * chdir() などはしない.
@@ -60,6 +60,7 @@ char *get_abs_path_from_cwd(char *relative_path)
 		}
 		idx++;
 	}
+	free_ptrarr((void **)directions);
 	return (current_dir);
 }
 
