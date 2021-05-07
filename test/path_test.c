@@ -16,6 +16,42 @@ int main(){
 		free(fullpath);
 	}
 
+	TEST_SECTION("canonicalize_path() /");
+	{
+		char *input = "/";
+		char *expected = "/";
+		char *actual = canonicalize_path(input);
+		CHECK_EQ_STR(actual, expected);
+		free(actual);
+	}
+
+	TEST_SECTION("canonicalize_path() ///////hoge/////fuga");
+	{
+		char *input = "///////hoge/////fuga";
+		char *expected = "/hoge/fuga";
+		char *actual = canonicalize_path(input);
+		CHECK_EQ_STR(actual, expected);
+		free(actual);
+	}
+
+	TEST_SECTION("canonicalize_path() /../../../..////////hoge/./././././.dir");
+	{
+		char *input = "/../../../..////////hoge/./././././.dir";
+		char *expected = "/hoge/.dir";
+		char *actual = canonicalize_path(input);
+		CHECK_EQ_STR(actual, expected);
+		free(actual);
+	}
+
+	TEST_SECTION("canonicalize_path() /..///////hoge/////fuga/././././../../hoge2/./././/////");
+	{
+		char *input = "/..///////hoge/////fuga/././././../../hoge2/./././/////";
+		char *expected = "/hoge2";
+		char *actual = canonicalize_path(input);
+		CHECK_EQ_STR(actual, expected);
+		free(actual);
+	}
+
 	int fail_count = print_result();
 	return (fail_count);
 }

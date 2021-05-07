@@ -64,6 +64,43 @@ char *get_abs_path_from_cwd(char *relative_path)
 	return (current_dir);
 }
 
+/* パスを正規化する.
+ * ex:
+ *   - "////hoge//fuga//../././//gaga" -> "/hoge/gaga"
+ */
+char	*canonicalize_path(char *path)
+{
+	char	**dirs;
+	char	*result;
+	char	*tmp;
+	int		i;
+
+	dirs = ft_split(path, '/');
+	i = 0;
+	result = ft_strdup("/");
+	while (dirs[i])
+	{
+		if (ft_strncmp(dirs[i], "..", 3) == 0
+			&& ft_strncmp(result, "/", 2) != 0)
+		{
+			// "/" 以外の時, 親ディレクトリに移動する
+			tmp = result;
+			result = ft_substr(tmp, 0, ft_strrchr(tmp, '/') - tmp);
+			free(tmp);
+		}
+		else if (ft_strncmp(dirs[i], ".", 2) == 0)
+			;
+		else
+		{
+			tmp = result;
+			result = path_join(tmp, dirs[i]);
+			free(tmp);
+		}
+		i++;
+	}
+	return (result);
+}
+
 /*
  * concatenate dirpath, "/" and filename.
  */
