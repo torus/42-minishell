@@ -3,7 +3,7 @@
 #include "path.h"
 #include "minishell.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 1
 	#define PRINT_DEBUG(fmt, ...) \
@@ -69,6 +69,7 @@ static int cd_cdpath(char *dest_path)
 		return (1);
 	dirs = ft_split(cdpath_env, ':');
 	free(cdpath_env);
+	i = 0;
 	while (dirs[i])
 	{
 		PRINT_DEBUG("search in |%s|\n", dirs[i]);
@@ -83,8 +84,7 @@ static int cd_cdpath(char *dest_path)
 			PRINT_DEBUG("dir is found!!\n");
 			free_ptrarr((void **)dirs);
 			return (0);
-		}
-		i++;
+		} i++;
 	}
 	free_ptrarr((void **)dirs);
 	return (1);
@@ -133,9 +133,7 @@ static int	change_directory(char *dest_path)
 			return (0);
 		// 絶対パスが渡された場合 $CDPATH から検索しない
 		// そうでなければ $CDPATH を起点として移動してみる.
-		if (dest_path[0] != '/')
-			status = cd_cdpath(dest_path);
-		if (status == 0)
+		if (dest_path[0] != '/' && cd_cdpath(dest_path) == 0)
 			return (0);
 	}
 	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
