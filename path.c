@@ -27,41 +27,30 @@ int	set_current_working_directory(char *abs_path)
  */
 char *get_abs_path_from_cwd(char *relative_path)
 {
-	char	**directions;  // ("..", ".", その他) みたいなのが入ってくる
-	char	*current_dir;
+	char	**dirs;  // ("..", ".", その他) みたいなのが入ってくる
+	char	*result;
 	char	*tmp;
-	int		idx;
+	int		i;
 
 	if (!g_cwd)
 		g_cwd = getcwd(NULL, 0);
-	current_dir = ft_strdup(g_cwd);
-	directions = ft_split(relative_path, '/');
-	if (!directions)
+	result = ft_strdup(g_cwd);
+	dirs = ft_split(relative_path, '/');
+	if (!dirs)
 		return (NULL);
-	idx = 0;
-	while (directions[idx])
+	i = 0;
+	while (dirs[i])
 	{
-		if (ft_strncmp(current_dir, "/", 2) != 0
-			&& ft_strncmp(directions[idx], "..", 3) == 0)
-		{
-			tmp = current_dir;
-			current_dir = ft_substr(tmp, 0, ft_strrchr(tmp, '/') - tmp);
-			free(tmp);
-		}
-		else if ((ft_strncmp(current_dir, "/", 2) == 0
-				&& ft_strncmp(directions[idx], "..", 3) == 0)
-			|| ft_strncmp(directions[idx], ".", 2) == 0)
-			;
-		else
-		{
-			tmp = current_dir;
-			current_dir = path_join(tmp, directions[idx]);
-			free(tmp);
-		}
-		idx++;
+		tmp = result;
+		result = path_join(tmp, dirs[i]);
+		free(tmp);
+		i++;
 	}
-	free_ptrarr((void **)directions);
-	return (current_dir);
+	free_ptrarr((void **)dirs);
+	tmp = result;
+	result = canonicalize_path(tmp);
+	free(tmp);
+	return (result);
 }
 
 /* パスを正規化する.
@@ -100,6 +89,22 @@ char	*canonicalize_path(char *path)
 		}
 		i++;
 	}
+	free_ptrarr((void **)dirs);
+	return (result);
+}
+
+/* 親ディレクトリに移動した後のパスを返す
+ */
+char	*change_to_parent_dir(char *path)
+{
+	char	*result;
+
+	result = ft_substr(path, 0, ft_strrchr(path, '/') - path);
+	if (result && ft_strlen(result) == 0)
+	{
+		free(result);
+		result = ft_strdup("/");
+	}
 	return (result);
 }
 
@@ -111,7 +116,7 @@ char	*path_join(char *dirpath, char *filename)
 	char	*tmp;
 	char	*result;
 
-	if (dirpath[ft_strlen(dirpath) - 1] != '/')
+	if (ft_strlen(dirpath) == 0 || dirpath[ft_strlen(dirpath) - 1] != '/')
 		tmp = ft_strjoin(dirpath, "/");
 	else
 		tmp = ft_strdup(dirpath);
