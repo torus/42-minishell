@@ -52,6 +52,44 @@ static int	change_to_directory(char *abs_path)
 	return (status);
 }
 
+/* $CDPATH から移動先ディレクトリを探す
+ */
+static int cd_cdpath(char *dest_path)
+{
+	char	*cdpath_env;
+	int		i;
+	char	*tmp;
+	char	*abs_path;
+	char	**dirs;
+	int		status;
+
+	PRINT_DEBUG("start search dir in $CDPATH\n");
+	cdpath_env = get_env_val("CDPATH");
+	if (!cdpath_env)
+		return (1);
+	dirs = ft_split(cdpath_env, ':');
+	free(cdpath_env);
+	while (dirs[i])
+	{
+		PRINT_DEBUG("search in |%s|\n", dirs[i]);
+		tmp = path_join(dirs[i], dest_path);
+		abs_path = canonicalize_path(tmp);
+		free(tmp);
+		PRINT_DEBUG("current path: |%s|\n", abs_path);
+		status = change_to_directory(abs_path);
+		free(abs_path);
+		if (status == 0)
+		{
+			PRINT_DEBUG("dir is found!!\n");
+			free_ptrarr((void **)dirs);
+			return (0);
+		}
+		i++;
+	}
+	free_ptrarr((void **)dirs);
+	return (1);
+}
+
 /* - This is `cd -', equivalent to `cd $OLDPWD'
  *   dest_path == "-" だった場合, $OLDPWD に移動して,
  *   $OLDPWD=$PWD にして, $PWDを更新する.
@@ -79,8 +117,10 @@ static int	change_directory(char *dest_path)
 			put_cd_errmsg(abs_path);
 		return (status);
 	}
-	if (dest_path[0] == '/')
+	// 絶対パスの場合
+	else if (dest_path[0] == '/')
 		return (change_to_directory(dest_path));
+	// 相対パスの場合
 	else
 	{
 		// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
@@ -94,34 +134,9 @@ static int	change_directory(char *dest_path)
 		// 絶対パスが渡された場合 $CDPATH から検索しない
 		// そうでなければ $CDPATH を起点として移動してみる.
 		if (dest_path[0] != '/')
-		{
-			PRINT_DEBUG("start search dir in $CDPATH\n");
-			char *cdpath_env = get_env_val("CDPATH");
-			if (cdpath_env)
-			{
-				char **dirs = ft_split(cdpath_env, ':');
-				free(cdpath_env);
-				int j = 0;
-				while (dirs[j])
-				{
-					PRINT_DEBUG("search in |%s|\n", dirs[j]);
-					char *tmp = path_join(dirs[j], dest_path);
-					abs_path = canonicalize_path(tmp);
-					free(tmp);
-					PRINT_DEBUG("current path: |%s|\n", abs_path);
-					status = change_to_directory(abs_path);
-					free(abs_path);
-					if (status == 0)
-					{
-						PRINT_DEBUG("dir is found!!\n");
-						free_ptrarr((void **)dirs);
-						return (0);
-					}
-					j++;
-				}
-				free_ptrarr((void **)dirs);
-			}
-		}
+			status = cd_cdpath(dest_path);
+		if (status == 0)
+			return (0);
 	}
 	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
 	return (1);
