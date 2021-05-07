@@ -66,23 +66,38 @@ static int	change_directory(char *dest_path)
 	if (dest_path[0] == '/')
 		return (change_to_directory(dest_path));
 	// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
-	// TODO: get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
+	// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
 	abs_path = get_abs_path_from_cwd(dest_path);
 	printf("[debug]\t abs_path = |%s|\n", abs_path);
 	status = change_to_directory(abs_path);
 	free(abs_path);
 	if (status == 0)
 		return (0);
-	/*
 	// 絶対パスが渡された場合 $CDPATH から検索しない
-	// そうでなければ $CDPATH を起点として移動してみる.
+	// TODO: そうでなければ $CDPATH を起点として移動してみる.
 	if (dest_path[0] != '/')
 	{
-
+		char *cdpath_env = get_env_val("CDPATH");
+		if (cdpath_env)
+		{
+			char **dirs = ft_split(cdpath_env, ':');
+			int j = 0;
+			while (dirs[j])
+			{
+				char *tmp = path_join(dirs[j], dest_path);
+				abs_path = canonicalize_path(tmp);
+				free(tmp);
+				status = change_to_directory(abs_path);
+				free(abs_path);
+				if (status == 0)
+					return (0);
+				j++;
+			}
+			free_ptrarr((void **)dirs);
+		}
+		free(cdpath_env);
 	}
-	// TODO: $CDPATH から試していって, うまくいけばok. だめならreturn(1);
-	// TODO: ここまで全て失敗したら chdir(dest_path) を試す.
-	*/
+	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
 	put_cd_errmsg(dest_path);
 	return (1);
 }
