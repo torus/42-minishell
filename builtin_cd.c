@@ -29,10 +29,15 @@ static void	put_cd_errmsg(char *dest_path)
 static int	change_to_directory(char *abs_path)
 {
 	int		status;
+	char	*canonicalized_path;
 
 	status = chdir(abs_path);
 	if (status == 0)
-		set_current_working_directory(abs_path);
+	{
+		canonicalized_path = canonicalize_path(abs_path);
+		set_current_working_directory(canonicalized_path);
+		free(canonicalized_path);
+	}
 	return (status);
 }
 
