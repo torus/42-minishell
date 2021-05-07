@@ -72,7 +72,7 @@ char	*canonicalize_path(char *path)
 		if (ft_strncmp(dirs[i], "..", 3) == 0)
 		{
 			// "/" 以外の時, 親ディレクトリに移動する
-			if (ft_strncmp(result, "/", 2) != 0)
+			if (ft_strncmp(result, "/", 2) && ft_strlen(result))
 			{
 				tmp = result;
 				result = ft_substr(tmp, 0, ft_strrchr(tmp, '/') - tmp);

@@ -25,6 +25,15 @@ int main(){
 		free(actual);
 	}
 
+	TEST_SECTION("canonicalize_path() /../..");
+	{
+		char *input = "/../..";
+		char *expected = "/";
+		char *actual = canonicalize_path(input);
+		CHECK_EQ_STR(actual, expected);
+		free(actual);
+	}
+
 	TEST_SECTION("canonicalize_path() ///////hoge/////fuga");
 	{
 		char *input = "///////hoge/////fuga";
