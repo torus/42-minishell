@@ -80,13 +80,15 @@ char	*canonicalize_path(char *path)
 	result = ft_strdup("/");
 	while (dirs[i])
 	{
-		if (ft_strncmp(dirs[i], "..", 3) == 0
-			&& ft_strncmp(result, "/", 2) != 0)
+		if (ft_strncmp(dirs[i], "..", 3) == 0)
 		{
 			// "/" 以外の時, 親ディレクトリに移動する
-			tmp = result;
-			result = ft_substr(tmp, 0, ft_strrchr(tmp, '/') - tmp);
-			free(tmp);
+			if (ft_strncmp(result, "/", 2) != 0)
+			{
+				tmp = result;
+				result = ft_substr(tmp, 0, ft_strrchr(tmp, '/') - tmp);
+				free(tmp);
+			}
 		}
 		else if (ft_strncmp(dirs[i], ".", 2) == 0)
 			;
