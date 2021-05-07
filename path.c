@@ -109,7 +109,10 @@ char	*path_join(char *dirpath, char *filename)
 	char	*tmp;
 	char	*result;
 
-	tmp = ft_strjoin(dirpath, "/");
+	if (dirpath[ft_strlen(dirpath) - 1] != '/')
+		tmp = ft_strjoin(dirpath, "/");
+	else
+		tmp = ft_strdup(dirpath);
 	if (!tmp)
 		return (NULL);
 	result = ft_strjoin(tmp, filename);

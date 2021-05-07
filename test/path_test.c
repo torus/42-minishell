@@ -12,7 +12,7 @@ int main(){
 	TEST_SECTION("path_join() 最後スラッシュあり");
 	{
 		char *fullpath = path_join("/usr/bin/", "cat");
-		CHECK_EQ_STR(fullpath, "/usr/bin//cat");
+		CHECK_EQ_STR(fullpath, "/usr/bin/cat");
 		free(fullpath);
 	}
 
