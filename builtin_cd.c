@@ -92,7 +92,10 @@ static int	change_directory(char *dest_path)
 					status = change_to_directory(abs_path);
 					free(abs_path);
 					if (status == 0)
+					{
+						free_ptrarr((void **)dirs);
 						return (0);
+					}
 					j++;
 				}
 				free_ptrarr((void **)dirs);
