@@ -162,7 +162,17 @@ static int	cd_home(void)
 	chdir_status = 0;
 	if (ft_strlen(dest_path))
 		chdir_status = chdir(dest_path);
-	if (chdir_status < 0)
+	if (chdir_status == 0)
+	{
+		char *abs_path;
+		if (dest_path[0] == '/')
+			abs_path = ft_strdup(dest_path);
+		else
+			abs_path = path_join(g_cwd, dest_path);
+		canonicalize_path_and_setcwd(abs_path);
+		free(abs_path);
+	}
+	else
 		put_cd_errmsg(dest_path);
 	free(dest_path);
 	if (chdir_status < 0)
