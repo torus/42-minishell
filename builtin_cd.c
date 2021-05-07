@@ -68,15 +68,22 @@ static int cd_cdpath(char *dest_path)
 	while (dirs[i])
 	{
 		PRINT_DEBUG("search in |%s|\n", dirs[i]);
-		abs_path = path_join(dirs[i], dest_path);
+		if (dirs[i][0] != '/')
+		{
+			char *tmp = path_join(g_cwd, dirs[i]);
+			abs_path = path_join(tmp, dest_path);
+			free(tmp);
+		}
+		else
+			abs_path = path_join(dirs[i], dest_path);
 		status = chdir(abs_path);
 		if (status == 0)
 		{
 			PRINT_DEBUG("dir is found!!\n");
 			canonicalize_path_and_setcwd(abs_path);
-			printf("%s\n", abs_path);
 			free(abs_path);
 			free_ptrarr((void **)dirs);
+			printf("%s\n", g_cwd);
 			return (0);
 		}
 		free(abs_path);
