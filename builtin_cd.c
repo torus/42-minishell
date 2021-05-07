@@ -74,7 +74,7 @@ static int	change_directory(char *dest_path)
 	if (status == 0)
 		return (0);
 	// 絶対パスが渡された場合 $CDPATH から検索しない
-	// TODO: そうでなければ $CDPATH を起点として移動してみる.
+	// そうでなければ $CDPATH を起点として移動してみる.
 	if (dest_path[0] != '/')
 	{
 		char *cdpath_env = get_env_val("CDPATH");
@@ -98,7 +98,6 @@ static int	change_directory(char *dest_path)
 		free(cdpath_env);
 	}
 	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
-	put_cd_errmsg(dest_path);
 	return (1);
 }
 
@@ -130,9 +129,9 @@ int	builtin_cd(char **argv)
 	else if (ptrarr_len((void **)argv) == 1)
 		return (cd_home());
 	chdir_status = change_directory(argv[1]);
-	if (chdir_status < 0)
+	if (chdir_status != 0)
 		put_cd_errmsg(argv[1]);
-	if (chdir_status < 0)
+	if (chdir_status != 0)
 		return (1);
 	return (0);
 }
