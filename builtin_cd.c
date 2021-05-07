@@ -6,12 +6,12 @@
 #define DEBUG 1
 
 #if DEBUG == 1
-	#define DEBUG_PRINT(fmt, ...) \
+	#define PRINT_DEBUG(fmt, ...) \
 		do { \
 			printf("[debug] %s:%d:\t" fmt, __FILE__, __LINE__, ##__VA_ARGS__); \
 		} while (0);
 #else
-	#define DEBUG_PRINT(fmt, ...) do {} while(0);
+	#define PRINT_DEBUG(fmt, ...) do {} while(0);
 #endif
 
 static void	put_cd_errmsg(char *dest_path)
@@ -64,16 +64,16 @@ static int	change_directory(char *dest_path)
 	char	*abs_path;
 	int		status;
 
-	DEBUG_PRINT("change_directory() start\n");
-	DEBUG_PRINT("dest_path = |%s|\n", dest_path);
+	PRINT_DEBUG("change_directory() start\n");
+	PRINT_DEBUG("dest_path = |%s|\n", dest_path);
 	// $OLDPWD に移動する場合
 	if (ft_strncmp(dest_path, "-", 2) == 0)
 	{
 		abs_path = get_env_val("OLDPWD");
-		DEBUG_PRINT("change to $OLDPWD start\n");
-		DEBUG_PRINT("$OLDPWD = |%s|\n", abs_path);
+		PRINT_DEBUG("change to $OLDPWD start\n");
+		PRINT_DEBUG("$OLDPWD = |%s|\n", abs_path);
 		status = change_to_directory(abs_path);
-		DEBUG_PRINT("change_to_directory() = %d\n", status);
+		PRINT_DEBUG("change_to_directory() = %d\n", status);
 		free(abs_path);
 		if (status == -1)
 			put_cd_errmsg(abs_path);
@@ -86,7 +86,7 @@ static int	change_directory(char *dest_path)
 		// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
 		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
 		abs_path = get_abs_path_from_cwd(dest_path);
-		DEBUG_PRINT("abs_path = |%s|\n", abs_path);
+		PRINT_DEBUG("abs_path = |%s|\n", abs_path);
 		status = change_to_directory(abs_path);
 		free(abs_path);
 		if (status == 0)
@@ -95,7 +95,7 @@ static int	change_directory(char *dest_path)
 		// そうでなければ $CDPATH を起点として移動してみる.
 		if (dest_path[0] != '/')
 		{
-			DEBUG_PRINT("start search dir in $CDPATH\n");
+			PRINT_DEBUG("start search dir in $CDPATH\n");
 			char *cdpath_env = get_env_val("CDPATH");
 			if (cdpath_env)
 			{
@@ -104,16 +104,16 @@ static int	change_directory(char *dest_path)
 				int j = 0;
 				while (dirs[j])
 				{
-					DEBUG_PRINT("search in |%s|\n", dirs[j]);
+					PRINT_DEBUG("search in |%s|\n", dirs[j]);
 					char *tmp = path_join(dirs[j], dest_path);
 					abs_path = canonicalize_path(tmp);
 					free(tmp);
-					DEBUG_PRINT("current path: |%s|\n", abs_path);
+					PRINT_DEBUG("current path: |%s|\n", abs_path);
 					status = change_to_directory(abs_path);
 					free(abs_path);
 					if (status == 0)
 					{
-						DEBUG_PRINT("dir is found!!\n");
+						PRINT_DEBUG("dir is found!!\n");
 						free_ptrarr((void **)dirs);
 						return (0);
 					}
