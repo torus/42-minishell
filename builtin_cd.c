@@ -3,6 +3,17 @@
 #include "path.h"
 #include "minishell.h"
 
+#define DEBUG 1
+
+#if DEBUG == 1
+	#define DEBUG_PRINT(fmt, ...) \
+		do { \
+			printf("[debug]\t" fmt, ##__VA_ARGS__); \
+		} while (0);
+#else
+	#define DEBUG_PRINT(fmt, ...) do {} while(0);
+#endif
+
 static void	put_cd_errmsg(char *dest_path)
 {
 	char	*errmsg;
@@ -53,16 +64,16 @@ static int	change_directory(char *dest_path)
 	char	*abs_path;
 	int		status;
 
-	printf("[debug]\t change_directory() start\n");
-	printf("[debug]\t dest_path = |%s|\n", dest_path);
+	DEBUG_PRINT("change_directory() start\n");
+	DEBUG_PRINT("dest_path = |%s|\n", dest_path);
 	// $OLDPWD に移動する場合
 	if (ft_strncmp(dest_path, "-", 2) == 0)
 	{
 		abs_path = get_env_val("OLDPWD");
-		printf("[debug]\t change to $OLDPWD start\n");
-		printf("[debug]\t $OLDPWD = |%s|\n", abs_path);
+		DEBUG_PRINT("change to $OLDPWD start\n");
+		DEBUG_PRINT("$OLDPWD = |%s|\n", abs_path);
 		status = change_to_directory(abs_path);
-		printf("[debug]\t change_to_directory() = %d\n", status);
+		DEBUG_PRINT("change_to_directory() = %d\n", status);
 		free(abs_path);
 		if (status == -1)
 			put_cd_errmsg(abs_path);
@@ -75,7 +86,7 @@ static int	change_directory(char *dest_path)
 		// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
 		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
 		abs_path = get_abs_path_from_cwd(dest_path);
-		printf("[debug]\t abs_path = |%s|\n", abs_path);
+		DEBUG_PRINT("abs_path = |%s|\n", abs_path);
 		status = change_to_directory(abs_path);
 		free(abs_path);
 		if (status == 0)
@@ -84,20 +95,25 @@ static int	change_directory(char *dest_path)
 		// そうでなければ $CDPATH を起点として移動してみる.
 		if (dest_path[0] != '/')
 		{
+			DEBUG_PRINT("start search dir in $CDPATH\n");
 			char *cdpath_env = get_env_val("CDPATH");
 			if (cdpath_env)
 			{
 				char **dirs = ft_split(cdpath_env, ':');
+				free(cdpath_env);
 				int j = 0;
 				while (dirs[j])
 				{
+					DEBUG_PRINT("search in |%s|\n", dirs[j]);
 					char *tmp = path_join(dirs[j], dest_path);
 					abs_path = canonicalize_path(tmp);
 					free(tmp);
+					DEBUG_PRINT("current path: |%s|\n", abs_path);
 					status = change_to_directory(abs_path);
 					free(abs_path);
 					if (status == 0)
 					{
+						DEBUG_PRINT("dir is found!!\n");
 						free_ptrarr((void **)dirs);
 						return (0);
 					}
@@ -105,7 +121,6 @@ static int	change_directory(char *dest_path)
 				}
 				free_ptrarr((void **)dirs);
 			}
-			free(cdpath_env);
 		}
 	}
 	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
