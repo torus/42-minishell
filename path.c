@@ -71,13 +71,9 @@ char	*canonicalize_path(char *path)
 	{
 		if (ft_strncmp(dirs[i], "..", 3) == 0)
 		{
-			// "/" 以外の時, 親ディレクトリに移動する
-			if (ft_strncmp(result, "/", 2) && ft_strlen(result))
-			{
-				tmp = result;
-				result = ft_substr(tmp, 0, ft_strrchr(tmp, '/') - tmp);
-				free(tmp);
-			}
+			tmp = result;
+			result = change_to_parent_dir(result);
+			free(tmp);
 		}
 		else if (ft_strncmp(dirs[i], ".", 2) == 0)
 			;
@@ -100,6 +96,7 @@ char	*change_to_parent_dir(char *path)
 	char	*result;
 
 	result = ft_substr(path, 0, ft_strrchr(path, '/') - path);
+	// ルートディレクトリ "/" で上の処理を実行すると空文字列が返ってくるので対策
 	if (result && ft_strlen(result) == 0)
 	{
 		free(result);
