@@ -83,6 +83,7 @@ static int	change_directory(char *dest_path)
 	// TODO: $CDPATH から試していって, うまくいけばok. だめならreturn(1);
 	// TODO: ここまで全て失敗したら chdir(dest_path) を試す.
 	*/
+	put_cd_errmsg(dest_path);
 	return (1);
 }
 
