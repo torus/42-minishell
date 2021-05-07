@@ -74,6 +74,7 @@ static int cd_cdpath(char *dest_path)
 		{
 			PRINT_DEBUG("dir is found!!\n");
 			canonicalize_path_and_setcwd(abs_path);
+			printf("%s\n", abs_path);
 			free(abs_path);
 			free_ptrarr((void **)dirs);
 			return (0);
