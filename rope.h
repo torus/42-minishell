@@ -46,3 +46,17 @@ t_splay_tree	*splay_zig_zag_left(
 t_splay_tree	*splay(t_splay_path *path);
 t_splay_path	*splay_path_left(t_splay_path *path);
 t_splay_path	*splay_path_right(t_splay_path *path);
+
+#define ROPE_NOWEIGHT ((void*)-1L)
+
+typedef t_splay_tree	t_rope;
+
+t_rope	*rope_create(char *left, char *right);
+t_rope	*rope_concat(t_rope *left, t_rope *right);
+int		rope_weight(t_rope *rope);
+char	rope_index(t_rope *rope, int index);
+char	rope_index_with_path(t_rope *rope, int index, t_splay_path **path);
+int		rope_length(t_rope *rope);
+void	rope_split(t_rope *rope, int index, t_rope **left, t_rope **right);
+t_rope	*rope_insert(t_rope *rope, int index, t_rope *right);
+t_rope	*rope_delete(t_rope *rope, int begin, int end);

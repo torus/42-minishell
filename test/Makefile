@@ -42,12 +42,17 @@ run: parse_test env_test path_test exec_test command_exec_test ast2cmdinvo_test
 
 SRCS_PARSE = $(wildcard ../lexer*.c ../parse*.c) ../libft/ft_memcpy.c
 SRCS_SPLAY = $(wildcard ../splay*.c)
+SRCS_ROPE = $(SRCS_SPLAY) $(wildcard ../rope*.c)	\
+	../libft/ft_strlcpy.c ../libft/ft_strlen.c
 
 parse_test: Makefile parse_test.c test.c test.h $(SRCS_PARSE) ../parse.h
 	gcc -Werror -Wall -Wextra -g -o $@ parse_test.c test.c $(SRCS_PARSE)
 
 splay_test: Makefile splay_test.c test.c test.h $(SRCS_SPLAY) ../rope.h
 	gcc -Werror -Wall -Wextra -g -o $@ splay_test.c test.c $(SRCS_SPLAY)
+
+rope_test: Makefile rope_test.c test.c test.h $(SRCS_ROPE) ../rope.h
+	gcc -Werror -Wall -Wextra -g -o $@ rope_test.c test.c $(SRCS_ROPE)
 
 env_test: env_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
