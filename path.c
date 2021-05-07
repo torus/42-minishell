@@ -32,8 +32,6 @@ char *get_abs_path_from_cwd(char *relative_path)
 	char	*tmp;
 	int		i;
 
-	if (!g_cwd)
-		g_cwd = getcwd(NULL, 0);
 	result = ft_strdup(g_cwd);
 	dirs = ft_split(relative_path, '/');
 	if (!dirs)

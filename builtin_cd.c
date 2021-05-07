@@ -174,6 +174,8 @@ int	builtin_cd(char **argv)
 {
 	int		chdir_status;
 
+	if (!g_cwd)
+		g_cwd = getcwd(NULL, 0);
 	if (ptrarr_len((void **)argv) > 2)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
 	else if (ptrarr_len((void **)argv) == 1)
