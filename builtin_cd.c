@@ -3,7 +3,7 @@
 #include "path.h"
 #include "minishell.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG == 1
 	#define PRINT_DEBUG(fmt, ...) \
@@ -37,19 +37,14 @@ static void	put_cd_errmsg(char *dest_path)
  *
  * 移動出来たら0, 移動出来なかったら-1を返す
  */
-static int	change_to_directory(char *abs_path)
+static int	canonicalize_path_and_setcwd(char *abs_path)
 {
-	int		status;
 	char	*canonicalized_path;
 
-	status = chdir(abs_path);
-	if (status == 0)
-	{
-		canonicalized_path = canonicalize_path(abs_path);
-		set_current_working_directory(canonicalized_path);
-		free(canonicalized_path);
-	}
-	return (status);
+	canonicalized_path = canonicalize_path(abs_path);
+	set_current_working_directory(canonicalized_path);
+	free(canonicalized_path);
+	return (0);
 }
 
 /* $CDPATH から移動先ディレクトリを探す
@@ -58,7 +53,6 @@ static int cd_cdpath(char *dest_path)
 {
 	char	*cdpath_env;
 	int		i;
-	char	*tmp;
 	char	*abs_path;
 	char	**dirs;
 	int		status;
@@ -73,20 +67,21 @@ static int cd_cdpath(char *dest_path)
 	while (dirs[i])
 	{
 		PRINT_DEBUG("search in |%s|\n", dirs[i]);
-		tmp = path_join(dirs[i], dest_path);
-		abs_path = canonicalize_path(tmp);
-		free(tmp);
-		PRINT_DEBUG("current path: |%s|\n", abs_path);
-		status = change_to_directory(abs_path);
-		free(abs_path);
+		abs_path = path_join(dirs[i], dest_path);
+		status = chdir(abs_path);
 		if (status == 0)
 		{
 			PRINT_DEBUG("dir is found!!\n");
+			canonicalize_path_and_setcwd(abs_path);
+			free(abs_path);
 			free_ptrarr((void **)dirs);
 			return (0);
-		} i++;
+		}
+		free(abs_path);
+		i++;
 	}
 	free_ptrarr((void **)dirs);
+	PRINT_DEBUG("dir is not found in $CDPATH\n");
 	return (1);
 }
 
@@ -108,32 +103,47 @@ static int	change_directory(char *dest_path)
 	if (ft_strncmp(dest_path, "-", 2) == 0)
 	{
 		abs_path = get_env_val("OLDPWD");
-		PRINT_DEBUG("change to $OLDPWD start\n");
-		PRINT_DEBUG("$OLDPWD = |%s|\n", abs_path);
-		status = change_to_directory(abs_path);
-		PRINT_DEBUG("change_to_directory() = %d\n", status);
-		free(abs_path);
-		if (status == -1)
+			PRINT_DEBUG("change to $OLDPWD start\n");
+			PRINT_DEBUG("$OLDPWD = |%s|\n", abs_path);
+
+		status = chdir(abs_path);
+			PRINT_DEBUG("chdir() = %d\n", status);
+
+		if (status == 0)
+			canonicalize_path_and_setcwd(abs_path);
+		else
 			put_cd_errmsg(abs_path);
+
+		free(abs_path);
 		return (status);
 	}
 	// 絶対パスの場合
 	else if (dest_path[0] == '/')
-		return (change_to_directory(dest_path));
+	{
+		status = chdir(dest_path);
+		if (status == 0)
+			canonicalize_path_and_setcwd(dest_path);
+		else
+			put_cd_errmsg(dest_path);
+		return (status);
+	}
 	// 相対パスの場合
 	else
 	{
 		// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
 		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
-		abs_path = get_abs_path_from_cwd(dest_path);
-		PRINT_DEBUG("abs_path = |%s|\n", abs_path);
-		status = change_to_directory(abs_path);
-		free(abs_path);
+		status = chdir(dest_path);
 		if (status == 0)
+		{
+			abs_path = get_abs_path_from_cwd(dest_path);
+			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
+			canonicalize_path_and_setcwd(abs_path);
+			free(abs_path);
 			return (0);
+		}
 		// 絶対パスが渡された場合 $CDPATH から検索しない
 		// そうでなければ $CDPATH を起点として移動してみる.
-		if (dest_path[0] != '/' && cd_cdpath(dest_path) == 0)
+		if (cd_cdpath(dest_path) == 0)
 			return (0);
 	}
 	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
