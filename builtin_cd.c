@@ -65,37 +65,40 @@ static int	change_directory(char *dest_path)
 	}
 	if (dest_path[0] == '/')
 		return (change_to_directory(dest_path));
-	// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
-	// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
-	abs_path = get_abs_path_from_cwd(dest_path);
-	printf("[debug]\t abs_path = |%s|\n", abs_path);
-	status = change_to_directory(abs_path);
-	free(abs_path);
-	if (status == 0)
-		return (0);
-	// 絶対パスが渡された場合 $CDPATH から検索しない
-	// そうでなければ $CDPATH を起点として移動してみる.
-	if (dest_path[0] != '/')
+	else
 	{
-		char *cdpath_env = get_env_val("CDPATH");
-		if (cdpath_env)
+		// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
+		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
+		abs_path = get_abs_path_from_cwd(dest_path);
+		printf("[debug]\t abs_path = |%s|\n", abs_path);
+		status = change_to_directory(abs_path);
+		free(abs_path);
+		if (status == 0)
+			return (0);
+		// 絶対パスが渡された場合 $CDPATH から検索しない
+		// そうでなければ $CDPATH を起点として移動してみる.
+		if (dest_path[0] != '/')
 		{
-			char **dirs = ft_split(cdpath_env, ':');
-			int j = 0;
-			while (dirs[j])
+			char *cdpath_env = get_env_val("CDPATH");
+			if (cdpath_env)
 			{
-				char *tmp = path_join(dirs[j], dest_path);
-				abs_path = canonicalize_path(tmp);
-				free(tmp);
-				status = change_to_directory(abs_path);
-				free(abs_path);
-				if (status == 0)
-					return (0);
-				j++;
+				char **dirs = ft_split(cdpath_env, ':');
+				int j = 0;
+				while (dirs[j])
+				{
+					char *tmp = path_join(dirs[j], dest_path);
+					abs_path = canonicalize_path(tmp);
+					free(tmp);
+					status = change_to_directory(abs_path);
+					free(abs_path);
+					if (status == 0)
+						return (0);
+					j++;
+				}
+				free_ptrarr((void **)dirs);
 			}
-			free_ptrarr((void **)dirs);
+			free(cdpath_env);
 		}
-		free(cdpath_env);
 	}
 	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
 	return (1);
