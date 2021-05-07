@@ -8,7 +8,7 @@
 #if DEBUG == 1
 	#define DEBUG_PRINT(fmt, ...) \
 		do { \
-			printf("[debug]\t" fmt, ##__VA_ARGS__); \
+			printf("[debug] %s:%d:\t" fmt, __FILE__, __LINE__, ##__VA_ARGS__); \
 		} while (0);
 #else
 	#define DEBUG_PRINT(fmt, ...) do {} while(0);
