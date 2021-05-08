@@ -24,7 +24,6 @@ t_splay_tree	*splay_insert_left(
 			tree->left, value, splay_create(NULL, tree->value, tree->right)));
 }
 
-
 t_splay_tree	*splay_insert_right(
 					t_splay_tree *tree, void *value)
 {

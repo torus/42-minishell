@@ -14,10 +14,10 @@ static t_splay_tree	*splay_1(t_splay_path *path)
 	d2 = path->next->dir;
 	if (d1 == SPLAY_LEFT)
 		new_path = splay_path_create(
-			d2, splay_zig_right(x, p), path->next->next);
+				d2, splay_zig_right(x, p), path->next->next);
 	else
 		new_path = splay_path_create(
-			d2, splay_zig_left(x, p), path->next->next);
+				d2, splay_zig_left(x, p), path->next->next);
 	return (splay(new_path));
 }
 
@@ -46,7 +46,7 @@ static t_splay_tree	*splay_2(t_splay_path *path)
 			rotated = splay_zig_zag_right(x, p, g);
 	}
 	return (splay(splay_path_create(
-		path->next->next->dir, rotated, path->next->next->next)));
+				path->next->next->dir, rotated, path->next->next->next)));
 }
 
 t_splay_tree	*splay(t_splay_path *path)
