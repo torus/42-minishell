@@ -64,7 +64,10 @@ char	*canonicalize_path(char *path)
 
 	dirs = ft_split(path, '/');
 	i = 0;
-	result = ft_strdup("/");
+	if (ft_strlen(path) >= 2 && path[0] == '/' && path[1] == '/' && path[2] != '/')
+		result = ft_strdup("//");
+	else
+		result = ft_strdup("/");
 	while (dirs[i])
 	{
 		if (ft_strncmp(dirs[i], "..", 3) == 0)

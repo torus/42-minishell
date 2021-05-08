@@ -61,6 +61,20 @@ int main(){
 		free(actual);
 	}
 
+	/*
+	 * 歴史的な理由から先頭のスラッシュが2つの場合はそのままになる.
+	 * これは bash の cd の仕様に合わせたものである.
+	 * http://tiswww.case.edu/php/chet/bash/FAQ の E10 を参照
+	 */
+	TEST_SECTION("canonicalize_path() //usr//bin");
+	{
+		char *input = "//usr//bin";
+		char *expected = "//usr/bin";
+		char *actual = canonicalize_path(input);
+		CHECK_EQ_STR(actual, expected);
+		free(actual);
+	}
+
 	TEST_SECTION("change_to_parent_dir() /");
 	{
 		char *input = "/";
