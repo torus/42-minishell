@@ -149,8 +149,19 @@ void	rope_split_iter(
 
 void	rope_split(t_rope *rope, int index, t_rope **left, t_rope **right)
 {
-	/* TODO: splay here */
-	rope_split_iter(rope, index, left, right);
+	t_splay_path	*path;
+	t_splay_path	*cur;
+	t_rope			*splayed;
+
+	rope_index_with_path(rope, index, &path);
+	cur = path->next;
+	while (cur)
+	{
+		cur->node->value = ROPE_NOWEIGHT;
+		cur = cur->next;
+	}
+	splayed = splay(path->next);
+	rope_split_iter(splayed, index, left, right);
 }
 
 t_rope	*rope_insert(t_rope *rope, int index, t_rope *new_rope)

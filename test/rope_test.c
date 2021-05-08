@@ -72,6 +72,30 @@ void	test_rope()
 		CHECK_EQ(rope_weight(rope), 5);
 	}
 
+	TEST_SECTION("splay");
+	{
+		t_rope	*rope = brownfox();
+
+		t_splay_path	*path;
+		t_splay_path	*cur;
+		t_rope			*splayed;
+
+		rope_index_with_path(rope, 9, &path);
+		cur = path->next;
+		while (cur)
+		{
+			cur->node->value = ROPE_NOWEIGHT;
+			cur = cur->next;
+		}
+		splayed = splay(path->next);
+
+		CHECK_EQ(rope_index(splayed, 0), 'q');
+		CHECK_EQ(rope_index(splayed, 9), 'w');
+		CHECK_EQ(rope_index(splayed, 10), 'n');
+		CHECK_EQ(rope_index(splayed, 20), 's');
+		CHECK_EQ(rope_length(splayed), 21);
+	}
+
 	TEST_SECTION("rope_split");
 	{
 		t_rope	*rope = brownfox();
