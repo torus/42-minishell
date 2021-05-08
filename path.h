@@ -12,5 +12,6 @@ int		set_current_working_directory(char *abs_path);
 char	*get_abs_path_from_cwd(char *relative_path);
 char	*canonicalize_path(char *path);
 char	*change_to_parent_dir(char *path);
+bool	is_directory(char *path);
 
 #endif

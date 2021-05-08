@@ -19,6 +19,17 @@ int	set_current_working_directory(char *abs_path)
 	return (0);
 }
 
+bool	is_directory(char *path)
+{
+	struct stat	buf;
+
+	if (stat(path, &buf) != 0)
+		return (false);
+	if (S_ISDIR(buf.st_mode))
+		return (true);
+	return (false);
+}
+
 /* 絶対パスを構築する
  * "{g_cwd}/{relative_path}" を返す
  * ex:
