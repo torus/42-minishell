@@ -140,7 +140,8 @@ static int	change_directory(char *dest_path)
 	else
 	{
 		// bashの仕様では, $CDPATH を調べてからカレントディレクトリを調べる
-		if (cd_cdpath(dest_path) == 0)
+		// "." の時は $CDPATH を探索しない
+		if (ft_strncmp(dest_path, ".", 2) && cd_cdpath(dest_path) == 0)
 			return (0);
 		// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
 		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
@@ -153,8 +154,8 @@ static int	change_directory(char *dest_path)
 			free(abs_path);
 			return (0);
 		}
+		// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
 	}
-	// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
 	return (1);
 }
 
