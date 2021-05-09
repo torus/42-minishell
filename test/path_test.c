@@ -34,28 +34,28 @@ int main(){
 		free(actual);
 	}
 
-	TEST_SECTION("canonicalize_path() ///////hoge/////fuga");
+	TEST_SECTION("canonicalize_path() ///////usr/////bin");
 	{
-		char *input = "///////hoge/////fuga";
-		char *expected = "/hoge/fuga";
+		char *input = "///////usr/////bin";
+		char *expected = "/usr/bin";
 		char *actual = canonicalize_path(input);
 		CHECK_EQ_STR(actual, expected);
 		free(actual);
 	}
 
-	TEST_SECTION("canonicalize_path() /../../../..////////hoge/./././././.dir");
+	TEST_SECTION("canonicalize_path() /../../../..////////usr/./././././bin");
 	{
-		char *input = "/../../../..////////hoge/./././././.dir";
-		char *expected = "/hoge/.dir";
+		char *input = "/../../../..////////usr/./././././bin";
+		char *expected = "/usr/bin";
 		char *actual = canonicalize_path(input);
 		CHECK_EQ_STR(actual, expected);
 		free(actual);
 	}
 
-	TEST_SECTION("canonicalize_path() /..///////hoge/////fuga/././././../../hoge2/./././/////");
+	TEST_SECTION("canonicalize_path() /..///////usr/////bin/././././../../usr/./././/////");
 	{
-		char *input = "/..///////hoge/////fuga/././././../../hoge2/./././/////";
-		char *expected = "/hoge2";
+		char *input = "/..///////usr/////bin/././././../../bin/./././/////";
+		char *expected = "/bin";
 		char *actual = canonicalize_path(input);
 		CHECK_EQ_STR(actual, expected);
 		free(actual);
@@ -72,6 +72,16 @@ int main(){
 		char *expected = "//usr/bin";
 		char *actual = canonicalize_path(input);
 		CHECK_EQ_STR(actual, expected);
+		free(actual);
+	}
+
+	/* 途中で存在しないディレクトリが入ってたらNULLが返ってくる */
+	TEST_SECTION("canonicalize_path() //usr//hoge/./././/../../usr");
+	{
+		char *input = "//usr//hoge/./././/../../usr";
+		char *expected = NULL;
+		char *actual = canonicalize_path(input);
+		CHECK_EQ(actual, expected);
 		free(actual);
 	}
 
