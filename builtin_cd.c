@@ -2,6 +2,7 @@
 #include "env.h"
 #include "path.h"
 #include "minishell.h"
+#include <string.h>
 
 #define DEBUG 1
 
@@ -18,15 +19,7 @@ static void	put_cd_errmsg(char *dest_path)
 {
 	char	*errmsg;
 
-	errmsg = NULL;
-	if (errno == ENOENT)
-		errmsg = ft_strjoin(dest_path, ": No such file or directory");
-	else if (errno == ENOTDIR)
-		errmsg = ft_strjoin(dest_path, ": Not a directory");
-	else if (errno == EACCES)
-		errmsg = ft_strjoin(dest_path, ": Permission denied");
-	if (!errmsg)
-		put_minish_err_msg_and_exit(1, "cd", "generating errmsg is failed!");
+	errmsg = ft_strjoin(dest_path, strerror(errno));
 	put_minish_err_msg("cd", errmsg);
 	free(errmsg);
 }
@@ -50,7 +43,7 @@ static int	canonicalize_path_and_setcwd(char *abs_path)
 
 /* $CDPATH から移動先ディレクトリを探す
  */
-static int cd_cdpath(char *dest_path)
+static int cd_cdpath_env(char *dest_path)
 {
 	char	*cdpath_env;
 	int		i;
@@ -95,131 +88,154 @@ static int cd_cdpath(char *dest_path)
 	return (1);
 }
 
-/* - This is `cd -', equivalent to `cd $OLDPWD'
- *   dest_path == "-" だった場合, $OLDPWD に移動して,
- *   $OLDPWD=$PWD にして, $PWDを更新する.
- *   $OLDPWDに移動失敗した場合は移動しないし, $OLDPWD, $PWD を更新しない.
- * - 絶対パス('/'から始まる)の場合は $CDPATH から検索しない
- * - $CDPATHから見つかった場合は移動先の絶対パスを標準出力する
+/*
+ * dest
+ * is_canon_path: 正規化されたパスかどうか
  */
-static int	change_directory(char *dest_path)
+static char *set_cd_path(char *dest, bool *is_canon_path)
 {
-	char	*abs_path;
-	int		status;
+	char *physical_path;
+	char *canon_path;
 
-	PRINT_DEBUG("change_directory() start\n");
-	PRINT_DEBUG("dest_path = |%s|\n", dest_path);
-	// $OLDPWD に移動する場合
-	if (ft_strncmp(dest_path, "-", 2) == 0)
-	{
-		abs_path = get_env_val("OLDPWD");
-			PRINT_DEBUG("change to $OLDPWD start\n");
-			PRINT_DEBUG("$OLDPWD = |%s|\n", abs_path);
-
-		status = chdir(abs_path);
-			PRINT_DEBUG("chdir() = %d\n", status);
-
-		if (status == 0)
-			canonicalize_path_and_setcwd(abs_path);
-		else
-			put_cd_errmsg(abs_path);
-
-		free(abs_path);
-		return (status);
-	}
-	// 絶対パスの場合
-	else if (dest_path[0] == '/')
-	{
-		status = chdir(dest_path);
-		if (status == 0)
-			canonicalize_path_and_setcwd(dest_path);
-		else
-			put_cd_errmsg(dest_path);
-		return (status);
-	}
-	// 相対パスの場合
+	if (dest[0] =='/')
+		physical_path = ft_strdup(dest);
 	else
+		physical_path = path_join(g_cwd, dest);
+	if (!physical_path)
+		return (NULL);
+	canon_path = canonicalize_path(physical_path);
+	if (canon_path)
 	{
-		// bashの仕様では, $CDPATH を調べてからカレントディレクトリを調べる
-		// ".", "./*" の時は $CDPATH を探索しない
-		if ((ft_strncmp(dest_path, ".", 2) && ft_strncmp(dest_path, "./", 2))
-		&& cd_cdpath(dest_path) == 0)
-			return (0);
-
-		// それ以外の場合は, 現在のディレクトリとdest_pathを繋げて正規化したパスに移動出来ればOK.
-		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
-		abs_path = get_abs_path_from_cwd(dest_path);
-		status = chdir(abs_path);
-		PRINT_DEBUG("正常 chdir(|%s|) = %d\n", abs_path, status);
-		if (status == 0)
-		{
-			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
-			canonicalize_path_and_setcwd(abs_path);
-			free(abs_path);
-			return (0);
-		}
-		free(abs_path);
-
-		// ここまで全て失敗したら chdir(dest_path) を試す.
-		status = chdir(dest_path);
-		PRINT_DEBUG("異常 chdir(|%s|) = %d\n", dest_path, status);
-		if (status == 0)
-		{
-			abs_path = path_join(g_cwd, dest_path);
-			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
-			set_cwd(abs_path);
-			if (is_directory(abs_path))
-				put_cwd_err_msg("cd");
-			free(abs_path);
-			return (0);
-		}
+		free(physical_path);
+		*is_canon_path = true;
+		return (canon_path);
 	}
-	return (1);
+	free(canon_path);
+	*is_canon_path = false;
+	return (physical_path);
 }
 
-static int	cd_home(void)
+static int set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
 {
-	char	*dest_path;
-	int		chdir_status;
+	char *new_pwd;
 
-	dest_path = get_env_val("HOME");
-	if (!dest_path)
-		return (put_minish_err_msg_and_ret(1, "cd", "HOME not set"));
-	chdir_status = 0;
-	if (ft_strlen(dest_path))
-		chdir_status = chdir(dest_path);
-	if (chdir_status == 0)
+	new_pwd = NULL;
+	if (is_abs_path)
 	{
-		char *abs_path;
-		if (dest_path[0] == '/')
-			abs_path = ft_strdup(dest_path);
-		else
-			abs_path = path_join(g_cwd, dest_path);
-		canonicalize_path_and_setcwd(abs_path);
-		free(abs_path);
+		if (is_canon_path == false)
+			new_pwd = get_cwd_path("cd");
+		if (is_canon_path || new_pwd == NULL)
+		{
+			if (!(new_pwd = ft_strdup(path)))
+				return (ERROR);
+		}
 	}
 	else
-		put_cd_errmsg(dest_path);
-	free(dest_path);
-	if (chdir_status < 0)
-		return (1);
-	return (0);
+	{
+		if (!(new_pwd = get_cwd_path("cd")))
+		{
+			if (!(new_pwd = ft_strdup(path)))
+				return (ERROR);
+		}
+	}
+	return (SUCCESS);
+}
+
+/* 実際に chdir() を実行して現在のプロセスのcwdを変更する
+ *
+ * cd_path: 1回目にchdir()を実行するパス
+ * arg: 2回目にchdir()を実行するパス
+ * is_canon_path: 正規化されたパス?
+ */
+static int	change_dir_process(char *cd_path, const char *arg, bool is_canon_path)
+{
+	int status;
+	int old_errno;
+
+	status = chdir(cd_path);
+	if (status == 0)
+	{
+		set_new_pwd(cd_path, is_canon_path, true);
+		return (status);
+	}
+	old_errno = errno;
+	status = chdir(arg);
+	if (status == 0)
+	{
+		set_new_pwd(cd_path, is_canon_path, false);
+		return (status);
+	}
+	errno = old_errno;
+	return (ERROR);
+}
+
+/* cdpathを取得し, プロセスのcwdを変更する
+ */
+static bool	change_directory_new(char *dest)
+{
+	char *path;
+	int status;
+	bool is_canon_path;
+
+	path = set_cd_path(dest, &is_canon_path);
+	status = change_dir_process(path, dest, is_canon_path);
+	free(path);
+	return (status);
+}
+
+/* cd先のディレクトリをargvを元に作成して返す */
+static char *set_cd_dest(char **argv)
+{
+	char	*dest_path;
+
+	if (ptrarr_len((void **)argv) == 1)
+	{
+		dest_path = get_env_val("HOME");
+		if (!dest_path)
+		{
+			put_minish_err_msg("cd", "HOME not set");
+			return (NULL);
+		}
+		return (dest_path);
+	}
+	return (ft_strdup(argv[1]));
+}
+
+/* $CDPATH を検索するかどうかを返す */
+static bool will_search_cdpath(char **argv, char *dest)
+{
+	if (argv[1] == NULL || argv[1][0] == '/')
+		return (false);
+	if (ft_strcmp((char *)dest, ".") == 0 ||
+		ft_strcmp((char *)dest, "..") == 0 ||
+		ft_strncmp((char *)dest, "./", 2) == 0 ||
+		ft_strncmp((char *)dest, "../", 3) == 0)
+		return (false);
+	return (true);
 }
 
 int	builtin_cd(char **argv)
 {
-	int		chdir_status;
+	bool	is_success;
+	char	*dest;
 
 	if (!g_cwd)
 		g_cwd = getcwd(NULL, 0);
 	if (ptrarr_len((void **)argv) > 2)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
-	else if (ptrarr_len((void **)argv) == 1)
-		return (cd_home());
-	chdir_status = change_directory(argv[1]);
-	if (chdir_status != 0)
-		put_cd_errmsg(argv[1]);
-	if (chdir_status != 0)
-		return (1);
-	return (0);
+	// set_cd_dest(argv) で移動先を取得する
+	dest = set_cd_dest(argv);
+	// $CDPATH を検索する必要があればする
+	if (will_search_cdpath(argv, dest))
+	{
+		if (cd_cdpath_env(dest) == 0)
+			return (0);
+	}
+	// chdir(dest)する
+	is_success = change_directory_new(dest);
+	free(dest);
+	if (is_success)
+		return (0);
+	put_cd_errmsg(dest);
+	return (1);
 }
