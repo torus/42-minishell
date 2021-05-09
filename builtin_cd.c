@@ -234,6 +234,8 @@ int	builtin_cd(char **argv)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
 	// set_cd_dest(argv) で移動先を取得する
 	dest = set_cd_dest(argv);
+	if (!dest)
+		return (ERROR);
 	PRINT_DEBUG("dest: |%s|\n", dest);
 	// $CDPATH を検索する必要があればする
 	if (will_search_cdpath(argv, dest))
