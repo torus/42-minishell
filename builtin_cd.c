@@ -4,17 +4,6 @@
 #include "minishell.h"
 #include <string.h>
 
-#define DEBUG 0
-
-#if DEBUG == 1
-	#define PRINT_DEBUG(fmt, ...) \
-		do { \
-			printf("[debug] %s:%d:\t" fmt, __FILE__, __LINE__, ##__VA_ARGS__); \
-		} while (0);
-#else
-	#define PRINT_DEBUG(fmt, ...) do {} while(0);
-#endif
-
 static void	put_cd_errmsg(char *dest_path)
 {
 	char	*tmp;
