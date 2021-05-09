@@ -56,9 +56,9 @@ char *get_abs_path_from_cwd(char *relative_path)
 		i++;
 	}
 	free_ptrarr((void **)dirs);
-	tmp = result;
-	result = canonicalize_path(tmp);
-	free(tmp);
+	// tmp = result;
+	// result = canonicalize_path(tmp);
+	// free(tmp);
 	return (result);
 }
 
