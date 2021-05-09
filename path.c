@@ -1,6 +1,7 @@
 #include "path.h"
 #include "env.h"
 #include "minishell.h"
+#include <string.h>
 
 char	*g_cwd;
 
@@ -18,6 +19,25 @@ int	set_cwd(char *abs_path)
 	ft_setenv("PWD", abs_path, 1);
 	free(oldpwd);
 	return (0);
+}
+
+char	*get_cwd_path(char *caller)
+{
+	char *cwd;
+
+	cwd = getcwd(0, 0);
+	if (!cwd)
+	{
+		ft_putstr_fd(caller, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd("error retrieving current directory", STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd("getcwd: cannot access parent directories", STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd(strerror(errno), STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
+	}
+	return (cwd);
 }
 
 void	put_cwd_err_msg(char *for_whom)
@@ -101,6 +121,12 @@ char	*canonicalize_path(char *path)
 			tmp = result;
 			result = path_join(tmp, dirs[i]);
 			free(tmp);
+		}
+		if (!is_directory(result))
+		{
+			free(result);
+			free_ptrarr((void **)dirs);
+			return (NULL);
 		}
 		i++;
 	}

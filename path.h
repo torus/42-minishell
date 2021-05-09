@@ -9,6 +9,7 @@
 extern char	*g_cwd;
 char	*path_join(char *dirpath, char *filename);
 int		set_cwd(char *abs_path);
+char	*get_cwd_path(char *caller);
 int		is_cwd_valid(char *for_whom);
 char	*get_abs_path_from_cwd(char *relative_path);
 char	*canonicalize_path(char *path);
