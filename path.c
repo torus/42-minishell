@@ -102,10 +102,7 @@ char	*canonicalize_path(char *path)
 
 	dirs = ft_split(path, '/');
 	i = 0;
-	if (ft_strlen(path) >= 2 && path[0] == '/' && path[1] == '/' && path[2] != '/')
-		result = ft_strdup("//");
-	else
-		result = ft_strdup("/");
+	result = ft_strdup("/");
 	while (dirs[i])
 	{
 		if (ft_strncmp(dirs[i], "..", 3) == 0)
@@ -122,6 +119,7 @@ char	*canonicalize_path(char *path)
 			result = path_join(tmp, dirs[i]);
 			free(tmp);
 		}
+		PRINT_DEBUG("canon_str: |%s|, dirs[%d]: |%s|\n", result, i, dirs[i]);
 		if (!is_directory(result))
 		{
 			free(result);
@@ -131,6 +129,12 @@ char	*canonicalize_path(char *path)
 		i++;
 	}
 	free_ptrarr((void **)dirs);
+	if (ft_strlen(path) >= 2 && path[0] == '/' && path[1] == '/' && path[2] != '/')
+	{
+		tmp = result;
+		result = ft_strjoin("/", result);
+		free(tmp);
+	}
 	return (result);
 }
 
