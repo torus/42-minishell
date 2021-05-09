@@ -80,6 +80,7 @@ static int cd_cdpath(char *dest_path)
 		if (status == 0)
 		{
 			PRINT_DEBUG("dir is found!!\n");
+			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
 			canonicalize_path_and_setcwd(abs_path);
 			free(abs_path);
 			free_ptrarr((void **)dirs);
@@ -140,21 +141,36 @@ static int	change_directory(char *dest_path)
 	else
 	{
 		// bashの仕様では, $CDPATH を調べてからカレントディレクトリを調べる
-		// "." の時は $CDPATH を探索しない
-		if (ft_strncmp(dest_path, ".", 2) && cd_cdpath(dest_path) == 0)
+		// ".", "./*" の時は $CDPATH を探索しない
+		if ((ft_strncmp(dest_path, ".", 2) && ft_strncmp(dest_path, "./", 2))
+		&& cd_cdpath(dest_path) == 0)
 			return (0);
-		// それ以外の場合は, 現在のディレクトリからdest_pathに移動出来ればOK.
+
+		// それ以外の場合は, 現在のディレクトリとdest_pathを繋げて正規化したパスに移動出来ればOK.
 		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
-		status = chdir(dest_path);
+		abs_path = get_abs_path_from_cwd(dest_path);
+		status = chdir(abs_path);
+		PRINT_DEBUG("chdir(|%s|) = %d\n", abs_path, status);
 		if (status == 0)
 		{
-			abs_path = get_abs_path_from_cwd(dest_path);
 			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
 			canonicalize_path_and_setcwd(abs_path);
 			free(abs_path);
 			return (0);
 		}
-		// TODO: ここまで全て失敗したら chdir(dest_path) を試す. (これはしなくても良いかも...)
+		free(abs_path);
+
+		// ここまで全て失敗したら chdir(dest_path) を試す.
+		status = chdir(dest_path);
+		PRINT_DEBUG("chdir(|%s|) = %d\n", dest_path, status);
+		if (status == 0)
+		{
+			abs_path = path_join(g_cwd, dest_path);
+			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
+			set_current_working_directory(abs_path);
+			free(abs_path);
+			return (0);
+		}
 	}
 	return (1);
 }
