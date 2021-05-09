@@ -4,7 +4,7 @@
 #include "minishell.h"
 #include <string.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 1
 	#define PRINT_DEBUG(fmt, ...) \
@@ -17,9 +17,16 @@
 
 static void	put_cd_errmsg(char *dest_path)
 {
+	char	*tmp;
 	char	*errmsg;
 
-	errmsg = ft_strjoin(dest_path, strerror(errno));
+	tmp = ft_strjoin(dest_path, ": ");
+	if (!tmp)
+		return ;
+	errmsg = ft_strjoin(tmp, strerror(errno));
+	free(tmp);
+	if (!errmsg)
+		return ;
 	put_minish_err_msg("cd", errmsg);
 	free(errmsg);
 }
@@ -117,27 +124,26 @@ static char *set_cd_path(char *dest, bool *is_canon_path)
 
 static int set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
 {
-	char *new_pwd;
+	char *new_cwd;
 
-	new_pwd = NULL;
+	new_cwd = NULL;
 	if (is_abs_path)
 	{
 		if (is_canon_path == false)
-			new_pwd = get_cwd_path("cd");
-		if (is_canon_path || new_pwd == NULL)
-		{
-			if (!(new_pwd = ft_strdup(path)))
-				return (ERROR);
-		}
+			new_cwd = get_cwd_path("cd");
+		if (is_canon_path || new_cwd == NULL)
+			new_cwd = ft_strdup(path);
 	}
 	else
 	{
-		if (!(new_pwd = get_cwd_path("cd")))
-		{
-			if (!(new_pwd = ft_strdup(path)))
-				return (ERROR);
-		}
+		new_cwd = get_cwd_path("cd");
+		if (!new_cwd)
+			new_cwd = ft_strdup(path);
 	}
+	if (!new_cwd)
+		return (ERROR);
+	set_cwd(new_cwd);
+	free(new_cwd);
 	return (SUCCESS);
 }
 
@@ -178,9 +184,12 @@ static bool	change_directory_new(char *dest)
 	bool is_canon_path;
 
 	path = set_cd_path(dest, &is_canon_path);
+	PRINT_DEBUG("path: |%s|, is_canon_path: %d\n", path, is_canon_path);
 	status = change_dir_process(path, dest, is_canon_path);
 	free(path);
-	return (status);
+	if (status == 0)
+		return (true);
+	return (false);
 }
 
 /* cd先のディレクトリをargvを元に作成して返す */
@@ -225,6 +234,7 @@ int	builtin_cd(char **argv)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
 	// set_cd_dest(argv) で移動先を取得する
 	dest = set_cd_dest(argv);
+	PRINT_DEBUG("dest: |%s|\n", dest);
 	// $CDPATH を検索する必要があればする
 	if (will_search_cdpath(argv, dest))
 	{
@@ -233,9 +243,12 @@ int	builtin_cd(char **argv)
 	}
 	// chdir(dest)する
 	is_success = change_directory_new(dest);
-	free(dest);
 	if (is_success)
+	{
+		free(dest);
 		return (0);
+	}
 	put_cd_errmsg(dest);
+	free(dest);
 	return (1);
 }
