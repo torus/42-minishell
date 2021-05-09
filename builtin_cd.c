@@ -241,7 +241,10 @@ int	builtin_cd(char **argv)
 	if (will_search_cdpath(argv, dest))
 	{
 		if (cd_cdpath_env(dest) == 0)
+		{
+			free(dest);
 			return (0);
+		}
 	}
 	// chdir(dest)する
 	is_success = change_directory_new(dest);
