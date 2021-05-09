@@ -1,5 +1,6 @@
 #include "path.h"
 #include "env.h"
+#include "minishell.h"
 
 char	*g_cwd;
 
@@ -17,6 +18,12 @@ int	set_cwd(char *abs_path)
 	ft_setenv("PWD", abs_path, 1);
 	free(oldpwd);
 	return (0);
+}
+
+void	put_cwd_err_msg(char *for_whom)
+{
+	write(STDERR_FILENO, for_whom, ft_strlen(for_whom));
+	write(STDERR_FILENO, ": error retrieving current directory: getcwd: cannot access parent directories: No such file or directory\n", 106);
 }
 
 bool	is_directory(char *path)
