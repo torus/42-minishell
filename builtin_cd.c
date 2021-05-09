@@ -150,7 +150,7 @@ static int	change_directory(char *dest_path)
 		// get_abs_path_from_cwd(dest_path) で取得した絶対パスに chdir() する.
 		abs_path = get_abs_path_from_cwd(dest_path);
 		status = chdir(abs_path);
-		PRINT_DEBUG("chdir(|%s|) = %d\n", abs_path, status);
+		PRINT_DEBUG("正常 chdir(|%s|) = %d\n", abs_path, status);
 		if (status == 0)
 		{
 			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
@@ -162,12 +162,14 @@ static int	change_directory(char *dest_path)
 
 		// ここまで全て失敗したら chdir(dest_path) を試す.
 		status = chdir(dest_path);
-		PRINT_DEBUG("chdir(|%s|) = %d\n", dest_path, status);
+		PRINT_DEBUG("異常 chdir(|%s|) = %d\n", dest_path, status);
 		if (status == 0)
 		{
 			abs_path = path_join(g_cwd, dest_path);
 			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
 			set_cwd(abs_path);
+			if (is_directory(abs_path))
+				put_cwd_err_msg("cd");
 			free(abs_path);
 			return (0);
 		}
