@@ -43,7 +43,7 @@ static int	canonicalize_path_and_setcwd(char *abs_path)
 
 	canonicalized_path = canonicalize_path(abs_path);
 	PRINT_DEBUG("canonicalized_path: |%s|\n", canonicalized_path);
-	set_current_working_directory(canonicalized_path);
+	set_cwd(canonicalized_path);
 	free(canonicalized_path);
 	return (0);
 }
@@ -167,7 +167,7 @@ static int	change_directory(char *dest_path)
 		{
 			abs_path = path_join(g_cwd, dest_path);
 			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
-			set_current_working_directory(abs_path);
+			set_cwd(abs_path);
 			free(abs_path);
 			return (0);
 		}
