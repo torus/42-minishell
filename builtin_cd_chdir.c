@@ -116,7 +116,6 @@ bool	change_directory(char *dest)
 	bool	is_canon_path;
 
 	path = get_cd_abs_dest(dest, &is_canon_path);
-	PRINT_DEBUG("path: |%s|, is_canon_path: %d\n", path, is_canon_path);
 	status = change_dir_process(path, dest, is_canon_path);
 	free(path);
 	return (status);

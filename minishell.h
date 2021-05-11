@@ -13,18 +13,6 @@
 
 # define PROMPT "minish > "
 
-#define DEBUG 1
-
-#if DEBUG == 1
-	#define PRINT_DEBUG(fmt, ...) \
-		do { \
-			printf("[debug] %s:%d:\t" fmt, __FILE__, __LINE__, ##__VA_ARGS__); \
-		} while (0);
-#else
-	#define PRINT_DEBUG(fmt, ...) do {} while(0);
-#endif
-
-
 // AST to command_invocation
 t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds);
 t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node);
