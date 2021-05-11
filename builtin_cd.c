@@ -76,9 +76,11 @@ static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
  *
  * cd_path: 1回目にchdir()を実行するパス
  * arg: 2回目にchdir()を実行するパス
- * is_canon_path: 正規化されたパス?
+ * is_canon_path: 正規化されたパスかどうか
+ *
+ * Return: 移動に成功したかどうか.
  */
-static int	change_dir_process(char *cd_path,
+static bool	change_dir_process(char *cd_path,
 	const char *arg, bool is_canon_path)
 {
 	int	status;
@@ -88,20 +90,24 @@ static int	change_dir_process(char *cd_path,
 	if (status == 0)
 	{
 		set_new_pwd(cd_path, is_canon_path, true);
-		return (status);
+		return (true);
 	}
 	old_errno = errno;
 	status = chdir(arg);
 	if (status == 0)
 	{
 		set_new_pwd(cd_path, is_canon_path, false);
-		return (status);
+		return (true);
 	}
 	errno = old_errno;
-	return (ERROR);
+	return (false);
 }
 
-/* cdpathを取得し, プロセスのcwdを変更する
+/* プロセスのcwdを変更する
+ *
+ * dest: get_cd_dest() で取得した移動先.
+ *
+ * Return: 移動に成功したかどうか.
  */
 static bool	change_directory(char *dest)
 {
@@ -113,9 +119,7 @@ static bool	change_directory(char *dest)
 	PRINT_DEBUG("path: |%s|, is_canon_path: %d\n", path, is_canon_path);
 	status = change_dir_process(path, dest, is_canon_path);
 	free(path);
-	if (status == 0)
-		return (true);
-	return (false);
+	return (status);
 }
 
 /* cd先のディレクトリをcdコマンドのargvを元に作成して返す.
@@ -209,7 +213,6 @@ static int	cd_cdpath_env(char *dest_path)
 
 int	builtin_cd(char **argv)
 {
-	bool	is_success;
 	char	*dest;
 
 	if (!g_cwd)
@@ -219,16 +222,12 @@ int	builtin_cd(char **argv)
 	dest = get_cd_dest(argv);
 	if (!dest)
 		return (ERROR);
-	if (will_search_cdpath(argv, dest))
+	if (will_search_cdpath(argv, dest) && cd_cdpath_env(dest))
 	{
-		if (cd_cdpath_env(dest))
-		{
-			free(dest);
-			return (0);
-		}
+		free(dest);
+		return (0);
 	}
-	is_success = change_directory(dest);
-	if (is_success)
+	if (change_directory(dest))
 	{
 		free(dest);
 		return (0);
