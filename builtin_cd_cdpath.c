@@ -67,6 +67,7 @@ static bool	cd_from_sources(char *dest_path, char **sources)
 
 /* $CDPATH を元に移動する.
  *
+ * dest_path: 移動先相対パス
  * Return: 移動に成功したら true を返す.
  *   そうでない場合は false を返す.
  */
