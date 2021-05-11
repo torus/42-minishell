@@ -13,7 +13,8 @@ SRCS = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c		\
 	parse_utils.c parse_utils2.c path.c g_cwd.c string_node2string.c		\
 	expand_env_var.c expand_string_node.c split_expanded_str.c				\
 	cmd_status.c signal.c env_setter.c minishell_error_msg.c				\
-	builtin.c builtin_cd.c builtin_echo.c builtin_env.c builtin_exit.c		\
+	builtin.c builtin_cd.c builtin_cd_utils.c								\
+	builtin_echo.c builtin_env.c builtin_exit.c								\
 	builtin_export.c builtin_pwd.c builtin_unset.c
 
 OBJS = $(SRCS:.c=.o)

@@ -48,3 +48,31 @@ void	put_cwd_err_msg(char *for_whom)
 		"No such file or directory\n", 106);
 }
 
+/* 絶対パスを構築する
+ * "{g_cwd}/{relative_path}" を返す
+ * ex:
+ *   - relative_path="dir/dir2/symlink2dir"
+ *   - relative_path="./../dir/../././/.//////./"
+ */
+char *get_abs_path_from_cwd(char *relative_path)
+{
+	char	**dirs;  // ("..", ".", その他) みたいなのが入ってくる
+	char	*result;
+	char	*tmp;
+	int		i;
+
+	result = ft_strdup(g_cwd);
+	dirs = ft_split(relative_path, '/');
+	if (!dirs)
+		return (NULL);
+	i = 0;
+	while (dirs[i])
+	{
+		tmp = result;
+		result = path_join(tmp, dirs[i]);
+		free(tmp);
+		i++;
+	}
+	free_ptrarr((void **)dirs);
+	return (result);
+}
