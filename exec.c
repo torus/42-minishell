@@ -113,5 +113,6 @@ int	cmd_execvp(char *filename, char **argv)
 	else
 		executable_path = find_executable_file_from_path_env(filename);
 	execve(executable_path, argv, environ);
+	free(executable_path);
 	return (ERROR);
 }
