@@ -1,5 +1,8 @@
 #include "env.h"
 #include "execution.h"
+#include "minishell.h"
+#include <string.h>
+#include <errno.h>
 
 /*
  * find executable file in dirpath.
@@ -113,6 +116,7 @@ int	cmd_execvp(char *filename, char **argv)
 	else
 		executable_path = find_executable_file_from_path_env(filename);
 	execve(executable_path, argv, environ);
+	put_minish_err_msg(executable_path, strerror(errno));
 	free(executable_path);
 	return (ERROR);
 }
