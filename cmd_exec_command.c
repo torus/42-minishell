@@ -47,5 +47,4 @@ void	cmd_exec_command(t_command_invocation *command,
 		exit(builtin_func((char **)command->exec_and_args));
 	cmd_execvp((char *)command->exec_and_args[0],
 		(char **) command->exec_and_args);
-	exit(EXIT_FAILURE);
 }
