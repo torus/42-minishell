@@ -1,7 +1,7 @@
 LIBFT_PATH = ../libft
 LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
 LIBFT_LIB = ../libft/libft.a
-SRCS = 	../env.c ../env_setter.c ../path.c															\
+SRCS = 	../env.c ../env_setter.c ../path.c ../g_cwd.c												\
 		../lexer1.c ../lexer2.c																		\
 		../parse1.c ../parse2.c ../parse_utils.c ../parse_utils2.c									\
 		../exec.c ../cmd_exec_command.c ../cmd_exec_commands.c ../cmd_redirection.c ../cmd_pipe.c	\
