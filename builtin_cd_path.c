@@ -3,6 +3,21 @@
 #include "minishell.h"
 #include <string.h>
 
+/* 親ディレクトリのパスを返す
+ */
+static char	*get_parent_dir(char *path)
+{
+	char	*result;
+
+	result = ft_substr(path, 0, ft_strrchr(path, '/') - path);
+	if (result && ft_strlen(result) == 0)
+	{
+		free(result);
+		result = ft_strdup("/");
+	}
+	return (result);
+}
+
 static void	update_path(char **path, char *retrieve_path)
 {
 	char	*tmp;
@@ -12,7 +27,7 @@ static void	update_path(char **path, char *retrieve_path)
 	else if (ft_strncmp(retrieve_path, "..", 3) == 0)
 	{
 		tmp = *path;
-		*path = change_to_parent_dir(*path);
+		*path = get_parent_dir(*path);
 		free(tmp);
 	}
 	else
@@ -65,20 +80,5 @@ char	*canonicalize_path(char *path)
 	free_ptrarr((void **)dirs);
 	if (is_double_slash(path))
 		add_double_slash(&result);
-	return (result);
-}
-
-/* 親ディレクトリに移動した後のパスを返す
- */
-char	*change_to_parent_dir(char *path)
-{
-	char	*result;
-
-	result = ft_substr(path, 0, ft_strrchr(path, '/') - path);
-	if (result && ft_strlen(result) == 0)
-	{
-		free(result);
-		result = ft_strdup("/");
-	}
 	return (result);
 }
