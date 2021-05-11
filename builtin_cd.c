@@ -20,69 +20,22 @@ static void	put_cd_errmsg(char *dest_path)
 	free(errmsg);
 }
 
-/* chdir() で移動が成功したら set_current_working_directory(abs_path) する
- * - ディレクトリがシンボリックリンクだった場合, chdir(dest_path)して,
- *   the_current_directory=dest_path にする.
- *
- * 移動出来たら0, 移動出来なかったら-1を返す
- */
-static int	canonicalize_path_and_setcwd(char *abs_path)
-{
-	char	*canonicalized_path;
-
-	canonicalized_path = canonicalize_path(abs_path);
-	PRINT_DEBUG("canonicalized_path: |%s|\n", canonicalized_path);
-	set_cwd(canonicalized_path);
-	free(canonicalized_path);
-	return (0);
-}
-
-/* $CDPATH から移動先ディレクトリを探す
- */
-static int cd_cdpath_env(char *dest_path)
-{
-	char	*cdpath_env;
-	int		i;
-	char	*abs_path;
-	char	**dirs;
-	int		status;
-
-	PRINT_DEBUG("start search dir in $CDPATH\n");
-	cdpath_env = get_env_val("CDPATH");
-	if (!cdpath_env)
-		return (1);
-	dirs = ft_split(cdpath_env, ':');
-	free(cdpath_env);
-	i = 0;
-	while (dirs[i])
-	{
-		PRINT_DEBUG("search in |%s|\n", dirs[i]);
-		if (dirs[i][0] != '/')
-		{
-			char *tmp = path_join(g_cwd, dirs[i]);
-			abs_path = path_join(tmp, dest_path);
-			free(tmp);
-		}
-		else
-			abs_path = path_join(dirs[i], dest_path);
-		status = chdir(abs_path);
-		if (status == 0)
-		{
-			PRINT_DEBUG("dir is found!!\n");
-			PRINT_DEBUG("abs_path = |%s|\n", abs_path);
-			canonicalize_path_and_setcwd(abs_path);
-			free(abs_path);
-			free_ptrarr((void **)dirs);
-			printf("%s\n", g_cwd);
-			return (0);
-		}
-		free(abs_path);
-		i++;
-	}
-	free_ptrarr((void **)dirs);
-	PRINT_DEBUG("dir is not found in $CDPATH\n");
-	return (1);
-}
+// /* chdir() で移動が成功したら set_current_working_directory(abs_path) する
+//  * - ディレクトリがシンボリックリンクだった場合, chdir(dest_path)して,
+//  *   the_current_directory=dest_path にする.
+//  *
+//  * 移動出来たら0, 移動出来なかったら-1を返す
+//  */
+// static int	canonicalize_path_and_setcwd(char *abs_path)
+// {
+// 	char	*canonicalized_path;
+// 
+// 	canonicalized_path = canonicalize_path(abs_path);
+// 	PRINT_DEBUG("canonicalized_path: |%s|\n", canonicalized_path);
+// 	set_cwd(canonicalized_path);
+// 	free(canonicalized_path);
+// 	return (0);
+// }
 
 /*
  * dest
@@ -210,6 +163,48 @@ static bool will_search_cdpath(char **argv, char *dest)
 		ft_strncmp((char *)dest, "../", 3) == 0)
 		return (false);
 	return (true);
+}
+
+/* $CDPATH から移動先ディレクトリを探す
+ */
+static int cd_cdpath_env(char *dest_path)
+{
+	char	*cdpath;
+	int		i;
+	char	*abs_path;
+	char	**dirs;
+
+	PRINT_DEBUG("start search dir in $CDPATH\n");
+	cdpath = get_env_val("CDPATH");
+	if (!cdpath)
+		return (1);
+	dirs = get_colon_units(cdpath, "");
+	free(cdpath);
+	i = 0;
+	while (dirs[i])
+	{
+		PRINT_DEBUG("search in |%s|\n", dirs[i]);
+		if (dirs[i][0] != '/')
+		{
+			char *tmp = path_join(g_cwd, dirs[i]);
+			abs_path = path_join(tmp, dest_path);
+			free(tmp);
+		}
+		else
+			abs_path = path_join(dirs[i], dest_path);
+		if (change_directory_new(abs_path))
+		{
+			free(abs_path);
+			free_ptrarr((void **)dirs);
+			printf("%s\n", g_cwd);
+			return (0);
+		}
+		free(abs_path);
+		i++;
+	}
+	free_ptrarr((void **)dirs);
+	PRINT_DEBUG("dir is not found in $CDPATH\n");
+	return (1);
 }
 
 int	builtin_cd(char **argv)
