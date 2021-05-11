@@ -15,10 +15,10 @@ bool	will_search_cdpath(char **argv, char *dest)
 {
 	if (argv[1] == NULL || argv[1][0] == '/')
 		return (false);
-	if (ft_strcmp((char *)dest, ".") == 0 ||
-		ft_strcmp((char *)dest, "..") == 0 ||
-		ft_strncmp((char *)dest, "./", 2) == 0 ||
-		ft_strncmp((char *)dest, "../", 3) == 0)
+	if (ft_strcmp((char *)dest, ".") == 0
+		|| ft_strcmp((char *)dest, "..") == 0
+		|| ft_strncmp((char *)dest, "./", 2) == 0
+		|| ft_strncmp((char *)dest, "../", 3) == 0)
 		return (false);
 	return (true);
 }
