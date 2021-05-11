@@ -85,29 +85,29 @@ int main(){
 		free(actual);
 	}
 
-	TEST_SECTION("change_to_parent_dir() /");
+	TEST_SECTION("get_parent_dir() /");
 	{
 		char *input = "/";
 		char *expected = "/";
-		char *actual = change_to_parent_dir(input);
+		char *actual = get_parent_dir(input);
 		CHECK_EQ_STR(actual, expected);
 		free(actual);
 	}
 
-	TEST_SECTION("change_to_parent_dir() /hoge");
+	TEST_SECTION("get_parent_dir() /hoge");
 	{
 		char *input = "/hoge";
 		char *expected = "/";
-		char *actual = change_to_parent_dir(input);
+		char *actual = get_parent_dir(input);
 		CHECK_EQ_STR(actual, expected);
 		free(actual);
 	}
 
-	TEST_SECTION("change_to_parent_dir() /hoge/fuga");
+	TEST_SECTION("get_parent_dir() /hoge/fuga");
 	{
 		char *input = "/hoge/fuga";
 		char *expected = "/hoge";
-		char *actual = change_to_parent_dir(input);
+		char *actual = get_parent_dir(input);
 		CHECK_EQ_STR(actual, expected);
 		free(actual);
 	}
