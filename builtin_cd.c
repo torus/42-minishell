@@ -183,7 +183,6 @@ static int	cd_cdpath_env(char *dest_path)
 	char	**dirs;
 	char	*tmp;
 
-	PRINT_DEBUG("start search dir in $CDPATH\n");
 	cdpath = get_env_val("CDPATH");
 	if (!cdpath)
 		return (false);
@@ -192,7 +191,6 @@ static int	cd_cdpath_env(char *dest_path)
 	i = 0;
 	while (dirs[i])
 	{
-		PRINT_DEBUG("search in |%s|\n", dirs[i]);
 		if (dirs[i][0] != '/')
 		{
 			tmp = path_join(g_cwd, dirs[i]);
@@ -213,7 +211,6 @@ static int	cd_cdpath_env(char *dest_path)
 		i++;
 	}
 	free_ptrarr((void **)dirs);
-	PRINT_DEBUG("dir is not found in $CDPATH\n");
 	return (false);
 }
 
