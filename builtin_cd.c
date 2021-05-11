@@ -194,9 +194,10 @@ static int cd_cdpath_env(char *dest_path)
 			abs_path = path_join(dirs[i], dest_path);
 		if (change_directory_new(abs_path))
 		{
+			if (ft_strlen(dirs[i]))
+				printf("%s\n", g_cwd);
 			free(abs_path);
 			free_ptrarr((void **)dirs);
-			printf("%s\n", g_cwd);
 			return (0);
 		}
 		free(abs_path);
