@@ -68,6 +68,39 @@ char	**split_first_c(const char *str, char c)
 	return (result);
 }
 
+/* コロン(:)で区切る.
+ * ft_split() と違い, ":/hoge/:/:" のような入力に対して [default_str, default_str, "/"] を作成して返す.
+ */
+char	**get_colon_units(char *str, char *default_str)
+{
+	char	**result;
+	char	*next;
+	char	*tmp;
+	char	**tmparr;
+
+	result = NULL;
+	next = ft_strchr(str, ':');
+	while (next)
+	{
+		if (next - str == 0)
+			tmp = ft_strdup(default_str);
+		else
+			tmp = ft_substr(str, 0, next - str);
+		tmparr = result;
+		result = (char **)ptrarr_add_ptr((void **)result, tmp);
+		free((void **)tmparr);
+		str = next + 1;
+		next = ft_strchr(str, ':');
+	}
+	tmparr = result;
+	if (*str)
+		result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(str));
+	else
+		result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(default_str));
+	free((void **)tmparr);
+	return (result);
+}
+
 /*
  * Get value from key-value string.
  * key-value string form like "key=value", "key:value", or something like that.
