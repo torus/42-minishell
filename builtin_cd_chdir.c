@@ -8,7 +8,8 @@
  * 移動先の絶対パスを返す.
  *
  * dest: get_cd_dest_from_argv() で取得した移動先.
- * is_canon_path: 正規化されたパスかどうか
+ * is_canon_path: 正規化されたパスかどうかが
+ *   ポインタに代入される.
  *
  * Return: 移動先ディレクトリの絶対パス.
  */
