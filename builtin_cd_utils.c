@@ -23,15 +23,16 @@ static void	update_path(char **path, char *retrieve_path)
 	}
 }
 
-static bool is_double_slash(char *path)
+static bool	is_double_slash(char *path)
 {
 	return (ft_strlen(path) >= 2
 		&& path[0] == '/' && path[1] == '/' && path[2] != '/');
 }
 
-static void add_double_slash(char **path)
+static void	add_double_slash(char **path)
 {
 	char	*tmp;
+
 	tmp = *path;
 	*path = ft_strjoin("/", *path);
 	free(tmp);

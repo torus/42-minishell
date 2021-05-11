@@ -24,10 +24,10 @@ static void	put_cd_errmsg(char *dest_path)
  * dest
  * is_canon_path: 正規化されたパスかどうか
  */
-static char *set_cd_path(char *dest, bool *is_canon_path)
+static char	*set_cd_path(char *dest, bool *is_canon_path)
 {
-	char *physical_path;
-	char *canon_path;
+	char	*physical_path;
+	char	*canon_path;
 
 	if (dest[0] =='/')
 		physical_path = ft_strdup(dest);
@@ -47,9 +47,9 @@ static char *set_cd_path(char *dest, bool *is_canon_path)
 	return (physical_path);
 }
 
-static int set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
+static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
 {
-	char *new_cwd;
+	char	*new_cwd;
 
 	new_cwd = NULL;
 	if (is_abs_path)
@@ -78,10 +78,11 @@ static int set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
  * arg: 2回目にchdir()を実行するパス
  * is_canon_path: 正規化されたパス?
  */
-static int	change_dir_process(char *cd_path, const char *arg, bool is_canon_path)
+static int	change_dir_process(char *cd_path,
+	const char *arg, bool is_canon_path)
 {
-	int status;
-	int old_errno;
+	int	status;
+	int	old_errno;
 
 	status = chdir(cd_path);
 	if (status == 0)
@@ -104,9 +105,9 @@ static int	change_dir_process(char *cd_path, const char *arg, bool is_canon_path
  */
 static bool	change_directory(char *dest)
 {
-	char *path;
-	int status;
-	bool is_canon_path;
+	char	*path;
+	int		status;
+	bool	is_canon_path;
 
 	path = set_cd_path(dest, &is_canon_path);
 	PRINT_DEBUG("path: |%s|, is_canon_path: %d\n", path, is_canon_path);
@@ -117,8 +118,13 @@ static bool	change_directory(char *dest)
 	return (false);
 }
 
-/* cd先のディレクトリをargvを元に作成して返す */
-static char *set_cd_dest(char **argv)
+/* cd先のディレクトリをcdコマンドのargvを元に作成して返す.
+ *
+ * argv: builtin_cd() の引数.
+ *
+ * Return: cdコマンドの移動先パス(絶対or相対パス).
+ */
+static char	*get_cd_dest(char **argv)
 {
 	char	*dest_path;
 
@@ -135,8 +141,14 @@ static char *set_cd_dest(char **argv)
 	return (ft_strdup(argv[1]));
 }
 
-/* $CDPATH を検索するかどうかを返す */
-static bool will_search_cdpath(char **argv, char *dest)
+/* $CDPATH を検索するかどうかを返す
+ *
+ * argv: builtin_cd() の引数.
+ * dest: get_cd_dest() で取得した移動先パス.
+ *
+ * Return: $CDPATH を検索する必要があるかどうか.
+ */
+static bool	will_search_cdpath(char **argv, char *dest)
 {
 	if (argv[1] == NULL || argv[1][0] == '/')
 		return (false);
@@ -148,19 +160,23 @@ static bool will_search_cdpath(char **argv, char *dest)
 	return (true);
 }
 
-/* $CDPATH から移動先ディレクトリを探す
+/* $CDPATH を元に移動する.
+ *
+ * Return: 移動に成功したら true を返す.
+ *   そうでない場合は false を返す.
  */
-static int cd_cdpath_env(char *dest_path)
+static int	cd_cdpath_env(char *dest_path)
 {
 	char	*cdpath;
 	int		i;
 	char	*abs_path;
 	char	**dirs;
+	char	*tmp;
 
 	PRINT_DEBUG("start search dir in $CDPATH\n");
 	cdpath = get_env_val("CDPATH");
 	if (!cdpath)
-		return (1);
+		return (false);
 	dirs = get_colon_units(cdpath);
 	free(cdpath);
 	i = 0;
@@ -169,7 +185,7 @@ static int cd_cdpath_env(char *dest_path)
 		PRINT_DEBUG("search in |%s|\n", dirs[i]);
 		if (dirs[i][0] != '/')
 		{
-			char *tmp = path_join(g_cwd, dirs[i]);
+			tmp = path_join(g_cwd, dirs[i]);
 			abs_path = path_join(tmp, dest_path);
 			free(tmp);
 		}
@@ -181,14 +197,14 @@ static int cd_cdpath_env(char *dest_path)
 				printf("%s\n", g_cwd);
 			free(abs_path);
 			free_ptrarr((void **)dirs);
-			return (0);
+			return (true);
 		}
 		free(abs_path);
 		i++;
 	}
 	free_ptrarr((void **)dirs);
 	PRINT_DEBUG("dir is not found in $CDPATH\n");
-	return (1);
+	return (false);
 }
 
 int	builtin_cd(char **argv)
@@ -200,21 +216,17 @@ int	builtin_cd(char **argv)
 		g_cwd = getcwd(NULL, 0);
 	if (ptrarr_len((void **)argv) > 2)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
-	// set_cd_dest(argv) で移動先を取得する
-	dest = set_cd_dest(argv);
+	dest = get_cd_dest(argv);
 	if (!dest)
 		return (ERROR);
-	PRINT_DEBUG("dest: |%s|\n", dest);
-	// $CDPATH を検索する必要があればする
 	if (will_search_cdpath(argv, dest))
 	{
-		if (cd_cdpath_env(dest) == 0)
+		if (cd_cdpath_env(dest))
 		{
 			free(dest);
 			return (0);
 		}
 	}
-	// chdir(dest)する
 	is_success = change_directory(dest);
 	if (is_success)
 	{
