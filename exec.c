@@ -116,7 +116,10 @@ int	cmd_execvp(char *filename, char **argv)
 	else
 		executable_path = find_executable_file_from_path_env(filename);
 	execve(executable_path, argv, environ);
-	put_minish_err_msg(executable_path, strerror(errno));
+	if (executable_path)
+		put_minish_err_msg(executable_path, strerror(errno));
+	else
+		put_minish_err_msg(filename, "No such file or directory");
 	free(executable_path);
 	return (ERROR);
 }
