@@ -8,7 +8,8 @@ SRCS = 	../env.c ../env_setter.c ../path.c ../g_cwd.c												\
 		../cmd_cmd_invocation.c ../cmd_cmd_invocation2.c ../convert_ast2cmdinvo.c					\
 		../expand_env_var.c ../split_expanded_str.c ../string_node2string.c ../expand_string_node.c	\
 		../cmd_status.c ../signal.c ../cmd_status.c ../signal.c ../minishell_error_msg.c			\
-		../builtin.c ../builtin_cd.c ../builtin_cd_path.c ../builtin_echo.c ../builtin_env.c		\
+		../builtin.c ../builtin_cd.c ../builtin_cd_path.c ../builtin_cd_chdir.c ../builtin_cdpath.c	\
+		../builtin_echo.c ../builtin_env.c		\
 		../builtin_exit.c ../builtin_export.c ../builtin_pwd.c ../builtin_unset.c
 HEADERS = ../env.h \
 		  ../parse.h \
