@@ -14,13 +14,31 @@ static struct termios		save_termios;
 static int					ttysavefd = -1;
 static enum { RESET, RAW, CBREAK }	ttystate = RESET;
 
+#include <term.h>
+
+int	edit_putc(int ch)
+{
+    write(1, &ch, 1);
+    return (1);
+}
+
 int	tty_reset(int fd)		/* restore terminal's mode */
 {
+    char	areabuf[32];
+    char	*area;
+    char	*c_exit_insert_mode;
+
+    area = areabuf;
+	c_exit_insert_mode = tgetstr("ei", &area);
+
 	if (ttystate == RESET)
 		return(0);
 	if (tcsetattr(fd, TCSAFLUSH, &save_termios) < 0)
 		return(-1);
 	ttystate = RESET;
+
+    tputs(c_exit_insert_mode, 1, edit_putc);
+
 	return(0);
 }
 
@@ -126,14 +144,6 @@ void	init_history(t_command_history *his)
 		his->ropes[i++] = NULL;
 }
 
-#include <term.h>
-
-int	edit_putc(int ch)
-{
-    write(1, &ch, 1);
-    return (1);
-}
-
 int	print_history(t_command_history *his, int index)
 {
 	t_rope	*rope;
@@ -174,6 +184,66 @@ void	dump_history(t_command_history *his)
 	}
 }
 
+void	add_new_rope(t_command_history *history, char *cbuf)
+{
+	if (history->current == history->end)
+	{
+		history->end = (history->end + 1) % LINE_BUFFER_SIZE;
+		if (history->end == history->begin)
+			history->begin = (history->end + 1) % LINE_BUFFER_SIZE;
+	}
+	history->ropes[history->current] = rope_create(cbuf, NULL);
+}
+
+void	edit_insert_character(
+			t_command_history *history, char *cbuf,
+			int cursor_x, int command_length)
+{
+	t_rope	*new_rope;
+	new_rope = rope_create(cbuf, NULL);
+	if (cursor_x == command_length)
+		history->ropes[history->current] =
+			rope_concat(history->ropes[history->current], new_rope);
+	else if (cursor_x == 0)
+	{
+		history->ropes[history->current] =
+			rope_concat(new_rope, history->ropes[history->current]);
+	}
+	else if (cursor_x < command_length)
+	{
+		history->ropes[history->current] =
+			rope_insert(history->ropes[history->current], cursor_x, new_rope);
+	}
+}
+
+typedef struct	s_command_state
+{
+	int	cursor_x;
+	int	length;
+}	t_command_state;
+
+void	edit_normal_character(
+    t_command_history *history, t_command_state *st,
+    char *cbuf)
+{
+    edit_putc(cbuf[0]);
+    if (!history->ropes[history->current])
+        add_new_rope(history, cbuf);
+    else
+        edit_insert_character(history, cbuf, st->cursor_x, st->length);
+    st->cursor_x++;
+    st->length++;
+}
+
+void	edit_enter(t_command_history *history, t_command_state *st)
+{
+	history->current = history->end;
+	history->ropes[history->current] = NULL;
+	st->cursor_x = 0;
+	st->length = 0;
+	edit_putc('\n');
+}
+
 int	main(void)
 {
 	int		i;
@@ -182,8 +252,9 @@ int	main(void)
 
     cbuf[1] = '\0';
 
-	t_command_history	history;
-	init_history(&history);
+	t_command_history	his;
+	t_command_history	*history = &his;
+	init_history(history);
 
 /*
  * isatty, ttyname, ttyslot, ioctl, getenv, tcsetattr, tcgetattr,
@@ -200,8 +271,6 @@ int	main(void)
     char	*area;
 
     area = areabuf;
-    /* char	*bl = tgetstr("bl", &area); */
-    /* tputs(bl, 1, edit_putc); */
     char	*c_left = tgetstr("le", &area);
     char	*c_right = tgetstr("nd", &area);
     char	*c_clear = tgetstr("cb", &area);
@@ -218,11 +287,13 @@ int	main(void)
 		err_sys("tty_cbreak error");
 	printf("\nEnter cbreak mode characters, terminate with SIGINT\n");
 
-	int	cursor_x;
-	int	command_length;
+	t_command_state	state;
+	t_command_state	*st = &state;
 
-	cursor_x = 0;
-	command_length = 0;
+	st->cursor_x = 0;
+	st->length = 0;
+
+    tputs(c_insert_mode, 1, edit_putc);
 
 	while (1) {
 		i = read(STDIN_FILENO, cbuf, 1);
@@ -234,48 +305,10 @@ int	main(void)
 
         if (c >= 0x20 && c < 0x7f)
         {
-			tputs(c_insert_mode, 1, edit_putc);
-            edit_putc(c);
-
-            if (!history.ropes[history.current])
-            {
-                if (history.current == history.end)
-                {
-                    history.end = (history.end + 1) % LINE_BUFFER_SIZE;
-                    if (history.end == history.begin)
-                        history.begin = (history.end + 1) % LINE_BUFFER_SIZE;
-                }
-                history.ropes[history.current] = rope_create(cbuf, NULL);
-            }
-            else
-            {
-                t_rope	*new_rope;
-                new_rope = rope_create(cbuf, NULL);
-				if (cursor_x == command_length)
-					history.ropes[history.current] =
-						rope_concat(history.ropes[history.current], new_rope);
-				else if (cursor_x == 0)
-				{
-					history.ropes[history.current] =
-						rope_concat(new_rope, history.ropes[history.current]);
-				}
-				else if (cursor_x < command_length)
-				{
-					history.ropes[history.current] =
-						rope_insert(history.ropes[history.current], cursor_x, new_rope);
-				}
-            }
-			cursor_x++;
-			command_length++;
+            edit_normal_character(history, st, cbuf);
         }
         else if (c == '\n')
-		{
-			history.current = history.end;
-			history.ropes[history.current] = NULL;
-			cursor_x = 0;
-			command_length = 0;
-            edit_putc(c);
-		}
+            edit_enter(history, st);
         else if (c == 0x1b)
         {
             i = read(STDIN_FILENO, cbuf, 1);
@@ -289,40 +322,40 @@ int	main(void)
                 if (c == 'D')
 				{
                     tputs(c_left, 1, edit_putc);
-					cursor_x--;
-					if (cursor_x < 0)
-						cursor_x = 0;
+					st->cursor_x--;
+					if (st->cursor_x < 0)
+						st->cursor_x = 0;
 				}
                 else if (c == 'C')
 				{
-					if (cursor_x < command_length)
+					if (st->cursor_x < st->length)
 					{
 						tputs(c_right, 1, edit_putc);
-						cursor_x++;
+						st->cursor_x++;
 					}
 				}
                 else if (c == 'B')
 				{
 					/* DOWN */
-					if (history.current != history.end)
+					if (history->current != history->end)
 					{
-						history.current = (history.current + 1) % LINE_BUFFER_SIZE;
+						history->current = (history->current + 1) % LINE_BUFFER_SIZE;
 						tputs(c_clear, 1, edit_putc);
 						edit_putc('\r');
-						cursor_x = print_history(&history, history.current);
-						command_length = cursor_x;
+						st->cursor_x = print_history(history, history->current);
+						st->length = st->cursor_x;
 					}
 				}
                 else if (c == 'A')
 				{
 					/* UP */
-					if (history.current != history.begin)
+					if (history->current != history->begin)
 					{
-						history.current = (LINE_BUFFER_SIZE + history.current - 1) % LINE_BUFFER_SIZE;
+						history->current = (LINE_BUFFER_SIZE + history->current - 1) % LINE_BUFFER_SIZE;
 						tputs(c_clear, 1, edit_putc);
 						edit_putc('\r');
-						cursor_x = print_history(&history, history.current);
-						command_length = cursor_x;
+						st->cursor_x = print_history(history, history->current);
+						st->length = st->cursor_x;
 					}
 				}
                 else if (c == '1')
@@ -334,7 +367,7 @@ int	main(void)
                         i = read(STDIN_FILENO, cbuf, 1);
                         if (cbuf[0] == '~')
                         {
-							dump_history(&history);
+							dump_history(history);
                         }
                     }
                 }
