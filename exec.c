@@ -61,7 +61,7 @@ static char	*get_executable_filepath(char *filename, const char *dirpaths_str)
 		if (dirpaths_str[path_len] == ':' || dirpaths_str[path_len] == '\0')
 		{
 			if (path_len == 0)
-				dirpath = getcwd(NULL, 0);
+				dirpath = ft_strdup("./");
 			else
 				dirpath = ft_substr(dirpaths_str, 0, path_len);
 			executable_path = find_executable_file_in_dir(filename, dirpath);
