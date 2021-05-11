@@ -13,6 +13,8 @@ int	set_cwd(char *abs_path)
 	char	*oldpwd;
 
 	oldpwd = get_env_val("PWD");
+	if (!oldpwd)
+		oldpwd = ft_strdup("");
 	free(g_cwd);
 	g_cwd = ft_strdup(abs_path);
 	ft_setenv("OLDPWD", oldpwd, 1);
