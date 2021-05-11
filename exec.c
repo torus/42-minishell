@@ -120,7 +120,6 @@ int	cmd_execvp(char *filename, char **argv)
 		put_minish_err_msg(executable_path, strerror(errno));
 	else
 		put_minish_err_msg(filename, "No such file or directory");
-	free(executable_path);
 	if (executable_path)
 		exit(126);
 	exit(127);
