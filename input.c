@@ -104,7 +104,7 @@ int	tty_cbreak(int fd)
 	return(0);
 }
 
-#define LINE_BUFFER_SIZE 4
+#define LINE_BUFFER_SIZE 8
 
 typedef struct	s_command_history
 {
@@ -134,33 +134,39 @@ int	edit_putc(int ch)
     return (1);
 }
 
+void	print_history(t_command_history *his, int index)
+{
+	t_rope	*rope;
+	int	len;
+	int	i;
+	char	ch;
+
+	rope = his->ropes[index];
+	if (rope)
+	{
+		len = rope_length(rope);
+		i = 0;
+		while (i < len)
+		{
+			ch = rope_index(rope, i);
+			write(1, &ch, 1);
+			i++;
+		}
+	}
+}
+
 void	dump_history(t_command_history *his)
 {
 	int	index;
-	t_rope	*rope;
 
-	fprintf(stderr, "begin: %d, cur: %d, end: %d\n",
+	fprintf(stderr, "\n**** HISTORY: beg: %d, cur: %d, end: %d\n",
 			his->begin, his->current, his->end);
 
 	index = his->begin;
 	while (index != his->end)
 	{
-		rope = his->ropes[index];
-		int	len;
-
-		len = rope_length(rope);
-		int	i;
-
-		i = 0;
 		fprintf(stderr, "| '");
-		while (i < len)
-		{
-			char	ch;
-
-			ch = rope_index(rope, i);
-			fprintf(stderr, "%c", ch);
-			i++;
-		}
+		print_history(his, index);
 		fprintf(stderr, "'\n");
 		index = (index + 1) % LINE_BUFFER_SIZE;
 	}
@@ -196,8 +202,7 @@ int	main(void)
     /* tputs(bl, 1, edit_putc); */
     char	*c_left = tgetstr("le", &area);
     char	*c_right = tgetstr("nd", &area);
-    char	*c_down = tgetstr("do", &area);
-    char	*c_up = tgetstr("up", &area);
+    char	*c_clear = tgetstr("cb", &area);
 
 	if (signal(SIGINT, sig_catch) == SIG_ERR)	/* catch signals */
 		err_sys("signal(SIGINT) error");
@@ -276,10 +281,28 @@ int	main(void)
                     tputs(c_right, 1, edit_putc);
 					cursor_x++;
 				}
-                /* else if (c == 'B') */
-                /*     tputs(c_down, 1, edit_putc); */
-                /* else if (c == 'A') */
-                /*     tputs(c_up, 1, edit_putc); */
+                else if (c == 'B')
+				{
+					/* DOWN */
+					if (history.current != history.end)
+					{
+						history.current = (history.current + 1) % LINE_BUFFER_SIZE;
+						tputs(c_clear, 1, edit_putc);
+						edit_putc('\r');
+						print_history(&history, history.current);
+					}
+				}
+                else if (c == 'A')
+				{
+					/* UP */
+					if (history.current != history.begin)
+					{
+						history.current = (LINE_BUFFER_SIZE + history.current - 1) % LINE_BUFFER_SIZE;
+						tputs(c_clear, 1, edit_putc);
+						edit_putc('\r');
+						print_history(&history, history.current);
+					}
+				}
                 else if (c == '1')
                 {
 					/* F5 */
@@ -289,8 +312,6 @@ int	main(void)
                         i = read(STDIN_FILENO, cbuf, 1);
                         if (cbuf[0] == '~')
                         {
-                            printf("\n***\n");
-                            fflush(stdout);
 							dump_history(&history);
                         }
                     }
