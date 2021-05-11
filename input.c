@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "rope.h"
+
 static struct termios		save_termios;
 static int					ttysavefd = -1;
 static enum { RESET, RAW, CBREAK }	ttystate = RESET;
@@ -102,18 +104,100 @@ int	tty_cbreak(int fd)
 	return(0);
 }
 
-#define LINE_BUFFER_SIZE 128
-typedef struct	s_
+#define LINE_BUFFER_SIZE 4
 
-typedef struct	s_line_buffer
+typedef struct	s_command_history
 {
-    char	**buffers;
-}	t_line_buffer;
+    t_rope	*ropes[LINE_BUFFER_SIZE];
+	int		begin;
+	int		end;
+	int		current;
+}	t_command_history;
+
+void	init_history(t_command_history *his)
+{
+	int	i;
+
+	his->begin = 0;
+	his->end = 0;
+	his->current = 0;
+	i = 0;
+	while (i < LINE_BUFFER_SIZE)
+		his->ropes[i++] = NULL;
+}
+
+#include <term.h>
+
+int	edit_putc(int ch)
+{
+    write(1, &ch, 1);
+    return (1);
+}
+
+void	dump_history(t_command_history *his)
+{
+	int	index;
+	t_rope	*rope;
+
+	fprintf(stderr, "begin: %d, cur: %d, end: %d\n",
+			his->begin, his->current, his->end);
+
+	index = his->begin;
+	while (index != his->end)
+	{
+		rope = his->ropes[index];
+		int	len;
+
+		len = rope_length(rope);
+		int	i;
+
+		i = 0;
+		fprintf(stderr, "| '");
+		while (i < len)
+		{
+			char	ch;
+
+			ch = rope_index(rope, i);
+			fprintf(stderr, "%c", ch);
+			i++;
+		}
+		fprintf(stderr, "'\n");
+		index = (index + 1) % LINE_BUFFER_SIZE;
+	}
+}
 
 int	main(void)
 {
 	int		i;
-	unsigned char	c;
+    unsigned char	c;
+    char	cbuf[2];
+
+    cbuf[1] = '\0';
+
+	t_command_history	history;
+	init_history(&history);
+
+/*
+ * isatty, ttyname, ttyslot, ioctl, getenv, tcsetattr, tcgetattr,
+ * tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
+ */
+
+    const char	*term = getenv("TERM");
+    if (!term)
+		err_sys("getenv(TERM) error");
+    fprintf(stderr, "TERM = '%s'\n", term);
+    tgetent(NULL, term);
+
+    char	areabuf[32];
+    char	*area;
+
+    area = areabuf;
+    /* char	*bl = tgetstr("bl", &area); */
+    /* tputs(bl, 1, edit_putc); */
+    char	*c_left = tgetstr("le", &area);
+    char	*c_right = tgetstr("nd", &area);
+    char	*c_down = tgetstr("do", &area);
+    char	*c_up = tgetstr("up", &area);
 
 	if (signal(SIGINT, sig_catch) == SIG_ERR)	/* catch signals */
 		err_sys("signal(SIGINT) error");
@@ -125,14 +209,101 @@ int	main(void)
 	if (tty_cbreak(STDIN_FILENO) < 0)
 		err_sys("tty_cbreak error");
 	printf("\nEnter cbreak mode characters, terminate with SIGINT\n");
-	while ((i = read(STDIN_FILENO, &c, 1)) == 1) {
+
+	int	cursor_x;
+
+	cursor_x = 0;
+
+
+	while (1) {
+		i = read(STDIN_FILENO, cbuf, 1);
+
+		if (i != 1)
+			break ;
+
+        c = cbuf[0];
 		c &= 255;
+
         if (c >= 0x20 && c < 0x7f)
-            printf("%c", c);
+        {
+            edit_putc(c);
+
+
+            if (!history.ropes[history.current])
+            {
+                if (history.current == history.end)
+                {
+                    history.end = (history.end + 1) % LINE_BUFFER_SIZE;
+                    if (history.end == history.begin)
+                        history.begin = (history.end + 1) % LINE_BUFFER_SIZE;
+                }
+                history.ropes[history.current] = rope_create(cbuf, NULL);
+            }
+            else
+            {
+                t_rope	*new_rope;
+                new_rope = rope_create(cbuf, NULL);
+                history.ropes[history.current] =
+                    rope_concat(history.ropes[history.current], new_rope);
+            }
+
+        }
         else if (c == '\n')
-            printf("\n");
+		{
+			history.current = history.end;
+			history.ropes[history.current] = NULL;
+            edit_putc(c);
+		}
+        else if (c == 0x1b)
+        {
+            i = read(STDIN_FILENO, cbuf, 1);
+			c = cbuf[0];
+            if (c == '[')
+            {
+                i = read(STDIN_FILENO, cbuf, 1);
+				if (i != 1)
+					break ;
+                c = cbuf[0];
+                if (c == 'D')
+				{
+                    tputs(c_left, 1, edit_putc);
+					cursor_x--;
+					if (cursor_x < 0)
+						cursor_x = 0;
+				}
+                else if (c == 'C')
+				{
+                    tputs(c_right, 1, edit_putc);
+					cursor_x++;
+				}
+                /* else if (c == 'B') */
+                /*     tputs(c_down, 1, edit_putc); */
+                /* else if (c == 'A') */
+                /*     tputs(c_up, 1, edit_putc); */
+                else if (c == '1')
+                {
+					/* F5 */
+                    i = read(STDIN_FILENO, cbuf, 1);
+                    if (cbuf[0] == '5')
+                    {
+                        i = read(STDIN_FILENO, cbuf, 1);
+                        if (cbuf[0] == '~')
+                        {
+                            printf("\n***\n");
+                            fflush(stdout);
+							dump_history(&history);
+                        }
+                    }
+                }
+                else
+                    /* printf("\\x%02x", c); */
+                    edit_putc(c);
+            }
+        }
         else
+		{
             printf("\\x%02x", c);
+		}
         fflush(stdout);
 	}
 	if (tty_reset(STDIN_FILENO) < 0)
