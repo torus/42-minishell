@@ -54,9 +54,9 @@ void	put_cwd_err_msg(char *for_whom)
  *   - relative_path="dir/dir2/symlink2dir"
  *   - relative_path="./../dir/../././/.//////./"
  */
-char *get_abs_path_from_cwd(char *relative_path)
+char	*get_abs_path_from_cwd(char *relative_path)
 {
-	char	**dirs;  // ("..", ".", その他) みたいなのが入ってくる
+	char	**dirs;
 	char	*result;
 	char	*tmp;
 	int		i;
