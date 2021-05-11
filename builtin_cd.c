@@ -20,23 +20,6 @@ static void	put_cd_errmsg(char *dest_path)
 	free(errmsg);
 }
 
-// /* chdir() で移動が成功したら set_current_working_directory(abs_path) する
-//  * - ディレクトリがシンボリックリンクだった場合, chdir(dest_path)して,
-//  *   the_current_directory=dest_path にする.
-//  *
-//  * 移動出来たら0, 移動出来なかったら-1を返す
-//  */
-// static int	canonicalize_path_and_setcwd(char *abs_path)
-// {
-// 	char	*canonicalized_path;
-// 
-// 	canonicalized_path = canonicalize_path(abs_path);
-// 	PRINT_DEBUG("canonicalized_path: |%s|\n", canonicalized_path);
-// 	set_cwd(canonicalized_path);
-// 	free(canonicalized_path);
-// 	return (0);
-// }
-
 /*
  * dest
  * is_canon_path: 正規化されたパスかどうか
@@ -119,7 +102,7 @@ static int	change_dir_process(char *cd_path, const char *arg, bool is_canon_path
 
 /* cdpathを取得し, プロセスのcwdを変更する
  */
-static bool	change_directory_new(char *dest)
+static bool	change_directory(char *dest)
 {
 	char *path;
 	int status;
@@ -192,7 +175,7 @@ static int cd_cdpath_env(char *dest_path)
 		}
 		else
 			abs_path = path_join(dirs[i], dest_path);
-		if (change_directory_new(abs_path))
+		if (change_directory(abs_path))
 		{
 			if (ft_strlen(dirs[i]))
 				printf("%s\n", g_cwd);
@@ -232,7 +215,7 @@ int	builtin_cd(char **argv)
 		}
 	}
 	// chdir(dest)する
-	is_success = change_directory_new(dest);
+	is_success = change_directory(dest);
 	if (is_success)
 	{
 		free(dest);
