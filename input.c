@@ -134,7 +134,7 @@ int	edit_putc(int ch)
     return (1);
 }
 
-void	print_history(t_command_history *his, int index)
+int	print_history(t_command_history *his, int index)
 {
 	t_rope	*rope;
 	int	len;
@@ -142,6 +142,7 @@ void	print_history(t_command_history *his, int index)
 	char	ch;
 
 	rope = his->ropes[index];
+	len = 0;
 	if (rope)
 	{
 		len = rope_length(rope);
@@ -153,6 +154,7 @@ void	print_history(t_command_history *his, int index)
 			i++;
 		}
 	}
+	return (len);
 }
 
 void	dump_history(t_command_history *his)
@@ -203,6 +205,7 @@ int	main(void)
     char	*c_left = tgetstr("le", &area);
     char	*c_right = tgetstr("nd", &area);
     char	*c_clear = tgetstr("cb", &area);
+    char	*c_insert_mode = tgetstr("im", &area);
 
 	if (signal(SIGINT, sig_catch) == SIG_ERR)	/* catch signals */
 		err_sys("signal(SIGINT) error");
@@ -216,9 +219,10 @@ int	main(void)
 	printf("\nEnter cbreak mode characters, terminate with SIGINT\n");
 
 	int	cursor_x;
+	int	command_length;
 
 	cursor_x = 0;
-
+	command_length = 0;
 
 	while (1) {
 		i = read(STDIN_FILENO, cbuf, 1);
@@ -227,12 +231,11 @@ int	main(void)
 			break ;
 
         c = cbuf[0];
-		c &= 255;
 
         if (c >= 0x20 && c < 0x7f)
         {
+			tputs(c_insert_mode, 1, edit_putc);
             edit_putc(c);
-
 
             if (!history.ropes[history.current])
             {
@@ -248,15 +251,29 @@ int	main(void)
             {
                 t_rope	*new_rope;
                 new_rope = rope_create(cbuf, NULL);
-                history.ropes[history.current] =
-                    rope_concat(history.ropes[history.current], new_rope);
+				if (cursor_x == command_length)
+					history.ropes[history.current] =
+						rope_concat(history.ropes[history.current], new_rope);
+				else if (cursor_x == 0)
+				{
+					history.ropes[history.current] =
+						rope_concat(new_rope, history.ropes[history.current]);
+				}
+				else if (cursor_x < command_length)
+				{
+					history.ropes[history.current] =
+						rope_insert(history.ropes[history.current], cursor_x, new_rope);
+				}
             }
-
+			cursor_x++;
+			command_length++;
         }
         else if (c == '\n')
 		{
 			history.current = history.end;
 			history.ropes[history.current] = NULL;
+			cursor_x = 0;
+			command_length = 0;
             edit_putc(c);
 		}
         else if (c == 0x1b)
@@ -278,8 +295,11 @@ int	main(void)
 				}
                 else if (c == 'C')
 				{
-                    tputs(c_right, 1, edit_putc);
-					cursor_x++;
+					if (cursor_x < command_length)
+					{
+						tputs(c_right, 1, edit_putc);
+						cursor_x++;
+					}
 				}
                 else if (c == 'B')
 				{
@@ -289,7 +309,8 @@ int	main(void)
 						history.current = (history.current + 1) % LINE_BUFFER_SIZE;
 						tputs(c_clear, 1, edit_putc);
 						edit_putc('\r');
-						print_history(&history, history.current);
+						cursor_x = print_history(&history, history.current);
+						command_length = cursor_x;
 					}
 				}
                 else if (c == 'A')
@@ -300,7 +321,8 @@ int	main(void)
 						history.current = (LINE_BUFFER_SIZE + history.current - 1) % LINE_BUFFER_SIZE;
 						tputs(c_clear, 1, edit_putc);
 						edit_putc('\r');
-						print_history(&history, history.current);
+						cursor_x = print_history(&history, history.current);
+						command_length = cursor_x;
 					}
 				}
                 else if (c == '1')
