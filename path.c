@@ -32,3 +32,21 @@ char	*path_join(char *dirpath, char *filename)
 	free(tmp);
 	return (result);
 }
+
+/* 親ディレクトリのパスを返す
+ *
+ * path: 絶対パス.
+ * Return: 親ディレクトリの絶対パス.
+ */
+char	*get_parent_dir(char *path)
+{
+	char	*result;
+
+	result = ft_substr(path, 0, ft_strrchr(path, '/') - path);
+	if (result && ft_strlen(result) == 0)
+	{
+		free(result);
+		result = ft_strdup("/");
+	}
+	return (result);
+}

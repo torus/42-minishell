@@ -3,21 +3,6 @@
 #include "minishell.h"
 #include <string.h>
 
-/* 親ディレクトリのパスを返す
- */
-static char	*get_parent_dir(char *path)
-{
-	char	*result;
-
-	result = ft_substr(path, 0, ft_strrchr(path, '/') - path);
-	if (result && ft_strlen(result) == 0)
-	{
-		free(result);
-		result = ft_strdup("/");
-	}
-	return (result);
-}
-
 static void	update_path(char **path, char *retrieve_path)
 {
 	char	*tmp;
