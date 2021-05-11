@@ -1,10 +1,10 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include "libft/libft.h"
-
 #ifndef PATH_H
 # define PATH_H
+
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <unistd.h>
+# include "libft/libft.h"
 
 extern char	*g_cwd;
 char	*path_join(char *dirpath, char *filename);
