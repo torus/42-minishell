@@ -20,11 +20,15 @@ static void	put_cd_errmsg(char *dest_path)
 	free(errmsg);
 }
 
-/*
- * dest
+/* get_cd_dest() で取得した移動先パス(絶対or相対) を元に
+ * 移動先の絶対パスを返す.
+ *
+ * dest: get_cd_dest() で取得した移動先.
  * is_canon_path: 正規化されたパスかどうか
+ *
+ * Return: 移動先ディレクトリの絶対パス.
  */
-static char	*set_cd_path(char *dest, bool *is_canon_path)
+static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
 {
 	char	*physical_path;
 	char	*canon_path;
@@ -74,29 +78,31 @@ static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
 
 /* 実際に chdir() を実行して現在のプロセスのcwdを変更する
  *
- * cd_path: 1回目にchdir()を実行するパス
- * arg: 2回目にchdir()を実行するパス
+ * abs_dest: chdir() を実行する絶対パス.
+ * arg: chdir(abs_dest) が失敗した時に移動するパス.
+ *   これは bash の cd がabs_dest に移動失敗した時に
+ *   引数で chdir() を試す挙動に合わせている.
  * is_canon_path: 正規化されたパスかどうか
  *
  * Return: 移動に成功したかどうか.
  */
-static bool	change_dir_process(char *cd_path,
+static bool	change_dir_process(char *abs_dest,
 	const char *arg, bool is_canon_path)
 {
 	int	status;
 	int	old_errno;
 
-	status = chdir(cd_path);
+	status = chdir(abs_dest);
 	if (status == 0)
 	{
-		set_new_pwd(cd_path, is_canon_path, true);
+		set_new_pwd(abs_dest, is_canon_path, true);
 		return (true);
 	}
 	old_errno = errno;
 	status = chdir(arg);
 	if (status == 0)
 	{
-		set_new_pwd(cd_path, is_canon_path, false);
+		set_new_pwd(abs_dest, is_canon_path, false);
 		return (true);
 	}
 	errno = old_errno;
@@ -115,7 +121,7 @@ static bool	change_directory(char *dest)
 	int		status;
 	bool	is_canon_path;
 
-	path = set_cd_path(dest, &is_canon_path);
+	path = get_cd_abs_dest(dest, &is_canon_path);
 	PRINT_DEBUG("path: |%s|, is_canon_path: %d\n", path, is_canon_path);
 	status = change_dir_process(path, dest, is_canon_path);
 	free(path);
@@ -128,7 +134,7 @@ static bool	change_directory(char *dest)
  *
  * Return: cdコマンドの移動先パス(絶対or相対パス).
  */
-static char	*get_cd_dest(char **argv)
+static char	*get_cd_dest_from_argv(char **argv)
 {
 	char	*dest_path;
 
@@ -219,7 +225,7 @@ int	builtin_cd(char **argv)
 		g_cwd = getcwd(NULL, 0);
 	if (ptrarr_len((void **)argv) > 2)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
-	dest = get_cd_dest(argv);
+	dest = get_cd_dest_from_argv(argv);
 	if (!dest)
 		return (ERROR);
 	if (will_search_cdpath(argv, dest) && cd_cdpath_env(dest))
