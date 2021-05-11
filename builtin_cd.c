@@ -161,7 +161,7 @@ static int cd_cdpath_env(char *dest_path)
 	cdpath = get_env_val("CDPATH");
 	if (!cdpath)
 		return (1);
-	dirs = get_colon_units(cdpath, "");
+	dirs = get_colon_units(cdpath);
 	free(cdpath);
 	i = 0;
 	while (dirs[i])

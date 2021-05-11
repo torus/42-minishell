@@ -69,9 +69,10 @@ char	**split_first_c(const char *str, char c)
 }
 
 /* コロン(:)で区切る.
- * ft_split() と違い, ":/hoge/:/:" のような入力に対して [default_str, default_str, "/"] を作成して返す.
+ * ft_split() と違い, "::/" のような入力に対して
+ * ["", "", "/"] を作成して返す.
  */
-char	**get_colon_units(char *str, char *default_str)
+char	**get_colon_units(char *str)
 {
 	char	**result;
 	char	*next;
@@ -82,10 +83,7 @@ char	**get_colon_units(char *str, char *default_str)
 	next = ft_strchr(str, ':');
 	while (next)
 	{
-		if (next - str == 0)
-			tmp = ft_strdup(default_str);
-		else
-			tmp = ft_substr(str, 0, next - str);
+		tmp = ft_substr(str, 0, next - str);
 		tmparr = result;
 		result = (char **)ptrarr_add_ptr((void **)result, tmp);
 		free((void **)tmparr);
@@ -93,10 +91,7 @@ char	**get_colon_units(char *str, char *default_str)
 		next = ft_strchr(str, ':');
 	}
 	tmparr = result;
-	if (*str)
-		result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(str));
-	else
-		result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(default_str));
+	result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(str));
 	free((void **)tmparr);
 	return (result);
 }
