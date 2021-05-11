@@ -23,6 +23,48 @@ bool	will_search_cdpath(char **argv, char *dest)
 	return (true);
 }
 
+static char	*path_join3(char *path0, char *path1, char *path2)
+{
+	char	*tmp;
+	char	*result;
+
+	tmp = path_join(path0, path1);
+	result = path_join(tmp, path2);
+	free(tmp);
+	return (result);
+}
+
+/* sources の各パスを起点として dest_path に移動を試みる.
+ *
+ * sources: 起点となるパスの文字列の配列
+ *
+ * Return: 移動が成功したかどうか.
+ */
+static bool	cd_from_sources(char *dest_path, char **sources)
+{
+	char	*abs_path;
+	int		i;
+
+	i = 0;
+	while (sources[i])
+	{
+		if (sources[i][0] != '/')
+			abs_path = path_join3(g_cwd, sources[i], dest_path);
+		else
+			abs_path = path_join(sources[i], dest_path);
+		if (change_directory(abs_path))
+		{
+			if (ft_strlen(sources[i]))
+				printf("%s\n", g_cwd);
+			free(abs_path);
+			return (true);
+		}
+		free(abs_path);
+		i++;
+	}
+	return (false);
+}
+
 /* $CDPATH を元に移動する.
  *
  * Return: 移動に成功したら true を返す.
@@ -31,39 +73,15 @@ bool	will_search_cdpath(char **argv, char *dest)
 int	cd_cdpath_env(char *dest_path)
 {
 	char	*cdpath;
-	int		i;
-	char	*abs_path;
-	char	**dirs;
-	char	*tmp;
+	char	**sources;
+	bool	status;
 
 	cdpath = get_env_val("CDPATH");
 	if (!cdpath)
 		return (false);
-	dirs = get_colon_units(cdpath);
+	sources = get_colon_units(cdpath);
+	status = cd_from_sources(dest_path, sources);
 	free(cdpath);
-	i = 0;
-	while (dirs[i])
-	{
-		if (dirs[i][0] != '/')
-		{
-			tmp = path_join(g_cwd, dirs[i]);
-			abs_path = path_join(tmp, dest_path);
-			free(tmp);
-		}
-		else
-			abs_path = path_join(dirs[i], dest_path);
-		if (change_directory(abs_path))
-		{
-			if (ft_strlen(dirs[i]))
-				printf("%s\n", g_cwd);
-			free(abs_path);
-			free_ptrarr((void **)dirs);
-			return (true);
-		}
-		free(abs_path);
-		i++;
-	}
-	free_ptrarr((void **)dirs);
-	return (false);
+	free_ptrarr((void **)sources);
+	return (status);
 }
-
