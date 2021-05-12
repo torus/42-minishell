@@ -72,7 +72,7 @@ char	**split_first_c(const char *str, char c)
  * ft_split() と違い, "::/" のような入力に対して
  * ["", "", "/"] を作成して返す.
  */
-char	**get_colon_units(char *str)
+char	**get_colon_units(char *str, char *default_str)
 {
 	char	**result;
 	char	*next;
@@ -83,7 +83,10 @@ char	**get_colon_units(char *str)
 	next = ft_strchr(str, ':');
 	while (next)
 	{
-		tmp = ft_substr(str, 0, next - str);
+		if (next - str == 0)
+			tmp = ft_strdup(default_str);
+		else
+			tmp = ft_substr(str, 0, next - str);
 		tmparr = result;
 		result = (char **)ptrarr_add_ptr((void **)result, tmp);
 		free((void **)tmparr);
@@ -91,7 +94,10 @@ char	**get_colon_units(char *str)
 		next = ft_strchr(str, ':');
 	}
 	tmparr = result;
-	result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(str));
+	if (*str == '\0')
+		result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(default_str));
+	else
+		result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(str));
 	free((void **)tmparr);
 	return (result);
 }

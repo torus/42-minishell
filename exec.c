@@ -110,12 +110,12 @@ void	search_and_exec_file_from_path_env(char *filename, char **argv)
 	path_env_val = get_env_val("PATH");
 	if (!path_env_val)
 		return ;
-	dirs = get_colon_units(path_env_val);
+	dirs = get_colon_units(path_env_val, "./");
 	free(path_env_val);
 	i = 0;
 	while (dirs[i])
 	{
-		if (dirs[i]);
+		if (dirs[i])
 			executable_path = find_executable_file_in_dir(filename, dirs[i]);
 		if (executable_path)
 			execve(executable_path, argv, environ);

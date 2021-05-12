@@ -80,7 +80,7 @@ int	cd_cdpath_env(char *dest_path)
 	cdpath = get_env_val("CDPATH");
 	if (!cdpath)
 		return (false);
-	sources = get_colon_units(cdpath);
+	sources = get_colon_units(cdpath, "");
 	status = cd_from_sources(dest_path, sources);
 	free(cdpath);
 	free_ptrarr((void **)sources);
