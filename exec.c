@@ -152,6 +152,12 @@ int	cmd_execvp(char *filename, char **argv)
 		execve(filename, argv, environ);
 	else
 		executable_path = search_and_exec_file_from_path_env(filename, argv);
+	if (executable_path && is_directory(executable_path))
+		put_minish_err_msg_and_exit(126, executable_path, "Is a directory");
+	if (errno == ENOEXEC && is_executable(executable_path))
+		exit(0);
+	else if (errno == ENOEXEC && !is_executable(executable_path))
+		errno = EACCES;
 	if (errno)
 		put_minish_err_msg(executable_path, strerror(errno));
 	else
