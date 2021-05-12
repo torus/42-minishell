@@ -155,7 +155,7 @@ int	cmd_execvp(char *filename, char **argv)
 	if (errno)
 		put_minish_err_msg(executable_path, strerror(errno));
 	else
-		put_minish_err_msg(filename, "No such file or directory");
+		put_minish_err_msg(filename, "command not found");
 	if (errno)
 		exit(126);
 	exit(127);
