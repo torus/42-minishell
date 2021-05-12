@@ -97,6 +97,33 @@ char	*find_executable_file_from_path_env(char *filename)
 	return (executable_path);
 }
 
+/* $PATH のディレクトリを検索して実行出来るか試す
+ */
+void	search_and_exec_file_from_path_env(char *filename, char **argv)
+{
+	extern char	**environ;
+	char		*path_env_val;
+	char		**dirs;
+	int			i;
+	char		*executable_path;
+
+	path_env_val = get_env_val("PATH");
+	if (!path_env_val)
+		return ;
+	dirs = get_colon_units(path_env_val);
+	free(path_env_val);
+	i = 0;
+	while (dirs[i])
+	{
+		if (dirs[i]);
+			executable_path = find_executable_file_in_dir(filename, dirs[i]);
+		if (executable_path)
+			execve(executable_path, argv, environ);
+		i++;
+	}
+	free_ptrarr((void **)dirs);
+}
+
 /*
  * This function works just like execvp.
  *
@@ -108,19 +135,18 @@ char	*find_executable_file_from_path_env(char *filename)
  */
 int	cmd_execvp(char *filename, char **argv)
 {
-	char		*executable_path;
 	extern char	**environ;
 
+	errno = 0;
 	if (ft_strchr(filename, '/'))
-		executable_path = filename;
+		execve(filename, argv, environ);
 	else
-		executable_path = find_executable_file_from_path_env(filename);
-	execve(executable_path, argv, environ);
-	if (executable_path)
-		put_minish_err_msg(executable_path, strerror(errno));
+		search_and_exec_file_from_path_env(filename, argv);
+	if (errno)
+		put_minish_err_msg(filename, strerror(errno));
 	else
 		put_minish_err_msg(filename, "No such file or directory");
-	if (executable_path)
+	if (errno)
 		exit(126);
 	exit(127);
 }
