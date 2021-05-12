@@ -35,6 +35,7 @@ int	invoke_sequential_commands(t_parse_ast *seqcmd)
 		if (!inv)
 			die();
 		status = cmd_exec_commands(inv);
+		cmd_free_cmdinvo(inv);
 		seqcmd = seqcmd->content.sequential_commands->rest_node;
 	}
 	return (status);
@@ -73,14 +74,14 @@ int	main(int argc, char **argv)
 	t_token					tok;
 	t_parse_ast				*seqcmd;
 
-	if (argc == 3
-		&& argv[1][0] == '-' && argv[1][1] == 'c' && argv[1][2] == '\0')
+	if (argc == 3 && ft_strncmp(argv[1], "-c", 3) == 0)
 		return (do_command(argv[2]));
+	set_shell_sighandlers();
 	init_buffer_with_string(&buf, "");
 	printf("Welcome to Minishell\n");
 	while (1)
 	{
-		printf("minish > ");
+		printf("\r"PROMPT);
 		fflush(stdout);
 		lex_get_token(&buf, &tok);
 		cmdline = parse_command_line(&buf, &tok);
@@ -88,6 +89,7 @@ int	main(int argc, char **argv)
 		{
 			seqcmd = cmdline->content.command_line->seqcmd_node;
 			invoke_sequential_commands(seqcmd);
+			parse_free_all_ast();
 		}
 		else
 			put_err_msg("Parse error.");

@@ -26,6 +26,44 @@ int main(){
 		free_ptrarr((void **)str_arr);
 	}
 
+	TEST_SECTION("split_first_c() 最後に区切り文字\"key=\"");
+	{
+		char *input = "PATH=";
+		char **str_arr = split_first_c(input, '=');
+		CHECK_EQ_STR(str_arr[0], "PATH");
+		CHECK_EQ_STR(str_arr[1], "");
+		CHECK_EQ(str_arr[2], NULL);
+
+		free_ptrarr((void **)str_arr);
+	}
+
+	TEST_SECTION("get_colon_units() \":/hoge/::/\"");
+	{
+		char *input = ":/hoge/::/";
+		char **str_arr = get_colon_units(input);
+		CHECK_EQ_STR(str_arr[0], "");
+		CHECK_EQ_STR(str_arr[1], "/hoge/");
+		CHECK_EQ_STR(str_arr[2], "");
+		CHECK_EQ_STR(str_arr[3], "/");
+		CHECK_EQ(str_arr[4], NULL);
+
+		free_ptrarr((void **)str_arr);
+	}
+
+	TEST_SECTION("get_colon_units() \"/hoge/::/::\"");
+	{
+		char *input = "/hoge/::/::";
+		char **str_arr = get_colon_units(input);
+		CHECK_EQ_STR(str_arr[0], "/hoge/");
+		CHECK_EQ_STR(str_arr[1], "");
+		CHECK_EQ_STR(str_arr[2], "/");
+		CHECK_EQ_STR(str_arr[3], "");
+		CHECK_EQ_STR(str_arr[4], "");
+		CHECK_EQ(str_arr[5], NULL);
+
+		free_ptrarr((void **)str_arr);
+	}
+
 	TEST_SECTION("get_env() 通常ケース");
 	{
 		char *original0 = environ[0];
@@ -105,6 +143,76 @@ int main(){
 		set_status(-1);
 		CHECK_EQ(get_status(), -1);
 	}
+
+	TEST_CHAPTER("env_setter");
+	/* env_setter関連のテストケースでは
+	 * 標準ライブラリ関数である setenv() や unsetenv() などは
+	 * 使っていません.
+	 * なぜなら, 標準ライブラリ関数では内部でrealloc()などを使っているのですが,
+	 * それが ft_setenv() と上手く噛み合わず, ダブルフリーすることになります.
+	 * だからといって ft_setenv() 内でfreeしない場合はメモリリークになります.
+	 * なのでテストケース内で 標準ライブラリ関数の setenv() や unsetenv() は使ってません.
+	 */
+
+	TEST_SECTION("ft_setenv() update rewrite=0");
+	{
+		ft_setenv("ABC", "ft_setenv() update rewrite=0", 1);
+		char	*prev = getenv("ABC");
+		CHECK(ft_setenv("ABC", "ft_setenv()", 0) == 0);
+		char	*new = getenv("ABC");
+		CHECK_EQ_STR(new, prev);
+		ft_unsetenv("ABC");
+	}
+
+	TEST_SECTION("ft_setenv() update rewrite=1");
+	{
+		ft_setenv("ABC", "ft_setenv() update rewrite=1", 1);
+		char	*prev = getenv("ABC");
+		CHECK(prev);
+		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
+		char	*new = getenv("ABC");
+		CHECK_EQ_STR(new, "ft_setenv()");
+		ft_unsetenv("ABC");
+	}
+
+	TEST_SECTION("ft_setenv() expand_and_add_env");
+	{
+		ft_unsetenv("ABC");
+		char	*prev = getenv("ABC");
+		CHECK(!prev);
+		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
+		char	*new = getenv("ABC");
+		CHECK_EQ_STR(new, "ft_setenv()");
+	}
+
+	TEST_SECTION("ft_unsetenv() unset env");
+	{
+		ft_setenv("ABC", "ft_unsetenv() unset env", 1);
+		char	*prev = getenv("ABC");
+		CHECK(prev);
+		CHECK(ft_unsetenv("ABC") == 0);
+		char	*new = getenv("ABC");
+		CHECK(!new);
+		ft_unsetenv("ABC");
+	}
+
+	TEST_SECTION("ft_unsetenv() unset env that doesn't exist");
+	{
+		ft_unsetenv("ABC");
+		char	*prev = getenv("ABC");
+		CHECK(!prev);
+		CHECK(ft_unsetenv("ABC") == 0);
+		char	*new = getenv("ABC");
+		CHECK(!new);
+		ft_unsetenv("ABC");
+	}
+
+	char c;
+	printf("environ: %p\n", environ);
+	printf("stack:   %p\n", &c);
+	// environ が heap領域 に配置されている時はfreeする
+	if ((void *)environ < (void *)&c)
+		free(environ);
 
 	int fail_count = print_result();
 	return (fail_count);
