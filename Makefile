@@ -19,13 +19,14 @@ SRCS = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c		\
 
 OBJS = $(SRCS:.c=.o)
 
-test: input
+# あとで消す
+run-input: input
 	./input
+
+all: $(NAME)
 
 input: input.c rope*.c splay*.c
 	$(CC) -g -Wall -Wextra -o $@ $^ -lcurses -L libft -lft
-
-all: $(NAME)
 
 $(NAME): ${HEADER_FILES} ${OBJS}
 	$(LIBFT_MAKE)
