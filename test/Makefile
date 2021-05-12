@@ -31,7 +31,7 @@ run: parse_test env_test path_test exec_test command_exec_test ast2cmdinvo_test
 SRCS_PARSE = $(wildcard ../lexer*.c ../parse*.c) ../libft/ft_memcpy.c
 
 parse_test: Makefile parse_test.c test.c test.h $(SRCS_PARSE) ../parse.h
-	gcc -Werror -Wall -Wextra -g -o $@ parse_test.c test.c $(SRCS_PARSE)
+	gcc -Werror -Wall -Wextra -g -o $@ parse_test.c test.c $(SRCS_PARSE) -L ../libft -lft
 
 env_test: env_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
