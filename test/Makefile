@@ -2,7 +2,7 @@ LIBFT_PATH = ../libft
 LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
 LIBFT_LIB = ../libft/libft.a
 SRCS = 	../env.c ../env_setter.c ../path.c ../g_cwd.c												\
-		../lexer1.c ../lexer2.c																		\
+		../lexer1.c ../lexer2.c ../lexer3.c															\
 		../parse1.c ../parse2.c ../parse_utils.c ../parse_utils2.c									\
 		../exec.c ../cmd_exec_command.c ../cmd_exec_commands.c ../cmd_redirection.c ../cmd_pipe.c	\
 		../cmd_cmd_invocation.c ../cmd_cmd_invocation2.c ../convert_ast2cmdinvo.c					\
@@ -28,10 +28,11 @@ run: parse_test env_test path_test exec_test command_exec_test ast2cmdinvo_test
 	${VALGRIND} ./command_exec_test
 	${VALGRIND} ./ast2cmdinvo_test
 
-SRCS_PARSE = $(wildcard ../lexer*.c ../parse*.c) ../libft/ft_memcpy.c
+SRCS_PARSE = $(wildcard ../lexer*.c ../parse*.c)
 
 parse_test: Makefile parse_test.c test.c test.h $(SRCS_PARSE) ../parse.h
-	gcc -Werror -Wall -Wextra -g -o $@ parse_test.c test.c $(SRCS_PARSE) -L ../libft -lft
+	$(LIBFT_MAKE)
+	gcc -Werror -Wall -Wextra -g -o $@ parse_test.c test.c $(SRCS_PARSE) ${LIBFT_LIB}
 
 env_test: env_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
