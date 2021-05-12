@@ -97,32 +97,39 @@ char	*find_executable_file_from_path_env(char *filename)
 	return (executable_path);
 }
 
-/* $PATH のディレクトリを検索して実行出来るか試す
+/* $PATH のディレクトリを検索して実行する.
  */
-void	search_and_exec_file_from_path_env(char *filename, char **argv)
+char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 {
 	extern char	**environ;
 	char		*path_env_val;
 	char		**dirs;
 	int			i;
 	char		*executable_path;
+	char		*last_executable_path;
 
 	path_env_val = get_env_val("PATH");
 	if (!path_env_val)
-		return ;
+		return (NULL);
 	dirs = get_colon_units(path_env_val, "./");
 	free(path_env_val);
 	i = 0;
+	last_executable_path = NULL;
 	while (dirs[i])
 	{
 		if (dirs[i])
 			executable_path = find_executable_file_in_dir(filename, dirs[i]);
 		if (executable_path)
+		{
+			free(last_executable_path);
+			last_executable_path = ft_strdup(executable_path);
 			execve(executable_path, argv, environ);
+		}
 		free(executable_path);
 		i++;
 	}
 	free_ptrarr((void **)dirs);
+	return (last_executable_path);
 }
 
 /*
@@ -137,14 +144,16 @@ void	search_and_exec_file_from_path_env(char *filename, char **argv)
 int	cmd_execvp(char *filename, char **argv)
 {
 	extern char	**environ;
+	char		*executable_path;
 
 	errno = 0;
+	executable_path = filename;
 	if (ft_strchr(filename, '/'))
 		execve(filename, argv, environ);
 	else
-		search_and_exec_file_from_path_env(filename, argv);
+		executable_path = search_and_exec_file_from_path_env(filename, argv);
 	if (errno)
-		put_minish_err_msg(filename, strerror(errno));
+		put_minish_err_msg(executable_path, strerror(errno));
 	else
 		put_minish_err_msg(filename, "No such file or directory");
 	if (errno)
