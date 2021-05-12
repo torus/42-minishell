@@ -40,22 +40,16 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 	return (free_and_rtn_ptr(dir, NULL));
 }
 
-/* $PATH のディレクトリを検索して実行する.
+/* dirs の各ディレクトリを検索して実行する.
  */
-char	*search_and_exec_file_from_path_env(char *filename, char **argv)
+static char	*search_and_exec_file_from_dirs(char *filename,
+	char **argv, char **dirs)
 {
 	extern char	**environ;
-	char		*path_env_val;
-	char		**dirs;
 	int			i;
 	char		*executable_path;
 	char		*last_executable_path;
 
-	path_env_val = get_env_val("PATH");
-	if (!path_env_val)
-		return (NULL);
-	dirs = get_colon_units(path_env_val, "./");
-	free(path_env_val);
 	i = 0;
 	last_executable_path = NULL;
 	while (dirs[i])
@@ -71,6 +65,26 @@ char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 		free(executable_path);
 		i++;
 	}
+	return (last_executable_path);
+}
+
+/* $PATH のディレクトリを検索して実行する.
+ */
+char	*search_and_exec_file_from_path_env(char *filename, char **argv)
+{
+	extern char	**environ;
+	char		*path_env_val;
+	char		**dirs;
+	int			i;
+	char		*last_executable_path;
+
+	path_env_val = get_env_val("PATH");
+	if (!path_env_val)
+		return (NULL);
+	dirs = get_colon_units(path_env_val, "./");
+	free(path_env_val);
+	i = 0;
+	last_executable_path = search_and_exec_file_from_dirs(filename, argv, dirs);
 	free_ptrarr((void **)dirs);
 	return (last_executable_path);
 }
