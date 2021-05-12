@@ -1,16 +1,5 @@
 #include "builtin.h"
 
-static void	print_env_value(char *env_val)
-{
-	if (env_val)
-	{
-		write(STDOUT_FILENO, "=", 1);
-		write(STDOUT_FILENO, "\"", 1);
-		ft_putstr_fd(env_val, STDOUT_FILENO);
-		write(STDOUT_FILENO, "\"", 1);
-	}
-}
-
 static int	print_envs_with_declaration(void)
 {
 	extern char	**environ;
@@ -26,12 +15,15 @@ static int	print_envs_with_declaration(void)
 			return (ERROR);
 		env_val = get_env_val(kvarr[0]);
 		free_ptrarr((void **)kvarr);
+		if (!env_val)
+			return (ERROR);
 		write(STDOUT_FILENO, "declare -x ", ft_strlen("declare -x "));
 		write(STDOUT_FILENO, environ[i],
-			ft_strchr(environ[i], '=') - environ[i]);
-		print_env_value(env_val);
-		write(STDOUT_FILENO, "\n", 1);
+			ft_strchr(environ[i], '=') - environ[i] + 1);
+		write(STDOUT_FILENO, "\"", 1);
+		ft_putstr_fd(env_val, STDOUT_FILENO);
 		free(env_val);
+		write(STDOUT_FILENO, "\"\n", 2);
 		i++;
 	}
 	return (0);
