@@ -5,16 +5,15 @@ extern char **environ;
 char *original0;
 
 // 環境変数のテスト用
-
-static void set_env_var(char *env_var)
-{
-	environ[0] = env_var;
-}
-
-static void restore_env_var(void)
-{
-	environ[0] = original0;
-}
+// static void set_env_var(char *env_var)
+// {
+// 	environ[0] = env_var;
+// }
+//
+// static void restore_env_var(void)
+// {
+// 	environ[0] = original0;
+// }
 
 int main(){
 	// 元の環境変数を保持しておく
