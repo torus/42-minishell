@@ -119,6 +119,7 @@ void	search_and_exec_file_from_path_env(char *filename, char **argv)
 			executable_path = find_executable_file_in_dir(filename, dirs[i]);
 		if (executable_path)
 			execve(executable_path, argv, environ);
+		free(executable_path);
 		i++;
 	}
 	free_ptrarr((void **)dirs);
