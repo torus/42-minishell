@@ -75,7 +75,6 @@ char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 	extern char	**environ;
 	char		*path_env_val;
 	char		**dirs;
-	int			i;
 	char		*last_executable_path;
 
 	path_env_val = get_env_val("PATH");
@@ -83,7 +82,6 @@ char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 		return (NULL);
 	dirs = get_colon_units(path_env_val, "./");
 	free(path_env_val);
-	i = 0;
 	last_executable_path = search_and_exec_file_from_dirs(filename, argv, dirs);
 	free_ptrarr((void **)dirs);
 	return (last_executable_path);
