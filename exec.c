@@ -40,63 +40,6 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 	return (free_and_rtn_ptr(dir, NULL));
 }
 
-/*
- * Find filename in directories which is listed in dirpaths_str.
- *
- * filename: program name that is searched.
- * dirpaths_str: string that has directory paths which is delimited with colon.
- *
- * return: filepath if executable file is found, otherwise return NULL.
- */
-static char	*get_executable_filepath(char *filename, const char *dirpaths_str)
-{
-	char	*executable_path;
-	size_t	path_len;
-	char	*dirpath;
-
-	path_len = 0;
-	executable_path = NULL;
-	while (!executable_path)
-	{
-		if (dirpaths_str[path_len] == ':' || dirpaths_str[path_len] == '\0')
-		{
-			if (path_len == 0)
-				dirpath = ft_strdup("./");
-			else
-				dirpath = ft_substr(dirpaths_str, 0, path_len);
-			executable_path = find_executable_file_in_dir(filename, dirpath);
-			free(dirpath);
-			if (dirpaths_str[path_len] == '\0')
-				break ;
-			dirpaths_str += path_len + 1;
-			path_len = 0;
-		}
-		else
-			path_len++;
-	}
-	return (executable_path);
-}
-
-/*
- * Find executable file in directories which is listed in $PATH.
- *
- * filename: program name that is searched.
- *
- * return: filepath if executable file is found, otherwise return NULL.
- */
-char	*find_executable_file_from_path_env(char *filename)
-{
-	char	*path_env_val;
-	char	*executable_path;
-
-	path_env_val = get_env_val("PATH");
-	if (!path_env_val)
-		return (NULL);
-	executable_path = get_executable_filepath(filename, path_env_val);
-	free(path_env_val);
-	return (executable_path);
-}
-
 /* $PATH のディレクトリを検索して実行する.
  */
 char	*search_and_exec_file_from_path_env(char *filename, char **argv)
