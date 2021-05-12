@@ -16,8 +16,11 @@ SRCS = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c	\
 
 OBJS = $(SRCS:.c=.o)
 
-input: input.c
-	$(CC) -g -Wall -Wextra -o $@ $^
+test: input
+	./input
+
+input: input.c rope*.c splay*.c
+	$(CC) -g -Wall -Wextra -o $@ $^ -lcurses -L libft -lft
 
 all: $(NAME)
 
