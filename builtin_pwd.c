@@ -1,12 +1,12 @@
 #include "builtin.h"
+#include "path.h"
 
 int	builtin_pwd(char **argv)
 {
-	char	buf[PATH_MAX];
-
 	(void)argv;
-	if (getcwd(buf, PATH_MAX) == NULL)
-		return (put_err_msg_and_ret("getcwd() failed"));
-	ft_putendl_fd(buf, STDOUT_FILENO);
+	if (!g_cwd)
+		g_cwd = getcwd(NULL, 0);
+	if (g_cwd)
+		ft_putendl_fd(g_cwd, STDOUT_FILENO);
 	return (0);
 }

@@ -68,6 +68,34 @@ char	**split_first_c(const char *str, char c)
 	return (result);
 }
 
+/* コロン(:)で区切る.
+ * ft_split() と違い, "::/" のような入力に対して
+ * ["", "", "/"] を作成して返す.
+ */
+char	**get_colon_units(char *str)
+{
+	char	**result;
+	char	*next;
+	char	*tmp;
+	char	**tmparr;
+
+	result = NULL;
+	next = ft_strchr(str, ':');
+	while (next)
+	{
+		tmp = ft_substr(str, 0, next - str);
+		tmparr = result;
+		result = (char **)ptrarr_add_ptr((void **)result, tmp);
+		free((void **)tmparr);
+		str = next + 1;
+		next = ft_strchr(str, ':');
+	}
+	tmparr = result;
+	result = (char **)ptrarr_add_ptr((void **) result, ft_strdup(str));
+	free((void **)tmparr);
+	return (result);
+}
+
 /*
  * Get value from key-value string.
  * key-value string form like "key=value", "key:value", or something like that.

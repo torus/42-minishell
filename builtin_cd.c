@@ -1,59 +1,70 @@
 #include "builtin.h"
 #include "env.h"
+#include "path.h"
 #include "minishell.h"
+#include <string.h>
 
 static void	put_cd_errmsg(char *dest_path)
 {
+	char	*tmp;
 	char	*errmsg;
 
-	errmsg = NULL;
-	if (errno == ENOENT)
-		errmsg = ft_strjoin(dest_path, ": No such file or directory");
-	else if (errno == ENOTDIR)
-		errmsg = ft_strjoin(dest_path, ": Not a directory");
-	else if (errno == EACCES)
-		errmsg = ft_strjoin(dest_path, ": Permission denied");
+	tmp = ft_strjoin(dest_path, ": ");
+	if (!tmp)
+		return ;
+	errmsg = ft_strjoin(tmp, strerror(errno));
+	free(tmp);
 	if (!errmsg)
-		put_minish_err_msg_and_exit(1, "cd", "generating errmsg is failed!");
+		return ;
 	put_minish_err_msg("cd", errmsg);
 	free(errmsg);
 }
 
-static int	cd_home(void)
+/* cd先のディレクトリをcdコマンドのargvを元に作成して返す.
+ *
+ * argv: builtin_cd() の引数.
+ *
+ * Return: cdコマンドの移動先パス(絶対or相対パス).
+ */
+static char	*get_cd_dest_from_argv(char **argv)
 {
 	char	*dest_path;
-	int		chdir_status;
 
-	dest_path = get_env_val("HOME");
-	if (!dest_path)
-		return (put_minish_err_msg_and_ret(1, "cd", "HOME not set"));
-	chdir_status = 0;
-	if (ft_strlen(dest_path))
-		chdir_status = chdir(dest_path);
-	if (chdir_status < 0)
-		put_cd_errmsg(dest_path);
-	free(dest_path);
-	if (chdir_status < 0)
-		return (1);
-	return (0);
+	if (ptrarr_len((void **)argv) == 1)
+	{
+		dest_path = get_env_val("HOME");
+		if (!dest_path)
+		{
+			put_minish_err_msg("cd", "HOME not set");
+			return (NULL);
+		}
+		return (dest_path);
+	}
+	return (ft_strdup(argv[1]));
 }
 
 int	builtin_cd(char **argv)
 {
-	char	*dest_path;
-	int		chdir_status;
+	char	*dest;
 
+	if (!g_cwd)
+		g_cwd = getcwd(NULL, 0);
 	if (ptrarr_len((void **)argv) > 2)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
-	if (ptrarr_len((void **)argv) == 2)
-		dest_path = ft_strdup(argv[1]);
-	else
-		return (cd_home());
-	chdir_status = chdir(dest_path);
-	if (chdir_status < 0)
-		put_cd_errmsg(dest_path);
-	free(dest_path);
-	if (chdir_status < 0)
-		return (1);
-	return (0);
+	dest = get_cd_dest_from_argv(argv);
+	if (!dest)
+		return (ERROR);
+	if (will_search_cdpath(argv, dest) && cd_cdpath_env(dest))
+	{
+		free(dest);
+		return (0);
+	}
+	if (change_directory(dest))
+	{
+		free(dest);
+		return (0);
+	}
+	put_cd_errmsg(dest);
+	free(dest);
+	return (1);
 }

@@ -37,6 +37,33 @@ int main(){
 		free_ptrarr((void **)str_arr);
 	}
 
+	TEST_SECTION("get_colon_units() \":/hoge/::/\"");
+	{
+		char *input = ":/hoge/::/";
+		char **str_arr = get_colon_units(input);
+		CHECK_EQ_STR(str_arr[0], "");
+		CHECK_EQ_STR(str_arr[1], "/hoge/");
+		CHECK_EQ_STR(str_arr[2], "");
+		CHECK_EQ_STR(str_arr[3], "/");
+		CHECK_EQ(str_arr[4], NULL);
+
+		free_ptrarr((void **)str_arr);
+	}
+
+	TEST_SECTION("get_colon_units() \"/hoge/::/::\"");
+	{
+		char *input = "/hoge/::/::";
+		char **str_arr = get_colon_units(input);
+		CHECK_EQ_STR(str_arr[0], "/hoge/");
+		CHECK_EQ_STR(str_arr[1], "");
+		CHECK_EQ_STR(str_arr[2], "/");
+		CHECK_EQ_STR(str_arr[3], "");
+		CHECK_EQ_STR(str_arr[4], "");
+		CHECK_EQ(str_arr[5], NULL);
+
+		free_ptrarr((void **)str_arr);
+	}
+
 	TEST_SECTION("get_env() 通常ケース");
 	{
 		char *original0 = environ[0];

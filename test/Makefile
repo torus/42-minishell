@@ -1,14 +1,15 @@
 LIBFT_PATH = ../libft
 LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
 LIBFT_LIB = ../libft/libft.a
-SRCS = 	../env.c ../env_setter.c ../path.c															\
+SRCS = 	../env.c ../env_setter.c ../path.c ../g_cwd.c												\
 		../lexer1.c ../lexer2.c																		\
 		../parse1.c ../parse2.c ../parse_utils.c ../parse_utils2.c									\
 		../exec.c ../cmd_exec_command.c ../cmd_exec_commands.c ../cmd_redirection.c ../cmd_pipe.c	\
 		../cmd_cmd_invocation.c ../cmd_cmd_invocation2.c ../convert_ast2cmdinvo.c					\
 		../expand_env_var.c ../split_expanded_str.c ../string_node2string.c ../expand_string_node.c	\
 		../cmd_status.c ../signal.c ../cmd_status.c ../signal.c ../minishell_error_msg.c			\
-		../builtin.c ../builtin_cd.c ../builtin_echo.c ../builtin_env.c								\
+		../builtin.c ../builtin_echo.c ../builtin_env.c												\
+		../builtin_cd.c ../builtin_cd_path.c ../builtin_cd_chdir.c ../builtin_cd_cdpath.c			\
 		../builtin_exit.c ../builtin_export.c ../builtin_pwd.c ../builtin_unset.c
 HEADERS = ../env.h \
 		  ../parse.h \
