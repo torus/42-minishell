@@ -261,7 +261,6 @@ int main(){
 
 		remove("output.txt");
 		int status = cmd_exec_commands(command);
-		printf("status: %d\n", status);
 		CHECK(status != 0);
 		CHECK(system("ls -l output.txt") == 0);
 		cmd_free_cmdinvo(command);
