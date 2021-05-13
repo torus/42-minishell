@@ -19,6 +19,13 @@ typedef enum e_token_type
 	TOKTYPE_SPACE,
 }	t_token_type;
 
+typedef enum e_lexer_state
+{
+    LEXSTAT_NORMAL = 0xd101,
+    LEXSTAT_SINGLE_QUOTED,
+    LEXSTAT_DOUBLE_QUOTED,
+}	t_lexer_state;
+
 typedef struct s_token
 {
 	char			text[TOKEN_BUFFER_SIZE];

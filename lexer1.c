@@ -52,13 +52,17 @@ int	lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch)
 
 int	lex_get_quoted(t_parse_buffer *buf, t_token *result, int ch)
 {
+	if (buf->lex_stat != LEXSTAT_NORMAL)
+		parse_die();
 	if (ch == '"')
 	{
+		buf->lex_stat = LEXSTAT_DOUBLE_QUOTED;
 		result->type = TOKTYPE_EXPANDABLE_QUOTED;
 		return (lex_read_double_quoted(buf, result));
 	}
 	else if (ch == '\'')
 	{
+		buf->lex_stat = LEXSTAT_SINGLE_QUOTED;
 		result->type = TOKTYPE_NON_EXPANDABLE;
 		return (lex_read_single_quoted(buf, result));
 	}
@@ -72,7 +76,11 @@ int	lex_get_token(t_parse_buffer *buf, t_token *result)
 
 	ret = 0;
 	ch = lex_getc(buf);
-	if (lex_get_spaces(buf, result, ch))
+	if (buf->lex_stat == LEXSTAT_DOUBLE_QUOTED)
+		ret = lex_read_double_quoted(buf, result);
+	else if (buf->lex_stat == LEXSTAT_SINGLE_QUOTED)
+		ret = lex_read_single_quoted(buf, result);
+	else if (lex_get_spaces(buf, result, ch))
 		ret = 1;
 	else if (lex_get_symbols(buf, result, ch))
 		ret = 1;

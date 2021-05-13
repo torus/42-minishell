@@ -6,6 +6,7 @@ void	init_buf_with_string(t_parse_buffer *buf, const char* str)
 	buf->cur_pos = 0;
 	strcpy(buf->buffer, str);
 	buf->size = strlen(str);
+	buf->lex_stat = LEXSTAT_NORMAL;
 }
 
 void test_lexer()
@@ -40,6 +41,7 @@ void test_lexer()
 
 		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_INPUT_REDIRECTION);
+		printf("length: %d\n", tok.length);
 		CHECK_EQ(tok.length, 10);
 
 		lex_get_token(&buf, &tok);
@@ -97,6 +99,61 @@ void test_lexer()
 		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ(tok.length, 8);
 		CHECK(!strncmp(tok.text, "file.txt", 8));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NEWLINE);
+	}
+
+	TEST_SECTION("lex_get_token クォートなしエスケープありの場合");
+	{
+		t_parse_buffer	buf;
+		// \$ABC c\ at \"xyz
+		init_buf_with_string(&buf, "\\$ABC c\\ at \\\"xyz \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "$", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "ABC", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "c", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, " ", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 2);
+		CHECK(!strncmp(tok.text, "at", 2));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "\"", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "xyz", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
 
 		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_NEWLINE);
