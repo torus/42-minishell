@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "libft/libft.h"
 #include "parse.h"
 
 int	lex_getc(t_parse_buffer *buf)
@@ -27,7 +28,10 @@ int	lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch)
 	else if (ch == '|')
 		result->type = TOKTYPE_PIPE;
 	else if (ch == '<')
+	{
 		result->type = TOKTYPE_INPUT_REDIRECTION;
+		result->length = 0;
+	}
 	else if (ch == '>')
 	{
 		ch = lex_getc(buf);
@@ -39,6 +43,7 @@ int	lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch)
 			if (ch != EOF)
 				lex_ungetc(buf);
 		}
+		result->length = 1;
 	}
 	else
 		return (0);
@@ -78,6 +83,8 @@ int	lex_get_token(t_parse_buffer *buf, t_token *result)
 		result->type = TOKTYPE_EXPANDABLE;
 		lex_ungetc(buf);
 		ret = lex_read_word(buf, result);
+		if (ret)
+			lex_check_redirection_with_fd(buf, result);
 	}
 	return (ret);
 }

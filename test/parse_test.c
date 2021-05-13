@@ -32,6 +32,31 @@ void test_lexer()
 		CHECK(!strncmp(tok.text, "cat", 3));
 	}
 
+	TEST_SECTION("lex_get_token デスクリプタ付きのリダイレクト");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "10< 123> 456>> ");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_INPUT_REDIRECTION);
+		CHECK_EQ(tok.length, 10);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_OUTPUT_REDIRECTION);
+		CHECK_EQ(tok.length, 123);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_OUTPUT_APPENDING);
+		CHECK_EQ(tok.length, 456);
+	}
+
 	TEST_SECTION("lex_get_token クォートなしの場合");
 	{
 		t_parse_buffer	buf;
@@ -64,6 +89,7 @@ void test_lexer()
 
 		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_OUTPUT_REDIRECTION);
+		CHECK_EQ(tok.length, 1); /* デフォルトで標準出力 (1) */
 		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SPACE);
 
@@ -114,6 +140,7 @@ void test_lexer()
 
 		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_INPUT_REDIRECTION);
+		CHECK_EQ(tok.length, 0); /* デフォルトで標準入力 (0) */
 
 		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SPACE);
@@ -297,6 +324,24 @@ void test_parser(void)
 		t_parse_ast *node = parse_redirection(&buf, &tok);
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 0);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					->content.string->text, "file");
+	}
+
+	TEST_SECTION("parse_redirection デスクリプタ付き <");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "123< file\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 123);
 		CHECK_EQ(node->content.redirection->type, TOKTYPE_INPUT_REDIRECTION);
 		CHECK_EQ_STR(node->content.redirection->string_node
 					->content.string->text, "file");
@@ -313,6 +358,24 @@ void test_parser(void)
 		t_parse_ast *node = parse_redirection(&buf, &tok);
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 1);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					 ->content.string->text, "file");
+	}
+
+	TEST_SECTION("parse_redirection　デスクリプタ付き >");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "123> file\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 123);
 		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
 		CHECK_EQ_STR(node->content.redirection->string_node
 					 ->content.string->text, "file");
@@ -329,6 +392,24 @@ void test_parser(void)
 		t_parse_ast *node = parse_redirection(&buf, &tok);
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 1);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_APPENDING);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					->content.string->text, "file");
+	}
+
+	TEST_SECTION("parse_redirection デスクリプタ付き >>");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "456>> file\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 456);
 		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_APPENDING);
 		CHECK_EQ_STR(node->content.redirection->string_node
 					->content.string->text, "file");

@@ -36,5 +36,6 @@ int		lex_get_spaces(t_parse_buffer *buf, t_token *result, int ch);
 int		lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch);
 int		lex_get_quoted(t_parse_buffer *buf, t_token *result, int ch);
 int		lex_get_token(t_parse_buffer *buf, t_token *result);
+int		lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result);
 
 #endif

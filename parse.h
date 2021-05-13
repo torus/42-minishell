@@ -57,6 +57,7 @@ typedef struct s_parse_node_redirection
 {
 	t_parse_ast		*string_node;
 	t_token_type	type;
+	int				fd;
 }	t_parse_node_redirection;
 
 typedef struct s_parse_node_delimiter
