@@ -113,7 +113,7 @@ int	cmd_execvp(char *filename, char **argv)
 		exit(0);
 	else if (errno == ENOEXEC && !is_executable(executable_path))
 		errno = EACCES;
-	if (errno)
+	if (errno && executable_path)
 		put_minish_err_msg(executable_path, strerror(errno));
 	else
 		put_minish_err_msg(filename, "command not found");
