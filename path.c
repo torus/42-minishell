@@ -51,7 +51,7 @@ char	*get_parent_dir(char *path)
 	return (result);
 }
 
-/* ユーザー が path のファイルのアクセス許可
+/* ユーザー が path のファイルの実行アクセス許可
  *   を持っているか
  */
 bool	is_executable(char *path)
