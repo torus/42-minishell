@@ -245,6 +245,7 @@ int main(){
 
     TEST_SECTION("存在しないコマンドを実行すると返り値は0以外になる");
     {
+		remove("not_exists");
 		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("not_exists", ' '));
 
 		int status = cmd_exec_commands(command);
@@ -254,6 +255,7 @@ int main(){
 
     TEST_SECTION("存在しないコマンドを実行してもリダイレクト先のファイルは作成される");
     {
+		remove("not_exists");
 		t_command_invocation *command = cmd_init_cmdinvo((const char**)ft_split("not_exists", ' '));
 		cmd_add_outredirect(command, ft_strdup("output.txt"), false);
 
