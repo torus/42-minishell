@@ -41,7 +41,6 @@ void test_lexer()
 
 		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_INPUT_REDIRECTION);
-		printf("length: %d\n", tok.length);
 		CHECK_EQ(tok.length, 10);
 
 		lex_get_token(&buf, &tok);
@@ -179,6 +178,31 @@ void test_lexer()
 		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
 		CHECK_EQ(tok.length, 2);
 		CHECK(!strncmp(tok.text, "wc", 2));
+	}
+
+	TEST_SECTION("lex_get_token クォートありエスケープあり");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "\"\\$ABC\" '\\abc'");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "$", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "ABC", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 4);
+		CHECK(!strncmp(tok.text, "\\abc", 4));
 	}
 
 	TEST_SECTION("lex_get_token のこり");

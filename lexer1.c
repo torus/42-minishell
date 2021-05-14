@@ -75,24 +75,33 @@ int	lex_get_token(t_parse_buffer *buf, t_token *result)
 	int	ret;
 
 	ret = 0;
-	ch = lex_getc(buf);
 	if (buf->lex_stat == LEXSTAT_DOUBLE_QUOTED)
-		ret = lex_read_double_quoted(buf, result);
-	else if (buf->lex_stat == LEXSTAT_SINGLE_QUOTED)
-		ret = lex_read_single_quoted(buf, result);
-	else if (lex_get_spaces(buf, result, ch))
-		ret = 1;
-	else if (lex_get_symbols(buf, result, ch))
-		ret = 1;
-	else if (lex_get_quoted(buf, result, ch))
-		ret = 1;
-	else if (ch != EOF)
 	{
-		result->type = TOKTYPE_EXPANDABLE;
-		lex_ungetc(buf);
-		ret = lex_read_word(buf, result);
-		if (ret)
-			lex_check_redirection_with_fd(buf, result);
+		result->type = TOKTYPE_EXPANDABLE_QUOTED;
+		ret = lex_read_double_quoted(buf, result);
+	}
+	else if (buf->lex_stat == LEXSTAT_SINGLE_QUOTED)
+	{
+		result->type = TOKTYPE_NON_EXPANDABLE;
+		ret = lex_read_single_quoted(buf, result);
+	}
+	else
+	{
+		ch = lex_getc(buf);
+		if (lex_get_spaces(buf, result, ch))
+			ret = 1;
+		else if (lex_get_symbols(buf, result, ch))
+			ret = 1;
+		else if (lex_get_quoted(buf, result, ch))
+			ret = 1;
+		else if (ch != EOF)
+		{
+			result->type = TOKTYPE_EXPANDABLE;
+			lex_ungetc(buf);
+			ret = lex_read_word(buf, result);
+			if (ret)
+				lex_check_redirection_with_fd(buf, result);
+		}
 	}
 	return (ret);
 }
