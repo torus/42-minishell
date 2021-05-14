@@ -50,3 +50,19 @@ char	*get_parent_dir(char *path)
 	}
 	return (result);
 }
+
+/* ユーザー が path のファイルの実行アクセス許可
+ *   を持っているか
+ */
+bool	is_executable(char *path)
+{
+	struct stat	buf;
+
+	if (stat(path, &buf) == -1)
+		return (false);
+	if (!(buf.st_mode & S_IXUSR))
+		return (false);
+	if (!(buf.st_mode & S_IRUSR))
+		return (false);
+	return (true);
+}

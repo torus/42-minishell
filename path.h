@@ -16,5 +16,6 @@ char	*canonicalize_path(char *path);
 bool	is_directory(char *path);
 char	*path_join(char *dirpath, char *filename);
 char	*get_parent_dir(char *path);
+bool	is_executable(char *path);
 
 #endif

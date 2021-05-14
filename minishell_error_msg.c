@@ -7,9 +7,11 @@
 void	put_minish_err_msg(const char *cmd_name, const char *msg)
 {
 	write(STDERR_FILENO, "minishell: ", 11);
-	write(STDERR_FILENO, cmd_name, ft_strlen(cmd_name));
+	if (cmd_name)
+		write(STDERR_FILENO, cmd_name, ft_strlen(cmd_name));
 	write(STDERR_FILENO, ": ", 2);
-	write(STDERR_FILENO, msg, ft_strlen(msg));
+	if (msg)
+		write(STDERR_FILENO, msg, ft_strlen(msg));
 	write(STDERR_FILENO, "\n", 1);
 }
 
