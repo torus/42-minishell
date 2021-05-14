@@ -22,12 +22,13 @@ t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args)
  * add input redirection
  */
 int	cmd_add_inredirect(t_command_invocation *command,
-	const char *filepath)
+	const char *filepath, int fd)
 {
 	t_cmd_redirection	*redirection;
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
 	redirection->filepath = filepath;
+	redirection->fd = fd;
 	if (!redirection || !ft_lstadd_back_new(
 			&command->input_redirections, (void *)redirection))
 	{
@@ -41,12 +42,13 @@ int	cmd_add_inredirect(t_command_invocation *command,
  * add output redirection
  */
 int	cmd_add_outredirect(t_command_invocation *command,
-	const char *filepath, bool is_append)
+	const char *filepath, int fd, bool is_append)
 {
 	t_cmd_redirection	*redirection;
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
 	redirection->filepath = filepath;
+	redirection->fd = fd;
 	redirection->is_append = is_append;
 	if (!redirection || !ft_lstadd_back_new(
 			&command->output_redirections, (void *)redirection))

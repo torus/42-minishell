@@ -61,7 +61,7 @@ int	cmd_set_input_file(t_command_invocation *command)
 		free(filepath);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error input file open()"));
-		if (!current->next && dup2(fd, STDIN_FILENO) == -1)
+		if (!current->next && dup2(fd, red->fd) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
 		current = current->next;
 	}
@@ -80,24 +80,23 @@ int	cmd_set_output_file(t_command_invocation *command)
 	int					fd;
 	t_list				*current;
 	int					flag_open;
+	t_cmd_redirection	*red;
 	char				*filepath;
 
 	current = command->output_redirections;
 	while (current)
 	{
-		filepath = expand_redirect_filepath(
-				(char *)((t_cmd_redirection *)current->content)->filepath);
+		red = (t_cmd_redirection *)current->content;
+		filepath = expand_redirect_filepath((char *)red->filepath);
 		if (!filepath)
 			return (ERROR);
-		flag_open = O_TRUNC;
-		if (((t_cmd_redirection *)current->content)->is_append)
-			flag_open = O_APPEND;
+		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open(filepath, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		free(filepath);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error output file open()"));
-		if (!current->next && dup2(fd, STDOUT_FILENO) == -1)
+		if (!current->next && dup2(fd, red->fd) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDOUT_NO)"));
 		current = current->next;
 	}
