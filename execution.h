@@ -13,6 +13,9 @@
 # include "libft/libft.h"
 # include "path.h"
 
+# define OUT_RED_FLAGS (O_WRONLY | O_CREAT)
+# define DEF_PERM (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH)
+
 typedef struct s_cmd_redirection
 {
 	const char	*filepath;
