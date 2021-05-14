@@ -372,7 +372,7 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("file", ' '));
-		cmd_add_inredirect(expected, ft_strdup("abc"), 1);
+		cmd_add_inredirect(expected, ft_strdup("abc"), 0);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -441,7 +441,7 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("file", ' '));
-		cmd_add_outredirect(expected, ft_strdup("abc"), 1, false);
+		cmd_add_outredirect(expected, ft_strdup("abc"), 123, false);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -511,7 +511,7 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("file", ' '));
-		cmd_add_outredirect(expected, ft_strdup("abc"), 1, true);
+		cmd_add_outredirect(expected, ft_strdup("abc"), 456, true);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
@@ -615,8 +615,8 @@ int main()
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("file", ' '));
 		cmd_add_inredirect(expected, ft_strdup("a"), 0);
 		cmd_add_inredirect(expected, ft_strdup("b"), 0);
-		cmd_add_outredirect(expected, ft_strdup("c"), false, 1);
-		cmd_add_outredirect(expected, ft_strdup("d"), false, 1);
+		cmd_add_outredirect(expected, ft_strdup("c"), 1, false);
+		cmd_add_outredirect(expected, ft_strdup("d"), 1, false);
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 
