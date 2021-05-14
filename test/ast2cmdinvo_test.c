@@ -36,8 +36,10 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				t_cmd_redirection	*red_actual = (t_cmd_redirection *)current_actual->content;
 				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
 
+				printf("  |%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK(red_actual->filepath && red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
+				printf("  |%d| == |%d|\n", red_actual->fd, red_expected->fd);
 				CHECK_EQ(red_actual->fd, red_expected->fd);
 
 				current_actual = current_actual->next;
@@ -53,9 +55,12 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				t_cmd_redirection	*red_actual = (t_cmd_redirection *)current_actual->content;
 				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
 
+				printf("  |%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK(red_actual->filepath && red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
+				printf("  |%d| == |%d|\n", red_actual->fd, red_expected->fd);
 				CHECK_EQ(red_actual->fd, red_expected->fd);
+				printf("  |%d| == |%d|\n", red_actual->is_append, red_expected->is_append);
 				CHECK(red_actual->is_append == red_expected->is_append);
 
 				current_actual = current_actual->next;
