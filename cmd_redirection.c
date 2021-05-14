@@ -91,7 +91,8 @@ int	cmd_set_output_file(t_command_invocation *command)
 		if (!filepath)
 			return (ERROR);
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
-		fd = open(filepath, OUT_RED_FLAGS | flag_open, DEF_PERM);
+		fd = open(filepath, O_WRONLY | O_CREAT | flag_open,
+				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		free(filepath);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error output file open()"));
