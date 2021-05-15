@@ -17,6 +17,7 @@ void	init_buffer_with_string(t_parse_buffer *buf, char *str)
 	len = ft_strlen(str);
 	buf->cur_pos = 0;
 	buf->size = len;
+	buf->lex_stat = LEXSTAT_NORMAL;
 	ft_strlcpy(buf->buffer, str, len + 1);
 }
 
