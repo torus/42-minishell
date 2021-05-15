@@ -314,7 +314,7 @@ int main()
 		/* 準備 */
 		setenv("ABC", "hoge", 1);
 		t_parse_buffer	buf;
-		init_buf_with_string(&buf, "echo \"\\$\\$ABC\\\\$ABC\"\"$ABC\"");
+		init_buf_with_string(&buf, "echo \"\\$\\$ABC\\\\$ABC\"\"$ABC\" \n");
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
