@@ -312,7 +312,7 @@ int main()
 	TEST_SECTION("expand_string_node() エスケープされた環境変数");
 	{
 		/* 準備 */
-		setenv("ABC", "abc def", 1);
+		setenv("ABC", " abc def ", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo \"\\$\\$ABC\\\\$ABC\"\"$ABC\" \n");
 		t_token	tok;
@@ -355,10 +355,10 @@ int main()
 		char **actual = expand_string_node(args_node->string_node->content.string);
 		char **expected = NULL;
 		char **tmp = expected;
-		expected = (char **)ptrarr_add_ptr((void **)expected, ft_strdup("$$ABC\\abc def"));
+		expected = (char **)ptrarr_add_ptr((void **)expected, ft_strdup("$$ABC\\ abc def "));
 		free(tmp);
 		tmp = expected;
-		expected = (char **)ptrarr_add_ptr((void **)expected, ft_strdup("abc def"));
+		expected = (char **)ptrarr_add_ptr((void **)expected, ft_strdup(" abc def "));
 		free(tmp);
 
 		check_strarr((const char **)actual, (const char **)expected);
