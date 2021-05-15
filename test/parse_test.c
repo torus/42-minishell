@@ -205,6 +205,62 @@ void test_lexer()
 		CHECK(!strncmp(tok.text, "\\abc", 4));
 	}
 
+	TEST_SECTION("lex_get_token 数字だけのトークン");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "111 22 abcd ");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "111", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 2);
+		CHECK(!strncmp(tok.text, "22", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 4);
+		CHECK(!strncmp(tok.text, "abcd", 4));
+	}
+
+	TEST_SECTION("lex_get_token #88");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "chmod 000 dir ");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 5);
+		CHECK(!strncmp(tok.text, "chmod", 5));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "000", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "dir", 3));
+	}
+
 	TEST_SECTION("lex_get_token のこり");
 	{
 		t_parse_buffer	buf;
