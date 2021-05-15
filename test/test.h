@@ -5,11 +5,15 @@
 #include <unistd.h>
 
 #define CHECK(val) test_check((int64_t)val, #val)
-#define CHECK_EQ(actual, expected) test_check(actual == expected, #actual " == " #expected)
+#define CHECK_EQ(actual, expected) \
+  do { \
+	test_check(actual == expected, #actual " == " #expected); \
+	printf("    %d == %d\n", actual, expected); \
+  } while(0);
 #define CHECK_EQ_STR(actual, expected) \
   do { \
-	printf("  |%s| == |%s|\n", actual, expected); \
 	test_check(strcmp(actual, expected) == 0, #actual " == " #expected); \
+	printf("    |%s| == |%s|\n", actual, expected); \
   } while(0);
 #define TEST_CHAPTER(message) printf("#\n# " message "\n#\n")
 #define TEST_SECTION(message) printf("- " message "\n")
