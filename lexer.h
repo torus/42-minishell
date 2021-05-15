@@ -19,6 +19,13 @@ typedef enum e_token_type
 	TOKTYPE_SPACE,
 }	t_token_type;
 
+typedef enum e_lexer_state
+{
+	LEXSTAT_NORMAL = 0xd101,
+	LEXSTAT_SINGLE_QUOTED,
+	LEXSTAT_DOUBLE_QUOTED,
+}	t_lexer_state;
+
 typedef struct s_token
 {
 	char			text[TOKEN_BUFFER_SIZE];
@@ -37,5 +44,6 @@ int		lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch);
 int		lex_get_quoted(t_parse_buffer *buf, t_token *result, int ch);
 int		lex_get_token(t_parse_buffer *buf, t_token *result);
 int		lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result);
+int		lex_escaped(t_parse_buffer *buf, t_token *result);
 
 #endif

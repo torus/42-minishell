@@ -7,9 +7,10 @@
 
 typedef struct s_parse_buffer
 {
-	char	buffer[PARSE_BUFFER_SIZE];
-	int		size;
-	int		cur_pos;
+	char			buffer[PARSE_BUFFER_SIZE];
+	int				size;
+	int				cur_pos;
+	t_lexer_state	lex_stat;
 }	t_parse_buffer;
 
 typedef enum e_parse_ast_type
@@ -106,6 +107,7 @@ t_parse_ast	*parse_delimiter(t_parse_buffer *buf, t_token *tok);
 t_parse_ast	*parse_sequential_commands(t_parse_buffer *buf, t_token *tok);
 t_parse_ast	*parse_command_line(t_parse_buffer *buf, t_token *tok);
 
+void		parse_die(void);
 void		parse_fatal_error(void);
 void		parse_skip_spaces(t_parse_buffer *buf, t_token *tok);
 

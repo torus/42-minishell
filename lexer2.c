@@ -14,13 +14,15 @@ int	lex_read_word(t_parse_buffer *buf, t_token *result)
 	int	pos;
 	int	ch;
 
+	if (lex_escaped(buf, result))
+		return (1);
 	pos = 0;
 	while (1)
 	{
 		ch = lex_getc(buf);
 		if (ch == EOF)
 			break ;
-		if (lex_is_special_char(ch))
+		if (ch == '\\' || lex_is_special_char(ch))
 		{
 			lex_ungetc(buf);
 			break ;
@@ -36,11 +38,17 @@ int	lex_read_double_quoted(t_parse_buffer *buf, t_token *result)
 	int	pos;
 	int	ch;
 
+	if (lex_escaped(buf, result))
+		return (1);
 	pos = 0;
 	while (1)
 	{
 		ch = lex_getc(buf);
-		if (ch == '"' || ch == '\n' || ch == EOF)
+		if (ch == '"')
+			buf->lex_stat = LEXSTAT_NORMAL;
+		if (ch == '\\')
+			lex_ungetc(buf);
+		if (ch == '\\' || ch == '"' || ch == '\n' || ch == EOF)
 			break ;
 		result->text[pos++] = ch;
 	}
@@ -57,6 +65,8 @@ int	lex_read_single_quoted(t_parse_buffer *buf, t_token *result)
 	while (1)
 	{
 		ch = lex_getc(buf);
+		if (ch == '\'')
+			buf->lex_stat = LEXSTAT_NORMAL;
 		if (ch == '\'' || ch == '\n' || ch == EOF)
 			break ;
 		result->text[pos++] = ch;

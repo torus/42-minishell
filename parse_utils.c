@@ -1,6 +1,14 @@
 #include <stdlib.h>
 #include "parse.h"
 
+void	parse_die(void)
+{
+	int	*nullpo;
+
+	nullpo = NULL;
+	nullpo[0] = 0xD1E;
+}
+
 void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
 {
 	while (1)

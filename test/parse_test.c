@@ -6,6 +6,7 @@ void	init_buf_with_string(t_parse_buffer *buf, const char* str)
 	buf->cur_pos = 0;
 	strcpy(buf->buffer, str);
 	buf->size = strlen(str);
+	buf->lex_stat = LEXSTAT_NORMAL;
 }
 
 void test_lexer()
@@ -102,6 +103,61 @@ void test_lexer()
 		CHECK_EQ(tok.type, TOKTYPE_NEWLINE);
 	}
 
+	TEST_SECTION("lex_get_token クォートなしエスケープありの場合");
+	{
+		t_parse_buffer	buf;
+		// \$ABC c\ at \"xyz
+		init_buf_with_string(&buf, "\\$ABC c\\ at \\\"xyz \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "$", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "ABC", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "c", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, " ", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 2);
+		CHECK(!strncmp(tok.text, "at", 2));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "\"", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "xyz", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NEWLINE);
+	}
+
 	TEST_SECTION("lex_get_token クォートありの場合");
 	{
 		t_parse_buffer	buf;
@@ -122,6 +178,87 @@ void test_lexer()
 		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
 		CHECK_EQ(tok.length, 2);
 		CHECK(!strncmp(tok.text, "wc", 2));
+	}
+
+	TEST_SECTION("lex_get_token クォートありエスケープあり");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "\"\\$ABC\" '\\abc'");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "$", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "ABC", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 4);
+		CHECK(!strncmp(tok.text, "\\abc", 4));
+	}
+
+	TEST_SECTION("lex_get_token 数字だけのトークン");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "111 22 abcd ");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "111", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 2);
+		CHECK(!strncmp(tok.text, "22", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 4);
+		CHECK(!strncmp(tok.text, "abcd", 4));
+	}
+
+	TEST_SECTION("lex_get_token #88");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "chmod 000 dir ");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 5);
+		CHECK(!strncmp(tok.text, "chmod", 5));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "000", 3));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ(tok.length, 3);
+		CHECK(!strncmp(tok.text, "dir", 3));
 	}
 
 	TEST_SECTION("lex_get_token のこり");
