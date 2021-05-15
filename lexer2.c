@@ -14,16 +14,8 @@ int	lex_read_word(t_parse_buffer *buf, t_token *result)
 	int	pos;
 	int	ch;
 
-	ch = lex_getc(buf);
-	if (ch == '\\')
-	{
-		ch = lex_getc(buf);
-		result->text[0] = ch;
-		result->length = 1;
-		result->type = TOKTYPE_NON_EXPANDABLE;
+	if (lex_escaped(buf, result))
 		return (1);
-	}
-	lex_ungetc(buf);
 	pos = 0;
 	while (1)
 	{
@@ -46,16 +38,8 @@ int	lex_read_double_quoted(t_parse_buffer *buf, t_token *result)
 	int	pos;
 	int	ch;
 
-	ch = lex_getc(buf);
-	if (ch == '\\')
-	{
-		ch = lex_getc(buf);
-		result->text[0] = ch;
-		result->length = 1;
-		result->type = TOKTYPE_NON_EXPANDABLE;
+	if (lex_escaped(buf, result))
 		return (1);
-	}
-	lex_ungetc(buf);
 	pos = 0;
 	while (1)
 	{

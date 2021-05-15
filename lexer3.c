@@ -26,3 +26,20 @@ int	lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result)
 		lex_ungetc(buf);
 	return (1);
 }
+
+int	lex_escaped(t_parse_buffer *buf, t_token *result)
+{
+	char	ch;
+
+	ch = lex_getc(buf);
+	if (ch == '\\')
+	{
+		ch = lex_getc(buf);
+		result->text[0] = ch;
+		result->length = 1;
+		result->type = TOKTYPE_NON_EXPANDABLE;
+		return (1);
+	}
+	lex_ungetc(buf);
+	return (0);
+}
