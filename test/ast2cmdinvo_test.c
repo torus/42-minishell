@@ -279,7 +279,7 @@ int main()
 		lex_get_token(&buf, &tok);
 
 		t_parse_ast *node = parse_command(&buf, &tok);
-        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->type, ASTNODE_COMMAND);
 		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
 		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
 		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
@@ -308,6 +308,62 @@ int main()
 		free_ptrarr((void **)actual);
 		free_ptrarr((void **)expected);
 	}
+
+	TEST_SECTION("expand_string_node() エスケープされた環境変数");
+	{
+		/* 準備 */
+		setenv("ABC", "hoge", 1);
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "echo \"\\$\\$ABC\\\\$ABC\"\"$ABC\"");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+
+		args_node = args_node->rest_node->content.arguments;
+
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "$");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "$");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "ABC");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "\\");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "$ABC");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "$ABC");
+
+		char **actual = expand_string_node(args_node->string_node->content.string);
+		char **expected = NULL;
+		char **tmp = expected;
+		expected = (char **)ptrarr_add_ptr((void **)expected, ft_strdup("$$ABC\\hogehoge"));
+		free(tmp);
+
+		check_strarr((const char **)actual, (const char **)expected);
+		free_ptrarr((void **)actual);
+		free_ptrarr((void **)expected);
+	}
+	return (0);
+
 
 	TEST_CHAPTER("AST to command_invocation");
 
