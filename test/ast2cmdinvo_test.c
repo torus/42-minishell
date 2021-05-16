@@ -284,13 +284,17 @@ int main()
 		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
 		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+
 		args_node = args_node->rest_node->content.arguments;
+
 		t_parse_node_string *string_node = args_node->string_node->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ_STR(string_node->text, "hoge$ABC");
+
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
 		CHECK_EQ_STR(string_node->text, "hoge hoge");
+
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
 		CHECK_EQ_STR(string_node->text, "$ABC");
@@ -365,7 +369,6 @@ int main()
 		free_ptrarr((void **)actual);
 		free_ptrarr((void **)expected);
 	}
-	return (0);
 
 
 	TEST_CHAPTER("AST to command_invocation");
