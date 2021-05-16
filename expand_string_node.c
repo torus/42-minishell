@@ -63,11 +63,11 @@ static char	**cmd_str2str_arr(t_cmd_str_node *str_node)
 	while (str_node)
 	{
 		// 前の文字列の右端と今回の文字列左端に空白が無ければくっつける
-		if (str_node->type == TOKTYPE_EXPANDABLE_QUOTED
-			|| str_node->type == TOKTYPE_NON_EXPANDABLE
-			&& last_idx >= 0
-			&& result[last_idx][ft_strlen(result[last_idx]) - 1] != ' '
-			&& str_node->text[0] != ' ')
+		if ((str_node->type == TOKTYPE_EXPANDABLE_QUOTED
+				|| str_node->type == TOKTYPE_NON_EXPANDABLE)
+			&& (last_idx >= 0
+				&& result[last_idx][ft_strlen(result[last_idx]) - 1] != ' '
+				&& str_node->text[0] != ' '))
 		{
 			char	*tmp = result[last_idx];
 			result[last_idx] = ft_strjoin(tmp, str_node->text);
@@ -89,7 +89,24 @@ char	**expand_string_node(t_parse_node_string *string_node)
 {
 	// string_nodeを中間表現構造体(テキストとタイプを持つ)の配列に変換する.
 	t_cmd_str_node *cmd_str = ast_str2cmd_str(string_node);
-	printf("%p\n", cmd_str);
+
+	t_cmd_str_node *tmp = cmd_str;
+	int i = 0;
+	while (tmp)
+	{
+		printf("%d:\n", i);
+		printf("\t|%s|\n", tmp->text);
+		if (tmp->type == TOKTYPE_EXPANDABLE)
+			printf("\tTOKTYPE_EXPANDABLE\n");
+		else if (tmp->type == TOKTYPE_EXPANDABLE_QUOTED)
+			printf("\tTOKTYPE_EXPANDABLE_QUOTED\n");
+		else if (tmp->type == TOKTYPE_NON_EXPANDABLE)
+			printf("\tTOKTYPE_NON_EXPANDABLE\n");
+		else
+			printf("\tUNKNOWN: %d\n", tmp->type);
+		i++;
+		tmp = tmp->next;
+	}
 	// 中間表現構造体を文字列配列にする.
 	char	**result = cmd_str2str_arr(cmd_str);
 
