@@ -75,7 +75,7 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 					start++;
 					end++;
 				}
-				if ((str_node[i]->text[end] == ' ' && start - end > 0) || !str_node[i]->text[end])
+				else if (str_node[i]->text[end] == ' ' && start - end)
 				{
 					char *tmp = next_str;
 					next_str = ft_strjoin(next_str, ft_substr(str_node[i]->text, start, end - start));
@@ -83,12 +83,21 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 
 					char	**tmparr;
 					tmparr = result;
+					printf("\t\tadd: |%s|\n", next_str);
 					result = (char **)ptrarr_add_ptr((void **)result, next_str);
 					free(tmparr);
 					next_str = ft_strdup("");
+					end++;
+					start = end;
 				}
 				else
 					end++;
+			}
+			if (start - end)
+			{
+				char *tmp = next_str;
+				next_str = ft_strjoin(next_str, ft_substr(str_node[i]->text, start, end - start));
+				free(tmp);
 			}
 		}
 		i++;
@@ -97,6 +106,7 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	{
 		char	**tmparr;
 		tmparr = result;
+					printf("\t\tadd: |%s|\n", next_str);
 		result = (char **)ptrarr_add_ptr((void **)result, next_str);
 		free(tmparr);
 	}
@@ -111,6 +121,7 @@ char	**expand_string_node(t_parse_node_string *string_node)
 	t_cmd_str_node **cmd_str = ast_str2cmd_str(string_node);
 
 	int i = 0;
+	printf("cmd_str:\n");
 	while (cmd_str[i])
 	{
 		printf("%d:\n", i);
@@ -125,8 +136,17 @@ char	**expand_string_node(t_parse_node_string *string_node)
 			printf("\tUNKNOWN: %d\n", cmd_str[i]->type);
 		i++;
 	}
+
 	// 中間表現構造体を文字列配列にする.
 	char	**result = cmd_str2str_arr(cmd_str);
+
+	i = 0;
+	printf("result:\n");
+	while (result[i])
+	{
+		printf("result[%d]: |%s|\n", i, result[i]);
+		i++;
+	}
 
 	i = 0;
 	while (cmd_str[i])
