@@ -157,5 +157,6 @@ char	**expand_string_node(t_parse_node_string *string_node)
 		free(cmd_str[i]);
 		i++;
 	}
+	free(cmd_str);
 	return (result);
 }
