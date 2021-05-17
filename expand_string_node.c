@@ -142,7 +142,7 @@ char	**expand_string_node(t_parse_node_string *string_node)
 
 	i = 0;
 	printf("result:\n");
-	while (result[i])
+	while (result && result[i])
 	{
 		printf("result[%d]: |%s|\n", i, result[i]);
 		i++;
