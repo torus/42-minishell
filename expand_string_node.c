@@ -48,38 +48,31 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 
 static void	cmd_str_expandable2str_arr(char ***result, char **next_str, t_cmd_str_node *str_node)
 {
-	int		start;
-	int		end;
-	char	*tmp;
+	int		len;
+	char	*str;
 	char	**tmparr;
 
-	start = 0;
-	end = 0;
-	while (str_node->text[end])
+	len = 0;
+	str = str_node->text;
+	while (str[len])
 	{
-		if (str_node->text[end] == ' ' && start - end == 0)
+		if (str[len] == ' ' && len == 0)
+			str++;
+		else if (str[len] == ' ' && len)
 		{
-			start++;
-			end++;
-		}
-		else if (str_node->text[end] == ' ' && start - end)
-		{
-			*next_str = strjoin_and_free_both(*next_str, ft_substr(str_node->text, start, end - start));
+			*next_str = strjoin_and_free_both(*next_str, ft_substr(str, 0, len));
 			tmparr = *result;
 			*result = (char **)ptrarr_add_ptr((void **)*result, *next_str);
 			free(tmparr);
 			*next_str = ft_strdup("");
-			end++;
-			start = end;
+			str += len + 1;
+			len = 0;
 		}
 		else
-			end++;
+			len++;
 	}
-	if (start - end)
-	{
-		tmp = ft_substr(str_node->text, start, end - start);
-		*next_str = strjoin_and_free_both(*next_str, tmp);
-	}
+	if (len)
+		*next_str = strjoin_and_free_both(*next_str, ft_substr(str, 0, len));
 }
 
 /* 中間表現構造体を文字列配列にする. */
@@ -88,6 +81,7 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	char	**result;
 	char	*next_str;  // 次resultに追加される文字列
 	int		i;
+	char	**tmparr;
 
 	i = 0;
 	result = NULL;
@@ -95,20 +89,14 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	while (str_node[i])
 	{
 		if (str_node[i]->type != TOKTYPE_EXPANDABLE)
-		{
-			char *tmp = next_str;
-			next_str = ft_strjoin(next_str, str_node[i]->text);
-			free(tmp);
-		}
+			next_str = strjoin_and_free_first(next_str, str_node[i]->text);
 		else
 			cmd_str_expandable2str_arr(&result, &next_str, str_node[i]);
 		i++;
 	}
 	if (next_str && ft_strlen(next_str))
 	{
-		char	**tmparr;
 		tmparr = result;
-					printf("\t\tadd: |%s|\n", next_str);
 		result = (char **)ptrarr_add_ptr((void **)result, next_str);
 		free(tmparr);
 	}
