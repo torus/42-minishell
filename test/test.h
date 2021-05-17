@@ -5,11 +5,7 @@
 #include <unistd.h>
 
 #define CHECK(val) test_check((int64_t)val, #val)
-#define CHECK_EQ(actual, expected) \
-  do { \
-	test_check(actual == expected, #actual " == " #expected); \
-	printf("    %d == %d\n", actual, expected); \
-  } while(0);
+#define CHECK_EQ(actual, expected) test_check(actual == expected, #actual " == " #expected)
 #define CHECK_EQ_STR(actual, expected) \
   do { \
 	test_check(strcmp(actual, expected) == 0, #actual " == " #expected); \
