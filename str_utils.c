@@ -25,4 +25,3 @@ char	*strjoin_and_free_both(char *first, char *second)
 	free(second);
 	return (result);
 }
-
