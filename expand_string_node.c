@@ -49,25 +49,59 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 {
 	char	**result;
+	char	*next_str;  // 次resultに追加される文字列
 	int		i;
 
 	i = 0;
 	result = NULL;
+	next_str = ft_strdup("");
 	while (str_node[i])
 	{
-		int j = 0;
-		while (str_node[i]->text[j])
-		// EXPANDABLEのの最後の文字列の後に空白が無ければ次とくっつける
-			if (str_node[i]->type == TOKTYPE_EXPANDABLE)
+		if (str_node[i]->type != TOKTYPE_EXPANDABLE)
+		{
+			char *tmp = next_str;
+			next_str = ft_strjoin(next_str, str_node[i]->text);
+			free(tmp);
+		}
+		else
+		{
+			int start = 0;
+			int end = 0;
+			// EXPANDABLEのの最後の文字列の後に空白が無ければ次とくっつける
+			while (str_node[i]->text[end])
 			{
-				
-			}
-			else
-			{
+				if (str_node[i]->text[end] == ' ' && start - end == 0)
+				{
+					start++;
+					end++;
+				}
+				if ((str_node[i]->text[end] == ' ' && start - end > 0) || !str_node[i]->text[end])
+				{
+					char *tmp = next_str;
+					next_str = ft_strjoin(next_str, ft_substr(str_node[i]->text, start, end - start));
+					free(tmp);
 
+					char	**tmparr;
+					tmparr = result;
+					result = (char **)ptrarr_add_ptr((void **)result, next_str);
+					free(tmparr);
+					next_str = ft_strdup("");
+				}
+				else
+					end++;
 			}
+		}
 		i++;
 	}
+	if (next_str && ft_strlen(next_str))
+	{
+		char	**tmparr;
+		tmparr = result;
+		result = (char **)ptrarr_add_ptr((void **)result, next_str);
+		free(tmparr);
+	}
+	else
+		free(next_str);
 	return (result);
 }
 
