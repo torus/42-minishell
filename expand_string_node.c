@@ -1,7 +1,8 @@
 #include "minishell.h"
 #include "utils.h"
 
-static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr, char *text, t_token_type tok_type)
+static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr,
+	char *text, t_token_type tok_type)
 {
 	t_cmd_str_node	*new_node;
 	t_cmd_str_node	**tmp;
@@ -12,7 +13,8 @@ static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr, char *text, t_
 	new_node->text = text;
 	new_node->type = tok_type;
 	tmp = *str_node_arr;
-	*str_node_arr = (t_cmd_str_node **)ptrarr_add_ptr((void **)*str_node_arr, new_node);
+	*str_node_arr = (t_cmd_str_node **)ptrarr_add_ptr(
+			(void **)*str_node_arr, new_node);
 	free(tmp);
 	return (true);
 }
@@ -41,11 +43,11 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 	return ((t_cmd_str_node **)result);
 }
 
-static void	cmd_str_expandable2str_arr(char ***result, char **next_str, t_cmd_str_node *str_node)
+static void	cmd_str_expandable2str_arr(char ***result,
+	char **next_str, t_cmd_str_node *str_node)
 {
 	int		len;
 	char	*str;
-	char	**tmparr;
 
 	len = 0;
 	str = str_node->text;
@@ -56,9 +58,7 @@ static void	cmd_str_expandable2str_arr(char ***result, char **next_str, t_cmd_st
 		else if (str[len] == ' ' && len)
 		{
 			*next_str = strjoin_and_free_both(*next_str, ft_substr(str, 0, len));
-			tmparr = *result;
-			*result = (char **)ptrarr_add_ptr((void **)*result, *next_str);
-			free(tmparr);
+			*result = (char **)ptrarr_add_ptr_and_free((void **)*result, *next_str);
 			*next_str = ft_strdup("");
 			str += len + 1;
 			len = 0;
