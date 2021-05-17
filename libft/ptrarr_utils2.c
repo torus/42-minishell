@@ -22,3 +22,12 @@ void	**ptrarr_merge(void **ptrarr_first, void **ptrarr_last)
 		sizeof(void *) * last_len);
 	return (ptrarr_new);
 }
+
+void	**ptrarr_add_ptr_and_free(void **ptrarr, void *ptr)
+{
+	void **result;
+
+	result = ptrarr_add_ptr(ptrarr, ptr);
+	free(ptrarr);
+	return (result);
+}
