@@ -1,5 +1,5 @@
 #include "utils.h"
-#include "../libft/libft.h"
+#include "libft/libft.h"
 
 /*
  * first に second を繋げて, firstだけfreeする
