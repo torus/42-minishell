@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include "utils.h"
 
 typedef struct	s_cmd_str_node {
 	char					*text;
@@ -45,6 +46,42 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 	return ((t_cmd_str_node **)result);
 }
 
+static void	cmd_str_expandable2str_arr(char ***result, char **next_str, t_cmd_str_node *str_node)
+{
+	int		start;
+	int		end;
+	char	*tmp;
+	char	**tmparr;
+
+	start = 0;
+	end = 0;
+	while (str_node->text[end])
+	{
+		if (str_node->text[end] == ' ' && start - end == 0)
+		{
+			start++;
+			end++;
+		}
+		else if (str_node->text[end] == ' ' && start - end)
+		{
+			*next_str = strjoin_and_free_both(*next_str, ft_substr(str_node->text, start, end - start));
+			tmparr = *result;
+			*result = (char **)ptrarr_add_ptr((void **)*result, *next_str);
+			free(tmparr);
+			*next_str = ft_strdup("");
+			end++;
+			start = end;
+		}
+		else
+			end++;
+	}
+	if (start - end)
+	{
+		tmp = ft_substr(str_node->text, start, end - start);
+		*next_str = strjoin_and_free_both(*next_str, tmp);
+	}
+}
+
 /* 中間表現構造体を文字列配列にする. */
 static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 {
@@ -64,42 +101,7 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 			free(tmp);
 		}
 		else
-		{
-			int start = 0;
-			int end = 0;
-			// EXPANDABLEのの最後の文字列の後に空白が無ければ次とくっつける
-			while (str_node[i]->text[end])
-			{
-				if (str_node[i]->text[end] == ' ' && start - end == 0)
-				{
-					start++;
-					end++;
-				}
-				else if (str_node[i]->text[end] == ' ' && start - end)
-				{
-					char *tmp = next_str;
-					next_str = ft_strjoin(next_str, ft_substr(str_node[i]->text, start, end - start));
-					free(tmp);
-
-					char	**tmparr;
-					tmparr = result;
-					printf("\t\tadd: |%s|\n", next_str);
-					result = (char **)ptrarr_add_ptr((void **)result, next_str);
-					free(tmparr);
-					next_str = ft_strdup("");
-					end++;
-					start = end;
-				}
-				else
-					end++;
-			}
-			if (start - end)
-			{
-				char *tmp = next_str;
-				next_str = ft_strjoin(next_str, ft_substr(str_node[i]->text, start, end - start));
-				free(tmp);
-			}
-		}
+			cmd_str_expandable2str_arr(&result, &next_str, str_node[i]);
 		i++;
 	}
 	if (next_str && ft_strlen(next_str))
