@@ -55,12 +55,17 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	result = NULL;
 	while (str_node[i])
 	{
-		// 前の文字列の右端と今回の文字列左端に空白が無ければくっつける
 		int j = 0;
 		while (str_node[i]->text[j])
-		{
-			
-		}
+		// EXPANDABLEのの最後の文字列の後に空白が無ければ次とくっつける
+			if (str_node[i]->type == TOKTYPE_EXPANDABLE)
+			{
+				
+			}
+			else
+			{
+
+			}
 		i++;
 	}
 	return (result);
