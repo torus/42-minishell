@@ -57,8 +57,10 @@ static void	cmd_str_expandable2str_arr(char ***result,
 			str++;
 		else if (str[len] == ' ' && len)
 		{
-			*next_str = strjoin_and_free_both(*next_str, ft_substr(str, 0, len));
-			*result = (char **)ptrarr_add_ptr_and_free((void **)*result, *next_str);
+			*next_str = strjoin_and_free_both(*next_str,
+					ft_substr(str, 0, len));
+			*result = (char **)ptrarr_add_ptr_and_free((void **)*result,
+					*next_str);
 			*next_str = ft_strdup("");
 			str += len + 1;
 			len = 0;
@@ -74,7 +76,7 @@ static void	cmd_str_expandable2str_arr(char ***result,
 static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 {
 	char	**result;
-	char	*next_str;  // 次resultに追加される文字列
+	char	*next_str;
 	int		i;
 	char	**tmparr;
 
@@ -102,37 +104,12 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 
 char	**expand_string_node(t_parse_node_string *string_node)
 {
-	// string_nodeを中間表現構造体(テキストとタイプを持つ)の配列に変換する.
-	t_cmd_str_node **cmd_str = ast_str2cmd_str(string_node);
+	t_cmd_str_node	**cmd_str;
+	int				i;
+	char			**result;
 
-	int i = 0;
-	printf("cmd_str:\n");
-	while (cmd_str[i])
-	{
-		printf("%d:\n", i);
-		printf("\t|%s|\n", cmd_str[i]->text);
-		if (cmd_str[i]->type == TOKTYPE_EXPANDABLE)
-			printf("\tTOKTYPE_EXPANDABLE\n");
-		else if (cmd_str[i]->type == TOKTYPE_EXPANDABLE_QUOTED)
-			printf("\tTOKTYPE_EXPANDABLE_QUOTED\n");
-		else if (cmd_str[i]->type == TOKTYPE_NON_EXPANDABLE)
-			printf("\tTOKTYPE_NON_EXPANDABLE\n");
-		else
-			printf("\tUNKNOWN: %d\n", cmd_str[i]->type);
-		i++;
-	}
-
-	// 中間表現構造体を文字列配列にする.
-	char	**result = cmd_str2str_arr(cmd_str);
-
-	i = 0;
-	printf("result:\n");
-	while (result && result[i])
-	{
-		printf("result[%d]: |%s|\n", i, result[i]);
-		i++;
-	}
-
+	cmd_str = ast_str2cmd_str(string_node);
+	result = cmd_str2str_arr(cmd_str);
 	i = 0;
 	while (cmd_str[i])
 	{
