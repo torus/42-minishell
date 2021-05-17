@@ -1,11 +1,6 @@
 #include "minishell.h"
 #include "utils.h"
 
-typedef struct	s_cmd_str_node {
-	char					*text;
-	t_token_type			type;
-}				t_cmd_str_node;
-
 static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr, char *text, t_token_type tok_type)
 {
 	t_cmd_str_node	*new_node;
