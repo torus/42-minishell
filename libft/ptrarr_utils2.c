@@ -25,7 +25,7 @@ void	**ptrarr_merge(void **ptrarr_first, void **ptrarr_last)
 
 void	**ptrarr_add_ptr_and_free(void **ptrarr, void *ptr)
 {
-	void **result;
+	void	**result;
 
 	result = ptrarr_add_ptr(ptrarr, ptr);
 	free(ptrarr);
