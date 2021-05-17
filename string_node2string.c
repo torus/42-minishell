@@ -1,17 +1,5 @@
 #include "minishell.h"
-
-/*
- * first に second を繋げて, firstだけfreeする
- */
-static char	*strjoin_and_free_first(char *first, char *second)
-{
-	char	*tmp;
-
-	tmp = first;
-	first = ft_strjoin(first, second);
-	free(tmp);
-	return (first);
-}
+#include "utils.h"
 
 /* string_nodeを文字列に戻す
  *うまくいけばASTの時点でこの文字列になるように依頼する
