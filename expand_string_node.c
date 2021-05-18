@@ -16,6 +16,8 @@ static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr,
 	*str_node_arr = (t_cmd_str_node **)ptrarr_add_ptr(
 			(void **)*str_node_arr, new_node);
 	free(tmp);
+	if (!*str_node_arr)
+		return (false);
 	return (true);
 }
 
@@ -33,7 +35,8 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 			expanded_str = ft_strdup(str_node->text);
 		else
 			expanded_str = expand_env_var(str_node->text);
-		if (!cmd_str_node_add_back(&result, expanded_str, str_node->type))
+		if (!expanded_str
+			|| !cmd_str_node_add_back(&result, expanded_str, str_node->type))
 			return (NULL);
 		if (str_node->next)
 			str_node = str_node->next->content.string;
