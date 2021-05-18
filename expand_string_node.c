@@ -46,9 +46,18 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 	return ((t_cmd_str_node **)result);
 }
 
-/* TOKTYPE_EXPANDABLEを処理する */
-static bool	cmd_str_expandable2str_arr(char ***result,
-	char **next_str, char *text)
+/* TOKTYPE_EXPANDABLEを処理する
+ *
+ * 渡された next_str を更新する際はは内部でfreeする.
+ *
+ * result: 文字列配列変数へのポインタ
+ * next_str: 次resultに追加される文字列を指すポインタ
+ * text: str_node->text
+ *
+ * Return: 更新された next_str
+ */
+static char	*cmd_str_expandable2str_arr(char ***result,
+	char *next_str, char *text)
 {
 	int		len;
 
@@ -59,12 +68,12 @@ static bool	cmd_str_expandable2str_arr(char ***result,
 			text++;
 		else if (text[len] == ' ' && len)
 		{
-			*next_str = strjoin_and_free_both(*next_str,
+			next_str = strjoin_and_free_both(next_str,
 					ft_substr(text, 0, len));
 			*result = (char **)ptrarr_add_ptr_and_free((void **)*result,
-					*next_str);
-			*next_str = ft_strdup("");
-			if (!*result || !*next_str)
+					next_str);
+			next_str = ft_strdup("");
+			if (!*result || !next_str)
 				return (false);
 			text += len + 1;
 			len = 0;
@@ -73,8 +82,8 @@ static bool	cmd_str_expandable2str_arr(char ***result,
 			len++;
 	}
 	if (len)
-		*next_str = strjoin_and_free_both(*next_str, ft_substr(text, 0, len));
-	return (!!*next_str);
+		next_str = strjoin_and_free_both(next_str, ft_substr(text, 0, len));
+	return (next_str);
 }
 
 /* 中間表現構造体を文字列配列にする. */
