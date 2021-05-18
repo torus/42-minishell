@@ -274,8 +274,6 @@ int main()
 		setenv("ABC", "abc def", 1);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hoge\"'$ABC' \n");
-		// "hogeabc def\"hoge hoge\"$ABC"
-		// ["hoge abc def ", "hoge hoge", "$ABC"]-> ["hoge", "abc", "def", "hoge hoge$ABC"]
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
