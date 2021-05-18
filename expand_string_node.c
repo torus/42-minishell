@@ -47,32 +47,30 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 }
 
 static void	cmd_str_expandable2str_arr(char ***result,
-	char **next_str, t_cmd_str_node *str_node)
+	char **next_str, char *text)
 {
 	int		len;
-	char	*str;
 
 	len = 0;
-	str = str_node->text;
-	while (str[len])
+	while (text[len])
 	{
-		if (str[len] == ' ' && len == 0)
-			str++;
-		else if (str[len] == ' ' && len)
+		if (text[len] == ' ' && len == 0)
+			text++;
+		else if (text[len] == ' ' && len)
 		{
 			*next_str = strjoin_and_free_both(*next_str,
-					ft_substr(str, 0, len));
+					ft_substr(text, 0, len));
 			*result = (char **)ptrarr_add_ptr_and_free((void **)*result,
 					*next_str);
 			*next_str = ft_strdup("");
-			str += len + 1;
+			text += len + 1;
 			len = 0;
 		}
 		else
 			len++;
 	}
 	if (len)
-		*next_str = strjoin_and_free_both(*next_str, ft_substr(str, 0, len));
+		*next_str = strjoin_and_free_both(*next_str, ft_substr(text, 0, len));
 }
 
 /* 中間表現構造体を文字列配列にする. */
@@ -91,7 +89,7 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 		if (str_node[i]->type != TOKTYPE_EXPANDABLE)
 			next_str = strjoin_and_free_first(next_str, str_node[i]->text);
 		else
-			cmd_str_expandable2str_arr(&result, &next_str, str_node[i]);
+			cmd_str_expandable2str_arr(&result, &next_str, str_node[i]->text);
 		i++;
 	}
 	if (next_str && ft_strlen(next_str))
