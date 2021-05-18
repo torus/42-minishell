@@ -13,6 +13,7 @@
 
 # define PROMPT "minish > "
 
+// AST から exec_and_args に変換する時に使う構造体
 typedef struct s_cmd_str_node {
 	char					*text;
 	t_token_type			type;
