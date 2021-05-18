@@ -56,7 +56,7 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
  *
  * Return: 更新された next_str
  */
-static char	*cmd_str_expandable2strarr(char ***result,
+static char	*expandable_node2strarr(char ***result,
 	char *next_str, char *text)
 {
 	int		len;
@@ -96,19 +96,17 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	i = 0;
 	result = NULL;
 	next_str = ft_strdup("");
-	while (str_node[i])
+	while (str_node[i] && next_str)
 	{
 		if (str_node[i]->type != TOKTYPE_EXPANDABLE)
 			next_str = strjoin_and_free_first(next_str, str_node[i]->text);
 		else
-			next_str = cmd_str_expandable2strarr(&result, next_str, str_node[i]->text);
-		if (!next_str)
-		{
-			free_ptrarr((void **)result);
-			return (NULL);
-		}
+			next_str = expandable_node2strarr(&result, next_str,
+					str_node[i]->text);
 		i++;
 	}
+	if (!next_str)
+		free_ptrarr_and_assign_null((void ***)&result);
 	if (next_str && ft_strlen(next_str))
 		result = (char **)ptrarr_add_ptr_and_free((void **)result, next_str);
 	else
