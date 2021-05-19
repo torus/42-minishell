@@ -10,34 +10,47 @@
 
 #include "rope.h"
 
-static struct termios		save_termios;
-static int					ttysavefd = -1;
-static enum { RESET, RAW, CBREAK }	ttystate = RESET;
+typedef struct s_terminal_state
+{
+	struct termios		save_termios;
+	enum
+	{
+		TTY_RESET,
+		TTY_CBREAK
+	}					ttystate;
+}	t_terminal_state;
+
+t_terminal_state	g_term_stat;
+
+void	terminal_state_init(t_terminal_state *st)
+{
+	st->ttystate = TTY_RESET;
+}
 
 #include <term.h>
 
 int	edit_putc(int ch)
 {
-    write(1, &ch, 1);
-    return (1);
+	write(1, &ch, 1);
+	return (1);
 }
 
 int	tty_reset(int fd)		/* restore terminal's mode */
 {
-    char	areabuf[32];
-    char	*area;
-    char	*c_exit_insert_mode;
+	char	areabuf[32];
+	char	*area;
+	char	*c_exit_insert_mode;
 
-    area = areabuf;
+	area = areabuf;
 	c_exit_insert_mode = tgetstr("ei", &area);
 
-	if (ttystate == RESET)
+	if (g_term_stat.ttystate == TTY_RESET)
 		return(0);
-	if (tcsetattr(fd, TCSAFLUSH, &save_termios) < 0)
+	if (tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios) < 0)
 		return(-1);
-	ttystate = RESET;
+	g_term_stat.ttystate = TTY_RESET;
 
-    tputs(c_exit_insert_mode, 1, edit_putc);
+	tputs(c_exit_insert_mode, 1, edit_putc);
 
 	return(0);
 }
@@ -89,13 +102,13 @@ int	tty_cbreak(int fd)
 	int				err;
 	struct termios	buf;
 
-	if (ttystate != RESET) {
+	if (g_term_stat.ttystate != TTY_RESET) {
 		errno = EINVAL;
 		return(-1);
 	}
 	if (tcgetattr(fd, &buf) < 0)
 		return(-1);
-	save_termios = buf;	/* structure copy */
+	g_term_stat.save_termios = buf;	/* structure copy */
 
 	buf.c_lflag &= ~(ECHO | ICANON);
 
@@ -106,19 +119,18 @@ int	tty_cbreak(int fd)
 
 	if (tcgetattr(fd, &buf) < 0) {
 		err = errno;
-		tcsetattr(fd, TCSAFLUSH, &save_termios);
+		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
 		errno = err;
 		return(-1);
 	}
 	if ((buf.c_lflag & (ECHO | ICANON)) || buf.c_cc[VMIN] != 1 ||
 	  buf.c_cc[VTIME] != 0) {
-		tcsetattr(fd, TCSAFLUSH, &save_termios);
+		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
 		errno = EINVAL;
 		return(-1);
 	}
 
-	ttystate = CBREAK;
-	ttysavefd = fd;
+	g_term_stat.ttystate = TTY_CBREAK;
 	return(0);
 }
 
@@ -126,7 +138,7 @@ int	tty_cbreak(int fd)
 
 typedef struct	s_command_history
 {
-    t_rope	*ropes[LINE_BUFFER_SIZE];
+	t_rope	*ropes[LINE_BUFFER_SIZE];
 	int		begin;
 	int		end;
 	int		current;
@@ -334,23 +346,8 @@ void	term_controls_init(t_term_controls *t)
 	t->c_exit_insert_mode = tgetstr("ei", &area);
 }
 
-int	main(void)
+int	setup_terminal(void)
 {
-	int		i;
-	unsigned char	c;
-	char	cbuf[2];
-
-	cbuf[1] = '\0';
-
-	t_command_history	his;
-	t_command_history	*history = &his;
-	init_history(history);
-
-/*
- * isatty, ttyname, ttyslot, ioctl, getenv, tcsetattr, tcgetattr,
- * tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
- */
-
 	const char	*term = getenv("TERM");
 	if (!term)
 		err_sys("getenv(TERM) error");
@@ -366,49 +363,49 @@ int	main(void)
 
 	if (tty_cbreak(STDIN_FILENO) < 0)
 		err_sys("tty_cbreak error");
-	printf("\nEnter cbreak mode characters, terminate with SIGINT\n");
+	return (1);
+}
 
-	t_command_state	state;
-	t_command_state	*st = &state;
+/*
+ * isatty, ttyname, ttyslot, ioctl, getenv, tcsetattr, tcgetattr,
+ * tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
+ */
 
-	st->cursor_x = 0;
-	st->length = 0;
+int	main_loop(t_command_history *history, t_command_state *state)
+{
+	char				cbuf[2];
 
-	term_controls_init(&st->cnt);
-
-	tputs(st->cnt.c_enter_insert_mode, 1, edit_putc);
-
+	cbuf[1] = '\0';
 	while (1) {
-		i = read(STDIN_FILENO, cbuf, 1);
-
-		if (i != 1)
+		if (read(STDIN_FILENO, cbuf, 1) != 1)
 			break ;
-
-		c = cbuf[0];
-
-		if (c >= 0x20 && c < 0x7f)
+		if (cbuf[0] >= 0x20 && cbuf[0] < 0x7f)
+			edit_normal_character(history, state, cbuf);
+		else if (cbuf[0] == '\n')
+			edit_enter(history, state);
+		else if (cbuf[0] == 0x1b)
 		{
-			edit_normal_character(history, st, cbuf);
+			if (read(STDIN_FILENO, cbuf, 1) == 1 && cbuf[0] == '[')
+				handle_escape_sequence (history, state);
 		}
-		else if (c == '\n')
-			edit_enter(history, st);
-		else if (c == 0x1b)
-		{
-			i = read(STDIN_FILENO, cbuf, 1);
-			c = cbuf[0];
-			if (c == '[')
-				handle_escape_sequence (history, st);
-		}
-		else
-		{
-			printf("\\x%02x", c);
-		}
-		fflush(stdout);
 	}
+	return (1);
+}
+
+int	main(void)
+{
+	t_command_history	history;
+	t_command_state		state;
+
+	terminal_state_init(&g_term_stat);
+	init_history(&history);
+	setup_terminal();
+	state.cursor_x = 0;
+	state.length = 0;
+	term_controls_init(&state.cnt);
+	tputs(state.cnt.c_enter_insert_mode, 1, edit_putc);
+	main_loop(&history, &state);
 	if (tty_reset(STDIN_FILENO) < 0)
 		err_sys("tty_reset error");
-	if (i <= 0)
-		err_sys("read error");
-
 	exit(0);
 }
