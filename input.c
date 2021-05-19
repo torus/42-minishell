@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <term.h>
+#include <string.h>
 
 #include "libft/libft.h"
 #include "rope.h"
@@ -59,8 +60,43 @@ static void	sig_catch(int signo)
 
 void	error_exit(const char *message)
 {
+	char	*error_message;
+
 	write(STDERR_FILENO, message, ft_strlen(message));
+	write(STDERR_FILENO, "\n", 1);
+	if (errno)
+	{
+		error_message = strerror(errno);
+		write(STDERR_FILENO, error_message, ft_strlen(error_message));
+		write(STDERR_FILENO, "\n", 1);
+	}
 	exit (1);
+}
+
+int	tty_set_attributes(int fd, struct termios *buf)
+{
+	int	err;
+
+	buf->c_lflag &= ~(ECHO | ICANON);
+	buf->c_cc[VMIN] = 1;
+	buf->c_cc[VTIME] = 0;
+	if (tcsetattr(fd, TCSAFLUSH, buf) < 0)
+		return (-1);
+	if (tcgetattr(fd, buf) < 0)
+	{
+		err = errno;
+		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
+		errno = err;
+		return (-1);
+	}
+	if ((buf->c_lflag & (ECHO | ICANON)) || buf->c_cc[VMIN] != 1 ||
+		buf->c_cc[VTIME] != 0)
+	{
+		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
+		errno = EINVAL;
+		return (-1);
+	}
+	return (0);
 }
 
 int	tty_cbreak(int fd)
@@ -70,34 +106,16 @@ int	tty_cbreak(int fd)
 
 	if (g_term_stat.ttystate != TTY_RESET) {
 		errno = EINVAL;
-		return(-1);
+		return (-1);
 	}
 	if (tcgetattr(fd, &buf) < 0)
-		return(-1);
-	g_term_stat.save_termios = buf;	/* structure copy */
-
-	buf.c_lflag &= ~(ECHO | ICANON);
-
-	buf.c_cc[VMIN] = 1;
-	buf.c_cc[VTIME] = 0;
-	if (tcsetattr(fd, TCSAFLUSH, &buf) < 0)
-		return(-1);
-
-	if (tcgetattr(fd, &buf) < 0) {
-		err = errno;
-		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
-		errno = err;
-		return(-1);
-	}
-	if ((buf.c_lflag & (ECHO | ICANON)) || buf.c_cc[VMIN] != 1 ||
-	  buf.c_cc[VTIME] != 0) {
-		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
-		errno = EINVAL;
-		return(-1);
-	}
-
+		return (-1);
+	g_term_stat.save_termios = buf;
+	err = tty_set_attributes(fd, &buf);
+	if (err)
+		return (err);
 	g_term_stat.ttystate = TTY_CBREAK;
-	return(0);
+	return (0);
 }
 
 #define LINE_BUFFER_SIZE 8
@@ -333,8 +351,14 @@ int	setup_terminal(void)
 }
 
 /*
- * isatty, ttyname, ttyslot, ioctl, getenv, tcsetattr, tcgetattr,
- * tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
+ * Allowed functions:
+ *
+ * printf, malloc, free, write, open, read, close, fork, wait,
+ * waitpid, wait3, wait4, signal, kill, exit, getcwd, chdir, stat,
+ * lstat, fstat, execve, dup, dup2, pipe, opendir, readdir, closedir,
+ * strerror, errno, isatty, ttyname, ttyslot, ioctl, getenv,
+ * tcsetattr, tcgetattr, tgetent, tgetflag, tgetnum, tgetstr, tgoto,
+ * tputs
  */
 
 int	main_loop(t_command_history *history, t_command_state *state)
