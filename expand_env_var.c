@@ -1,3 +1,4 @@
+#include "env.h"
 #include "minishell.h"
 
 /*

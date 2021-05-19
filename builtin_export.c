@@ -1,4 +1,9 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdbool.h>
 #include "builtin.h"
+#include "env.h"
+#include "libft/libft.h"
 
 static int	print_envs_with_declaration(void)
 {

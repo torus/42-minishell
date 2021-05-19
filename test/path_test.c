@@ -1,5 +1,6 @@
 #include "test.h"
 #include "../execution.h"
+#include "../path.h"
 
 int main(){
 	TEST_SECTION("path_join() 最後スラッシュ無し");

@@ -1,5 +1,6 @@
 #include "builtin.h"
 #include "minishell.h"
+#include "env.h"
 
 /*
  * unset に渡すキーとして正しいか?

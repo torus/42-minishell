@@ -1,5 +1,6 @@
 #include "test.h"
 #include "../env.h"
+#include "../libft/libft.h"
 
 int main(){
 	extern char **environ;

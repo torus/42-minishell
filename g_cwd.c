@@ -1,7 +1,8 @@
+#include <errno.h>
+#include <string.h>
 #include "path.h"
 #include "env.h"
 #include "minishell.h"
-#include <string.h>
 
 char	*g_cwd;
 

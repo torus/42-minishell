@@ -2,16 +2,7 @@
 # define EXECUTION_H
 
 # include <unistd.h>
-# include <stdio.h>
-# include <sys/types.h>
-# include <sys/wait.h>
-# include <sys/stat.h>
-# include <fcntl.h>
-# include <signal.h>
-# include <dirent.h>
-# include <stdbool.h>
 # include "libft/libft.h"
-# include "path.h"
 
 typedef struct s_cmd_redirection
 {
