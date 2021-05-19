@@ -68,11 +68,8 @@ static char	*expandable_node2strarr(char ***result,
 			text++;
 		else if (text[len] == ' ' && len)
 		{
-			if (next_str)
-				next_str = strjoin_and_free_both(next_str,
-						ft_substr(text, 0, len));
-			else
-				next_str = ft_substr(text, 0, len);
+			next_str = strjoin_nullable_and_free_both(
+				next_str, ft_substr(text, 0, len));
 			*result = (char **)ptrarr_add_ptr_and_free((void **)*result,
 					next_str);
 			next_str = NULL;
@@ -85,12 +82,8 @@ static char	*expandable_node2strarr(char ***result,
 			len++;
 	}
 	if (len)
-	{
-		if (next_str)
-			next_str = strjoin_and_free_both(next_str, ft_substr(text, 0, len));
-		else
-			next_str = ft_substr(text, 0, len);
-	}
+		next_str = strjoin_nullable_and_free_both(
+			next_str, ft_substr(text, 0, len));
 	return (next_str);
 }
 

@@ -25,3 +25,16 @@ char	*strjoin_and_free_both(char *first, char *second)
 	free(second);
 	return (result);
 }
+
+char	*strjoin_nullable_and_free_both(char *str_nullable, char *second)
+{
+	char *result;
+
+	if (str_nullable)
+		result = ft_strjoin(str_nullable, second);
+	else
+		result = ft_strdup(second);
+	free(str_nullable);
+	free(second);
+	return (result);
+}
