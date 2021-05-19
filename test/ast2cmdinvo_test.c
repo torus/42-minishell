@@ -2,6 +2,7 @@
 #include "../parse.h"
 #include "../execution.h"
 #include "../minishell.h"
+#include "../env.h"
 
 void	init_buf_with_string(t_parse_buffer *buf, const char* str)
 {
