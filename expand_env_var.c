@@ -110,6 +110,9 @@ static bool	join_str_or_env(char **result,
  * ex:
  *   in($ABC=" abc def "):  |"$ABC"'\'$ABC'|
  *   out:                   |" abc def "'\'$ABC'|
+ * ex:
+ *   in($ABC="hoge"):       |'$''$'"ABC"'\'"$ABC""$ABC"|
+ *   out:                   |'$''$'"ABC"'\'"hoge""hoge"|
  */
 char	*expand_env_var(char *str)
 {

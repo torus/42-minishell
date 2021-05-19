@@ -13,6 +13,12 @@
 
 # define PROMPT "minish > "
 
+// AST から exec_and_args に変換する時に使う構造体
+typedef struct s_cmd_str_node {
+	char					*text;
+	t_token_type			type;
+}				t_cmd_str_node;
+
 // AST to command_invocation
 t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds);
 t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node);
