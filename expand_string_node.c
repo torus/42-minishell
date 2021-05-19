@@ -51,12 +51,13 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
  * 渡された next_str を更新する際はは内部でfreeする.
  *
  * result: 文字列配列変数へのポインタ
+ *   (Normのためにvoidポインタになってる)
  * next_str: 次resultに追加される文字列を指すポインタ
  * text: str_node->text
  *
  * Return: 更新された next_str
  */
-static char	*expandable_node2strarr(char ***result,
+static char	*expandable_node2strarr(void ***result,
 	char *next_str, char *text)
 {
 	int		len;
@@ -70,8 +71,7 @@ static char	*expandable_node2strarr(char ***result,
 		{
 			next_str = strjoin_nullable_and_free_both(
 					next_str, ft_substr(text, 0, len));
-			*result = (char **)ptrarr_add_ptr_and_free((void **)*result,
-					next_str);
+			*result = ptrarr_add_ptr_and_free(*result, next_str);
 			next_str = NULL;
 			if (!*result)
 				return (NULL);
@@ -90,7 +90,7 @@ static char	*expandable_node2strarr(char ***result,
 /* 中間表現構造体を文字列配列にする. */
 static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 {
-	char	**result;
+	void	**result;
 	char	*next_str;
 	int		i;
 
@@ -112,8 +112,8 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 		i++;
 	}
 	if (next_str)
-		result = (char **)ptrarr_add_ptr_and_free((void **)result, next_str);
-	return (result);
+		result = ptrarr_add_ptr_and_free(result, next_str);
+	return ((char **)result);
 }
 
 /* t_parse_node_string を文字列配列に変換して返す */
