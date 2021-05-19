@@ -11,7 +11,7 @@ SRCS = 	../env.c ../env_setter.c ../path.c ../g_cwd.c												\
 		../builtin.c ../builtin_echo.c ../builtin_env.c												\
 		../builtin_cd.c ../builtin_cd_path.c ../builtin_cd_chdir.c ../builtin_cd_cdpath.c			\
 		../builtin_exit.c ../builtin_export.c ../builtin_pwd.c ../builtin_unset.c					\
-		../str_utils.c
+		../str_utils.c ../shell_initialization.c
 HEADERS = ../env.h \
 		  ../parse.h \
 		  ../execution.h \
