@@ -1,15 +1,9 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdlib.h>
-# include <unistd.h>
-# include <stdio.h>
+# include <signal.h>
 # include "execution.h"
-# include "env.h"
-# include "path.h"
-# include "lexer.h"
 # include "parse.h"
-# include "builtin.h"
 
 # define PROMPT "minish > "
 
