@@ -216,23 +216,34 @@ void	edit_insert_character(
 	}
 }
 
+typedef struct s_term_controls
+{
+	char	areabuf[32];
+	char	*c_cursor_left;
+	char	*c_cursor_right;
+	char	*c_clr_bol;
+	char	*c_enter_insert_mode;
+	char	*c_exit_insert_mode;
+}	t_term_controls;
+
 typedef struct	s_command_state
 {
-	int	cursor_x;
-	int	length;
+	int				cursor_x;
+	int				length;
+	t_term_controls	cnt;
 }	t_command_state;
 
 void	edit_normal_character(
-    t_command_history *history, t_command_state *st,
-    char *cbuf)
+	t_command_history *history, t_command_state *st,
+	char *cbuf)
 {
-    edit_putc(cbuf[0]);
-    if (!history->ropes[history->current])
-        add_new_rope(history, cbuf);
-    else
-        edit_insert_character(history, cbuf, st->cursor_x, st->length);
-    st->cursor_x++;
-    st->length++;
+	edit_putc(cbuf[0]);
+	if (!history->ropes[history->current])
+		add_new_rope(history, cbuf);
+	else
+		edit_insert_character(history, cbuf, st->cursor_x, st->length);
+	st->cursor_x++;
+	st->length++;
 }
 
 void	edit_enter(t_command_history *history, t_command_state *st)
@@ -244,13 +255,92 @@ void	edit_enter(t_command_history *history, t_command_state *st)
 	edit_putc('\n');
 }
 
+void	handle_escape_sequence (t_command_history *history, t_command_state *st)
+{
+	int	i;
+	char	c;
+	char	cbuf[2];
+
+	i = read(STDIN_FILENO, cbuf, 1);
+	if (i != 1)
+		return ;
+	c = cbuf[0];
+	if (c == 'D')
+	{
+		tputs(st->cnt.c_cursor_left, 1, edit_putc);
+		st->cursor_x--;
+		if (st->cursor_x < 0)
+			st->cursor_x = 0;
+	}
+	else if (c == 'C')
+	{
+		if (st->cursor_x < st->length)
+		{
+			tputs(st->cnt.c_cursor_right, 1, edit_putc);
+			st->cursor_x++;
+		}
+	}
+	else if (c == 'B')
+	{
+		/* DOWN */
+		if (history->current != history->end)
+		{
+			history->current = (history->current + 1) % LINE_BUFFER_SIZE;
+			tputs(st->cnt.c_clr_bol, 1, edit_putc);
+			edit_putc('\r');
+			st->cursor_x = print_history(history, history->current);
+			st->length = st->cursor_x;
+		}
+	}
+	else if (c == 'A')
+	{
+		/* UP */
+		if (history->current != history->begin)
+		{
+			history->current = (LINE_BUFFER_SIZE + history->current - 1) % LINE_BUFFER_SIZE;
+			tputs(st->cnt.c_clr_bol, 1, edit_putc);
+			edit_putc('\r');
+			st->cursor_x = print_history(history, history->current);
+			st->length = st->cursor_x;
+		}
+	}
+	else if (c == '1')
+	{
+		/* F5 */
+		i = read(STDIN_FILENO, cbuf, 1);
+		if (cbuf[0] == '5')
+		{
+			i = read(STDIN_FILENO, cbuf, 1);
+			if (cbuf[0] == '~')
+			{
+				dump_history(history);
+			}
+		}
+	}
+	else
+		/* printf("\\x%02x", c); */
+		edit_putc(c);
+}
+
+void	term_controls_init(t_term_controls *t)
+{
+	char	*area;
+
+	area = t->areabuf;
+	t->c_cursor_left = tgetstr("le", &area);
+	t->c_cursor_right = tgetstr("nd", &area);
+	t->c_clr_bol = tgetstr("cb", &area);
+	t->c_enter_insert_mode = tgetstr("im", &area);
+	t->c_exit_insert_mode = tgetstr("ei", &area);
+}
+
 int	main(void)
 {
 	int		i;
-    unsigned char	c;
-    char	cbuf[2];
+	unsigned char	c;
+	char	cbuf[2];
 
-    cbuf[1] = '\0';
+	cbuf[1] = '\0';
 
 	t_command_history	his;
 	t_command_history	*history = &his;
@@ -261,20 +351,11 @@ int	main(void)
  * tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
  */
 
-    const char	*term = getenv("TERM");
-    if (!term)
+	const char	*term = getenv("TERM");
+	if (!term)
 		err_sys("getenv(TERM) error");
-    fprintf(stderr, "TERM = '%s'\n", term);
-    tgetent(NULL, term);
-
-    char	areabuf[32];
-    char	*area;
-
-    area = areabuf;
-    char	*c_left = tgetstr("le", &area);
-    char	*c_right = tgetstr("nd", &area);
-    char	*c_clear = tgetstr("cb", &area);
-    char	*c_insert_mode = tgetstr("im", &area);
+	fprintf(stderr, "TERM = '%s'\n", term);
+	tgetent(NULL, term);
 
 	if (signal(SIGINT, sig_catch) == SIG_ERR)	/* catch signals */
 		err_sys("signal(SIGINT) error");
@@ -293,7 +374,9 @@ int	main(void)
 	st->cursor_x = 0;
 	st->length = 0;
 
-    tputs(c_insert_mode, 1, edit_putc);
+	term_controls_init(&st->cnt);
+
+	tputs(st->cnt.c_enter_insert_mode, 1, edit_putc);
 
 	while (1) {
 		i = read(STDIN_FILENO, cbuf, 1);
@@ -301,86 +384,26 @@ int	main(void)
 		if (i != 1)
 			break ;
 
-        c = cbuf[0];
+		c = cbuf[0];
 
-        if (c >= 0x20 && c < 0x7f)
-        {
-            edit_normal_character(history, st, cbuf);
-        }
-        else if (c == '\n')
-            edit_enter(history, st);
-        else if (c == 0x1b)
-        {
-            i = read(STDIN_FILENO, cbuf, 1);
-			c = cbuf[0];
-            if (c == '[')
-            {
-                i = read(STDIN_FILENO, cbuf, 1);
-				if (i != 1)
-					break ;
-                c = cbuf[0];
-                if (c == 'D')
-				{
-                    tputs(c_left, 1, edit_putc);
-					st->cursor_x--;
-					if (st->cursor_x < 0)
-						st->cursor_x = 0;
-				}
-                else if (c == 'C')
-				{
-					if (st->cursor_x < st->length)
-					{
-						tputs(c_right, 1, edit_putc);
-						st->cursor_x++;
-					}
-				}
-                else if (c == 'B')
-				{
-					/* DOWN */
-					if (history->current != history->end)
-					{
-						history->current = (history->current + 1) % LINE_BUFFER_SIZE;
-						tputs(c_clear, 1, edit_putc);
-						edit_putc('\r');
-						st->cursor_x = print_history(history, history->current);
-						st->length = st->cursor_x;
-					}
-				}
-                else if (c == 'A')
-				{
-					/* UP */
-					if (history->current != history->begin)
-					{
-						history->current = (LINE_BUFFER_SIZE + history->current - 1) % LINE_BUFFER_SIZE;
-						tputs(c_clear, 1, edit_putc);
-						edit_putc('\r');
-						st->cursor_x = print_history(history, history->current);
-						st->length = st->cursor_x;
-					}
-				}
-                else if (c == '1')
-                {
-					/* F5 */
-                    i = read(STDIN_FILENO, cbuf, 1);
-                    if (cbuf[0] == '5')
-                    {
-                        i = read(STDIN_FILENO, cbuf, 1);
-                        if (cbuf[0] == '~')
-                        {
-							dump_history(history);
-                        }
-                    }
-                }
-                else
-                    /* printf("\\x%02x", c); */
-                    edit_putc(c);
-            }
-        }
-        else
+		if (c >= 0x20 && c < 0x7f)
 		{
-            printf("\\x%02x", c);
+			edit_normal_character(history, st, cbuf);
 		}
-        fflush(stdout);
+		else if (c == '\n')
+			edit_enter(history, st);
+		else if (c == 0x1b)
+		{
+			i = read(STDIN_FILENO, cbuf, 1);
+			c = cbuf[0];
+			if (c == '[')
+				handle_escape_sequence (history, st);
+		}
+		else
+		{
+			printf("\\x%02x", c);
+		}
+		fflush(stdout);
 	}
 	if (tty_reset(STDIN_FILENO) < 0)
 		err_sys("tty_reset error");
