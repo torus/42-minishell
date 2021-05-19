@@ -28,7 +28,7 @@ char	*strjoin_and_free_both(char *first, char *second)
 
 /*
  * str_nullable がtruthyだったら, strjoin(str_nullable, second) を返し,
- * そうでない場合 ft_strdup(second) を返す.
+ * そうでない場合 strdup(second) を返す.
  */
 char	*strjoin_nullable_and_free_both(char *str_nullable, char *second)
 {
