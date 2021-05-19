@@ -12,7 +12,8 @@ static void	init_pwd(void)
 	if (!pwd)
 	{
 		tmp = getcwd(NULL, 0);
-		ft_setenv("PWD", tmp, 1);
+		if (tmp)
+			ft_setenv("PWD", tmp, 1);
 		free(tmp);
 	}
 	free(pwd);
@@ -36,7 +37,8 @@ static void	init_shlvl(void)
 	else
 		num = 1;
 	num_str = ft_itoa(num);
-	ft_setenv("SHLVL", num_str, 1);
+	if (num_str)
+		ft_setenv("SHLVL", num_str, 1);
 	free(num_str);
 	free(shlvl);
 }
