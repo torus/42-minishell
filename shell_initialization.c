@@ -45,9 +45,7 @@ static void	init_shlvl(void)
 int	initialize_shell(void)
 {
 	set_shell_sighandlers();
-	// PWD
 	init_pwd();
-	// SHLVL
 	init_shlvl();
 	return (0);
 }
