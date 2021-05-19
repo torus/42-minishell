@@ -236,7 +236,6 @@ int main()
 		unsetenv("ABC");
 	}
 
-	// TODO: これでargs_nodeのコマンド引数展開がうまくいけそうならこの処理はparser側でやってもらう
 	TEST_SECTION("string_node2string()");
 	{
 		/* 準備 */
@@ -280,18 +279,22 @@ int main()
 		lex_get_token(&buf, &tok);
 
 		t_parse_ast *node = parse_command(&buf, &tok);
-        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->type, ASTNODE_COMMAND);
 		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
 		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
 		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+
 		args_node = args_node->rest_node->content.arguments;
+
 		t_parse_node_string *string_node = args_node->string_node->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
 		CHECK_EQ_STR(string_node->text, "hoge$ABC");
+
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
 		CHECK_EQ_STR(string_node->text, "hoge hoge");
+
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
 		CHECK_EQ_STR(string_node->text, "$ABC");
@@ -303,6 +306,61 @@ int main()
 		free(tmp);
 		tmp = expected;
 		expected = (char **)ptrarr_add_ptr((void **)expected, ft_strdup("defhoge hoge$ABC"));
+		free(tmp);
+
+		check_strarr((const char **)actual, (const char **)expected);
+		free_ptrarr((void **)actual);
+		free_ptrarr((void **)expected);
+	}
+
+	TEST_SECTION("expand_string_node() エスケープされた環境変数");
+	{
+		/* 準備 */
+		setenv("ABC", " abc def ", 1);
+		t_parse_buffer	buf;
+		// echo "\$\$ABC\\$ABC""$ABC"
+		init_buf_with_string(&buf, "echo \"\\$\\$ABC\\\\$ABC\"\"$ABC\" \n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+		CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+
+		args_node = args_node->rest_node->content.arguments;
+
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "$");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "$");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "ABC");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "\\");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "$ABC");
+
+		string_node = string_node->next->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "$ABC");
+
+		char **actual = expand_string_node(args_node->string_node->content.string);
+		char **expected = NULL;
+		char **tmp = expected;
+		expected = (char **)ptrarr_add_ptr((void **)expected, ft_strdup("$$ABC\\ abc def  abc def "));
 		free(tmp);
 
 		check_strarr((const char **)actual, (const char **)expected);
@@ -352,6 +410,80 @@ int main()
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
 		t_command_invocation *expected = cmd_init_cmdinvo((const char **)ft_split("abc def", ' '));
+		CHECK(actual);
+		check_cmdinvo(actual, expected);
+
+		cmd_free_cmdinvo(actual);
+		cmd_free_cmdinvo(expected);
+	}
+
+	TEST_SECTION("cmd_ast_cmd2cmdinvo() 空文字列を含む");
+	{
+		/* 準備 */
+		t_parse_buffer	buf;
+		// echo a "" b "" c
+		init_buf_with_string(&buf, "echo a \"\" b \"\" c\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_command(&buf, &tok);
+		CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
+		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
+		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
+
+		args_node = args_node->rest_node->content.arguments;
+
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "a");
+
+		args_node = args_node->rest_node->content.arguments;
+		string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "");
+
+		args_node = args_node->rest_node->content.arguments;
+		string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "b");
+
+		args_node = args_node->rest_node->content.arguments;
+		string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ_STR(string_node->text, "");
+
+		args_node = args_node->rest_node->content.arguments;
+		string_node = args_node->string_node->content.string;
+		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(string_node->text, "c");
+
+		/* テスト */
+		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
+		t_command_invocation *expected = cmd_init_cmdinvo(NULL);
+
+		const char **tmp;
+		tmp = expected->exec_and_args;
+		expected->exec_and_args = (const char**)ptrarr_add_ptr((void **)tmp, ft_strdup("echo"));
+		free(tmp);
+		tmp = expected->exec_and_args;
+		expected->exec_and_args = (const char**)ptrarr_add_ptr((void **)tmp, ft_strdup("a"));
+		free(tmp);
+		tmp = expected->exec_and_args;
+		expected->exec_and_args = (const char**)ptrarr_add_ptr((void **)tmp, ft_strdup(""));
+		free(tmp);
+		tmp = expected->exec_and_args;
+		expected->exec_and_args = (const char**)ptrarr_add_ptr((void **)tmp, ft_strdup("b"));
+		free(tmp);
+		tmp = expected->exec_and_args;
+		expected->exec_and_args = (const char**)ptrarr_add_ptr((void **)tmp, ft_strdup(""));
+		free(tmp);
+		tmp = expected->exec_and_args;
+		expected->exec_and_args = (const char**)ptrarr_add_ptr((void **)tmp, ft_strdup("c"));
+		free(tmp);
+
 		CHECK(actual);
 		check_cmdinvo(actual, expected);
 

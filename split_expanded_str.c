@@ -84,6 +84,10 @@ static char	*get_str_from_expanded_str(char **str)
 
 /*
  * 環境変数展開した文字列を分解して返す
+ *
+ * ex:
+ *   in($ABC="hoge"):       |'$''$'"ABC"'\'"$ABC""$ABC"|
+ *   out:                   ["$$ABC\hogehoge"]
  */
 char	**split_expanded_str(char *str)
 {

@@ -205,6 +205,31 @@ void test_lexer()
 		CHECK(!strncmp(tok.text, "\\abc", 4));
 	}
 
+	TEST_SECTION("lex_get_token クォートありエスケープ2つあり");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "\"\\\\$ABC\" '\\\\abc'");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 1);
+		CHECK(!strncmp(tok.text, "\\", 1));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EXPANDABLE_QUOTED);
+		CHECK_EQ(tok.length, 4);
+		CHECK(!strncmp(tok.text, "$ABC", 4));
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_SPACE);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_NON_EXPANDABLE);
+		CHECK_EQ(tok.length, 5);
+		CHECK(!strncmp(tok.text, "\\\\abc", 5));
+	}
+
 	TEST_SECTION("lex_get_token 数字だけのトークン");
 	{
 		t_parse_buffer	buf;

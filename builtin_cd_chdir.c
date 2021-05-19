@@ -19,7 +19,7 @@ static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
 	char	*physical_path;
 	char	*canon_path;
 
-	if (dest[0] =='/')
+	if (dest[0] == '/')
 		physical_path = ft_strdup(dest);
 	else
 		physical_path = path_join(g_cwd, dest);
