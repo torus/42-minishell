@@ -69,7 +69,7 @@ static char	*expandable_node2strarr(char ***result,
 		else if (text[len] == ' ' && len)
 		{
 			next_str = strjoin_nullable_and_free_both(
-				next_str, ft_substr(text, 0, len));
+					next_str, ft_substr(text, 0, len));
 			*result = (char **)ptrarr_add_ptr_and_free((void **)*result,
 					next_str);
 			next_str = NULL;
@@ -83,7 +83,7 @@ static char	*expandable_node2strarr(char ***result,
 	}
 	if (len)
 		next_str = strjoin_nullable_and_free_both(
-			next_str, ft_substr(text, 0, len));
+				next_str, ft_substr(text, 0, len));
 	return (next_str);
 }
 
@@ -116,6 +116,7 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	return (result);
 }
 
+/* t_parse_node_string を文字列配列に変換して返す */
 char	**expand_string_node(t_parse_node_string *string_node)
 {
 	t_cmd_str_node	**cmd_str;
