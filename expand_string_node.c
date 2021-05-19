@@ -68,13 +68,16 @@ static char	*expandable_node2strarr(char ***result,
 			text++;
 		else if (text[len] == ' ' && len)
 		{
-			next_str = strjoin_and_free_both(next_str,
-					ft_substr(text, 0, len));
+			if (next_str)
+				next_str = strjoin_and_free_both(next_str,
+						ft_substr(text, 0, len));
+			else
+				next_str = ft_substr(text, 0, len);
 			*result = (char **)ptrarr_add_ptr_and_free((void **)*result,
 					next_str);
-			next_str = ft_strdup("");
-			if (!*result || !next_str)
-				return (false);
+			next_str = NULL;
+			if (!*result)
+				return (NULL);
 			text += len + 1;
 			len = 0;
 		}
@@ -82,7 +85,12 @@ static char	*expandable_node2strarr(char ***result,
 			len++;
 	}
 	if (len)
-		next_str = strjoin_and_free_both(next_str, ft_substr(text, 0, len));
+	{
+		if (next_str)
+			next_str = strjoin_and_free_both(next_str, ft_substr(text, 0, len));
+		else
+			next_str = ft_substr(text, 0, len);
+	}
 	return (next_str);
 }
 
@@ -95,22 +103,23 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 
 	i = 0;
 	result = NULL;
-	next_str = ft_strdup("");
-	while (str_node[i] && next_str)
+	next_str = NULL;
+	while (str_node[i])
 	{
 		if (str_node[i]->type != TOKTYPE_EXPANDABLE)
-			next_str = strjoin_and_free_first(next_str, str_node[i]->text);
+		{
+			if (next_str)
+				next_str = strjoin_and_free_first(next_str, str_node[i]->text);
+			else
+				next_str = ft_strdup(str_node[i]->text);
+		}
 		else
 			next_str = expandable_node2strarr(&result, next_str,
 					str_node[i]->text);
 		i++;
 	}
-	if (!next_str)
-		free_ptrarr_and_assign_null((void ***)&result);
-	if (next_str && ft_strlen(next_str))
+	if (next_str)
 		result = (char **)ptrarr_add_ptr_and_free((void **)result, next_str);
-	else
-		free(next_str);
 	return (result);
 }
 
