@@ -28,7 +28,7 @@ char	*strjoin_and_free_both(char *first, char *second)
 
 char	*strjoin_nullable_and_free_both(char *str_nullable, char *second)
 {
-	char *result;
+	char	*result;
 
 	if (str_nullable)
 		result = ft_strjoin(str_nullable, second);
