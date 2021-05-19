@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
-
 #include <stdio.h>
-#include <string.h>
+#include <term.h>
 
+#include "libft/libft.h"
 #include "rope.h"
 
 typedef struct s_terminal_state
@@ -27,15 +27,13 @@ void	terminal_state_init(t_terminal_state *st)
 	st->ttystate = TTY_RESET;
 }
 
-#include <term.h>
-
 int	edit_putc(int ch)
 {
 	write(1, &ch, 1);
 	return (1);
 }
 
-int	tty_reset(int fd)		/* restore terminal's mode */
+int	tty_reset(int fd)
 {
 	char	areabuf[32];
 	char	*area;
@@ -43,15 +41,12 @@ int	tty_reset(int fd)		/* restore terminal's mode */
 
 	area = areabuf;
 	c_exit_insert_mode = tgetstr("ei", &area);
-
 	if (g_term_stat.ttystate == TTY_RESET)
 		return(0);
 	if (tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios) < 0)
 		return(-1);
 	g_term_stat.ttystate = TTY_RESET;
-
 	tputs(c_exit_insert_mode, 1, edit_putc);
-
 	return(0);
 }
 
@@ -62,39 +57,10 @@ static void	sig_catch(int signo)
 	exit(0);
 }
 
-#define	MAXLINE	4096			/* max line length */
-
-/*
- * Print a message and return to caller.
- * Caller specifies "errnoflag".
- */
-static void	err_doit(int errnoflag, int error, const char *fmt, va_list ap)
+void	error_exit(const char *message)
 {
-	char	buf[MAXLINE];
-
-	vsnprintf(buf, MAXLINE-1, fmt, ap);
-	if (errnoflag)
-		snprintf(buf+strlen(buf), MAXLINE-strlen(buf)-1, ": %s",
-		  strerror(error));
-	strcat(buf, "\n");
-	fflush(stdout);		/* in case stdout and stderr are the same */
-	fputs(buf, stderr);
-	fflush(NULL);		/* flushes all stdio output streams */
-}
-
-/*
- * Fatal error related to a system call.
- * Print a message and terminate.
- */
-void
-err_sys(const char *fmt, ...)
-{
-	va_list		ap;
-
-	va_start(ap, fmt);
-	err_doit(1, errno, fmt, ap);
-	va_end(ap);
-	exit(1);
+	write(STDERR_FILENO, message, ft_strlen(message));
+	exit (1);
 }
 
 int	tty_cbreak(int fd)
@@ -350,19 +316,19 @@ int	setup_terminal(void)
 {
 	const char	*term = getenv("TERM");
 	if (!term)
-		err_sys("getenv(TERM) error");
+		error_exit("getenv(TERM) error");
 	fprintf(stderr, "TERM = '%s'\n", term);
 	tgetent(NULL, term);
 
-	if (signal(SIGINT, sig_catch) == SIG_ERR)	/* catch signals */
-		err_sys("signal(SIGINT) error");
+	if (signal(SIGINT, sig_catch) == SIG_ERR)
+		error_exit("signal(SIGINT) error");
 	if (signal(SIGQUIT, sig_catch) == SIG_ERR)
-		err_sys("signal(SIGQUIT) error");
+		error_exit("signal(SIGQUIT) error");
 	if (signal(SIGTERM, sig_catch) == SIG_ERR)
-		err_sys("signal(SIGTERM) error");
+		error_exit("signal(SIGTERM) error");
 
 	if (tty_cbreak(STDIN_FILENO) < 0)
-		err_sys("tty_cbreak error");
+		error_exit("tty_cbreak error");
 	return (1);
 }
 
@@ -406,6 +372,6 @@ int	main(void)
 	tputs(state.cnt.c_enter_insert_mode, 1, edit_putc);
 	main_loop(&history, &state);
 	if (tty_reset(STDIN_FILENO) < 0)
-		err_sys("tty_reset error");
-	exit(0);
+		error_exit("tty_reset error");
+	return (0);
 }
