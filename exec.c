@@ -1,8 +1,13 @@
-#include "env.h"
-#include "execution.h"
-#include "minishell.h"
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include "env.h"
+#include "path.h"
+#include "execution.h"
+#include "minishell.h"
 
 /*
  * find executable file in dirpath.

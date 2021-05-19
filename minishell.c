@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "libft/libft.h"
 #include "minishell.h"
 #include "parse.h"

@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <sys/wait.h>
 #include "env.h"
 #include "execution.h"
 #include "builtin.h"

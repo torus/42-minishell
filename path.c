@@ -1,7 +1,10 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
 #include "path.h"
 #include "env.h"
 #include "minishell.h"
-#include <string.h>
 
 bool	is_directory(char *path)
 {

@@ -1,4 +1,6 @@
+#include <stdbool.h>
 #include "builtin.h"
+#include "libft/libft.h"
 
 bool	is_builtin_command(char *cmd_name)
 {

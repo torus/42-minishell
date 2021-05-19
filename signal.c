@@ -1,4 +1,7 @@
+#include <signal.h>
+#include <stdio.h>
 #include "minishell.h"
+#include "env.h"
 
 static void	sigint_sighandler(int sig)
 {

@@ -1,8 +1,9 @@
+#include <string.h>
+#include <stdio.h>
 #include "builtin.h"
 #include "env.h"
 #include "path.h"
 #include "minishell.h"
-#include <string.h>
 
 /* $CDPATH を検索するかどうかを返す
  *

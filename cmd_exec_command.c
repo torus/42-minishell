@@ -1,4 +1,7 @@
+#include <unistd.h>
 #include "minishell.h"
+#include "builtin.h"
+#include "libft/libft.h"
 
 /*
  * STDIN_FILENO, STDOUT_FILENO をdup2()で置き換える.

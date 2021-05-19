@@ -1,6 +1,8 @@
 #ifndef BUILTIN_H
 # define BUILTIN_H
 
+# include <stdbool.h>
+
 // ビルトインコマンドは argv を受け取って, ステータスを返す
 typedef int	t_builtin_cmd(char**);
 bool			is_builtin_command(char *cmd_name);

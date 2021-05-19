@@ -1,5 +1,7 @@
+#include <limits.h>
 #include "minishell.h"
 #include "builtin.h"
+#include "env.h"
 
 static void	put_exit_errmsg_and_exit(char *exit_status)
 {
