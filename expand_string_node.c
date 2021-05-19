@@ -51,7 +51,7 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
  * 渡された next_str を更新する際はは内部でfreeする.
  *
  * result: 文字列配列変数へのポインタ
- *   (Normのためにvoidポインタになってる)
+ *   (Normのためにvoidポインタにしている)
  * next_str: 次resultに追加される文字列を指すポインタ
  * text: str_node->text
  *
