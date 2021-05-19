@@ -324,7 +324,7 @@ int main()
 		lex_get_token(&buf, &tok);
 
 		t_parse_ast *node = parse_command(&buf, &tok);
-        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->type, ASTNODE_COMMAND);
 		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
 		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
 		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
@@ -427,7 +427,7 @@ int main()
 		lex_get_token(&buf, &tok);
 
 		t_parse_ast *node = parse_command(&buf, &tok);
-        CHECK_EQ(node->type, ASTNODE_COMMAND);
+		CHECK_EQ(node->type, ASTNODE_COMMAND);
 		CHECK_EQ(node->content.command->arguments_node->type, ASTNODE_ARGUMENTS);
 		t_parse_node_arguments *args_node = node->content.command->arguments_node->content.arguments;
 		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
