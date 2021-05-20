@@ -2,6 +2,7 @@
 #include "minishell.h"
 #include "builtin.h"
 #include "env.h"
+#include "libft/libft.h"
 
 static void	put_exit_errmsg_and_exit(char *exit_status)
 {
@@ -13,22 +14,25 @@ static void	put_exit_errmsg_and_exit(char *exit_status)
 	put_minish_err_msg_and_exit(2, "exit", tmp);
 }
 
-static int	exit_atoi(char *str)
+static void	exit_atol(char *str)
 {
-	int	num;
-	int	i;
+	char	*nptr;
+	long	num;
+	int		sign;
 
-	i = 0;
+	nptr = str;
+	sign = 1;
 	num = 0;
-	while (str[i])
-	{
-		if (!ft_isdigit(str[i])
-			|| num > (INT_MAX - (str[i] - '0')) / 10)
-			put_exit_errmsg_and_exit(str);
-		num = num * 10 + (str[i] - '0');
-		i++;
-	}
-	exit(num);
+	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\f'
+		|| *nptr == '\r' || *nptr == '\n' || *nptr == '\v')
+		nptr++;
+	if (*nptr++ == '-')
+		sign = -1;
+	if (!ft_isdigit(*nptr) || is_long_overflow(nptr, sign))
+		put_exit_errmsg_and_exit(str);
+	while (ft_isdigit(*nptr))
+		num = num * 10 + (*nptr++ - '0');
+	exit(num & 255);
 }
 
 /*
@@ -43,7 +47,7 @@ int	builtin_exit(char **argv)
 	if (argv_len > 2)
 		return (put_minish_err_msg_and_ret(1, "exit", "too many arguments"));
 	else if (argv_len == 2)
-		exit_atoi(argv[1]);
+		exit_atol(argv[1]);
 	else
 		exit(get_status());
 	return (0);
