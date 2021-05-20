@@ -35,6 +35,9 @@ static void	exit_atol(char *str)
 		put_exit_errmsg_and_exit(str);
 	while (ft_isdigit(*nptr))
 		num = num * 10 + (*nptr++ - '0');
+	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\f'
+		|| *nptr == '\r' || *nptr == '\n' || *nptr == '\v')
+		nptr++;
 	if (*nptr)
 		put_exit_errmsg_and_exit(str);
 	exit((sign * num) & 255);
