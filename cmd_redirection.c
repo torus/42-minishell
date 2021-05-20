@@ -3,6 +3,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <string.h>
 #include "libft/libft.h"
 #include "env.h"
 #include "minishell.h"
@@ -66,10 +68,8 @@ int	cmd_set_input_file(t_command_invocation *command)
 			return (ERROR);
 		fd = open(filepath, O_RDONLY);
 		free(filepath);
-		if (fd == -1)
-			return (put_err_msg_and_ret("error input file open()"));
-		if (!current->next && dup2(fd, red->fd) == -1)
-			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
+		if (fd == -1 || (!current->next && dup2(fd, red->fd) == -1))
+			return (put_minish_err_msg_and_ret(-1, red->filepath, strerror(errno)));
 		current = current->next;
 	}
 	return (0);
