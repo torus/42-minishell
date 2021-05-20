@@ -26,8 +26,11 @@ static void	exit_atol(char *str)
 	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\f'
 		|| *nptr == '\r' || *nptr == '\n' || *nptr == '\v')
 		nptr++;
-	if (*nptr++ == '-')
+	if (*nptr == '-')
+	{
 		sign = -1;
+		nptr++;
+	}
 	if (!ft_isdigit(*nptr) || is_long_overflow(nptr, sign))
 		put_exit_errmsg_and_exit(str);
 	while (ft_isdigit(*nptr))
