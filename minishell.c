@@ -76,9 +76,9 @@ int	main(int argc, char **argv)
 	t_token					tok;
 	t_parse_ast				*seqcmd;
 
+	initialize_shell();
 	if (argc == 3 && ft_strncmp(argv[1], "-c", 3) == 0)
 		return (do_command(argv[2]));
-	set_shell_sighandlers();
 	init_buffer_with_string(&buf, "");
 	printf("Welcome to Minishell\n");
 	while (1)

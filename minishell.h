@@ -29,4 +29,7 @@ int						put_minish_err_msg_and_ret(int ret_val,
 void					put_minish_err_msg_and_exit(int status,
 							const char *cmd_name, const char *msg);
 
+// シェルの初期化
+int						initialize_shell(void);
+
 #endif
