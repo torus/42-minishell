@@ -10,18 +10,7 @@
 
 #include "libft/libft.h"
 #include "rope.h"
-
-typedef struct s_terminal_state
-{
-	struct termios		save_termios;
-	enum
-	{
-		TTY_RESET,
-		TTY_CBREAK
-	}					ttystate;
-}	t_terminal_state;
-
-t_terminal_state	g_term_stat;
+#include "input.h"
 
 void	terminal_state_init(t_terminal_state *st)
 {
@@ -43,12 +32,12 @@ int	tty_reset(int fd)
 	area = areabuf;
 	c_exit_insert_mode = tgetstr("ei", &area);
 	if (g_term_stat.ttystate == TTY_RESET)
-		return(0);
+		return (0);
 	if (tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios) < 0)
-		return(-1);
+		return (-1);
 	g_term_stat.ttystate = TTY_RESET;
 	tputs(c_exit_insert_mode, 1, edit_putc);
-	return(0);
+	return (0);
 }
 
 static void	sig_catch(int signo)
@@ -89,8 +78,8 @@ int	tty_set_attributes(int fd, struct termios *buf)
 		errno = err;
 		return (-1);
 	}
-	if ((buf->c_lflag & (ECHO | ICANON)) || buf->c_cc[VMIN] != 1 ||
-		buf->c_cc[VTIME] != 0)
+	if ((buf->c_lflag & (ECHO | ICANON)) || buf->c_cc[VMIN] != 1
+		|| buf->c_cc[VTIME] != 0)
 	{
 		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
 		errno = EINVAL;
@@ -104,7 +93,8 @@ int	tty_cbreak(int fd)
 	int				err;
 	struct termios	buf;
 
-	if (g_term_stat.ttystate != TTY_RESET) {
+	if (g_term_stat.ttystate != TTY_RESET)
+	{
 		errno = EINVAL;
 		return (-1);
 	}
@@ -117,16 +107,6 @@ int	tty_cbreak(int fd)
 	g_term_stat.ttystate = TTY_CBREAK;
 	return (0);
 }
-
-#define LINE_BUFFER_SIZE 8
-
-typedef struct	s_command_history
-{
-	t_rope	*ropes[LINE_BUFFER_SIZE];
-	int		begin;
-	int		end;
-	int		current;
-}	t_command_history;
 
 void	init_history(t_command_history *his)
 {
@@ -143,8 +123,8 @@ void	init_history(t_command_history *his)
 int	print_history(t_command_history *his, int index)
 {
 	t_rope	*rope;
-	int	len;
-	int	i;
+	int		len;
+	int		i;
 	char	ch;
 
 	rope = his->ropes[index];
@@ -168,8 +148,7 @@ void	dump_history(t_command_history *his)
 	int	index;
 
 	fprintf(stderr, "\n**** HISTORY: beg: %d, cur: %d, end: %d\n",
-			his->begin, his->current, his->end);
-
+		his->begin, his->current, his->end);
 	index = his->begin;
 	while (index != his->end)
 	{
@@ -196,38 +175,18 @@ void	edit_insert_character(
 			int cursor_x, int command_length)
 {
 	t_rope	*new_rope;
+
 	new_rope = rope_create(cbuf, NULL);
 	if (cursor_x == command_length)
-		history->ropes[history->current] =
-			rope_concat(history->ropes[history->current], new_rope);
+		history->ropes[history->current]
+			= rope_concat(history->ropes[history->current], new_rope);
 	else if (cursor_x == 0)
-	{
-		history->ropes[history->current] =
-			rope_concat(new_rope, history->ropes[history->current]);
-	}
+		history->ropes[history->current]
+			= rope_concat(new_rope, history->ropes[history->current]);
 	else if (cursor_x < command_length)
-	{
-		history->ropes[history->current] =
-			rope_insert(history->ropes[history->current], cursor_x, new_rope);
-	}
+		history->ropes[history->current]
+			= rope_insert(history->ropes[history->current], cursor_x, new_rope);
 }
-
-typedef struct s_term_controls
-{
-	char	areabuf[32];
-	char	*c_cursor_left;
-	char	*c_cursor_right;
-	char	*c_clr_bol;
-	char	*c_enter_insert_mode;
-	char	*c_exit_insert_mode;
-}	t_term_controls;
-
-typedef struct	s_command_state
-{
-	int				cursor_x;
-	int				length;
-	t_term_controls	cnt;
-}	t_command_state;
 
 void	edit_normal_character(
 	t_command_history *history, t_command_state *st,
@@ -251,22 +210,15 @@ void	edit_enter(t_command_history *history, t_command_state *st)
 	edit_putc('\n');
 }
 
-void	handle_escape_sequence (t_command_history *history, t_command_state *st)
+int	handle_left_right(t_command_state *st, char c)
 {
-	int	i;
-	char	c;
-	char	cbuf[2];
-
-	i = read(STDIN_FILENO, cbuf, 1);
-	if (i != 1)
-		return ;
-	c = cbuf[0];
 	if (c == 'D')
 	{
 		tputs(st->cnt.c_cursor_left, 1, edit_putc);
 		st->cursor_x--;
 		if (st->cursor_x < 0)
 			st->cursor_x = 0;
+		return (1);
 	}
 	else if (c == 'C')
 	{
@@ -275,10 +227,17 @@ void	handle_escape_sequence (t_command_history *history, t_command_state *st)
 			tputs(st->cnt.c_cursor_right, 1, edit_putc);
 			st->cursor_x++;
 		}
+		return (1);
 	}
-	else if (c == 'B')
+	return (0);
+}
+
+int	handle_up_down(t_command_history *history, t_command_state *st, char c)
+{
+	if (c != 'A' && c != 'B')
+		return (0);
+	if (c == 'B')
 	{
-		/* DOWN */
 		if (history->current != history->end)
 		{
 			history->current = (history->current + 1) % LINE_BUFFER_SIZE;
@@ -287,22 +246,37 @@ void	handle_escape_sequence (t_command_history *history, t_command_state *st)
 			st->cursor_x = print_history(history, history->current);
 			st->length = st->cursor_x;
 		}
+		return (1);
 	}
-	else if (c == 'A')
+	if (history->current != history->begin)
 	{
-		/* UP */
-		if (history->current != history->begin)
-		{
-			history->current = (LINE_BUFFER_SIZE + history->current - 1) % LINE_BUFFER_SIZE;
-			tputs(st->cnt.c_clr_bol, 1, edit_putc);
-			edit_putc('\r');
-			st->cursor_x = print_history(history, history->current);
-			st->length = st->cursor_x;
-		}
+		history->current = (LINE_BUFFER_SIZE + history->current - 1)
+			% LINE_BUFFER_SIZE;
+		tputs(st->cnt.c_clr_bol, 1, edit_putc);
+		edit_putc('\r');
+		st->cursor_x = print_history(history, history->current);
+		st->length = st->cursor_x;
 	}
-	else if (c == '1')
+	return (1);
+}
+
+/*
+ * '\x1b[5~' => F5 key for debugging
+ */
+
+void	handle_escape_sequence (t_command_history *history, t_command_state *st)
+{
+	int		i;
+	char	cbuf[2];
+
+	i = read(STDIN_FILENO, cbuf, 1);
+	if (i != 1)
+		return ;
+	if (handle_left_right(st, cbuf[0])
+		|| handle_up_down(history, st, cbuf[0]))
+		;
+	else if (cbuf[0] == '1')
 	{
-		/* F5 */
 		i = read(STDIN_FILENO, cbuf, 1);
 		if (cbuf[0] == '5')
 		{
@@ -313,9 +287,6 @@ void	handle_escape_sequence (t_command_history *history, t_command_state *st)
 			}
 		}
 	}
-	else
-		/* printf("\\x%02x", c); */
-		edit_putc(c);
 }
 
 void	term_controls_init(t_term_controls *t)
@@ -333,18 +304,17 @@ void	term_controls_init(t_term_controls *t)
 int	setup_terminal(void)
 {
 	const char	*term = getenv("TERM");
+
 	if (!term)
 		error_exit("getenv(TERM) error");
 	fprintf(stderr, "TERM = '%s'\n", term);
 	tgetent(NULL, term);
-
 	if (signal(SIGINT, sig_catch) == SIG_ERR)
 		error_exit("signal(SIGINT) error");
 	if (signal(SIGQUIT, sig_catch) == SIG_ERR)
 		error_exit("signal(SIGQUIT) error");
 	if (signal(SIGTERM, sig_catch) == SIG_ERR)
 		error_exit("signal(SIGTERM) error");
-
 	if (tty_cbreak(STDIN_FILENO) < 0)
 		error_exit("tty_cbreak error");
 	return (1);
@@ -366,7 +336,8 @@ int	main_loop(t_command_history *history, t_command_state *state)
 	char				cbuf[2];
 
 	cbuf[1] = '\0';
-	while (1) {
+	while (1)
+	{
 		if (read(STDIN_FILENO, cbuf, 1) != 1)
 			break ;
 		if (cbuf[0] >= 0x20 && cbuf[0] < 0x7f)
