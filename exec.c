@@ -1,5 +1,13 @@
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
 #include "env.h"
+#include "path.h"
 #include "execution.h"
+#include "minishell.h"
 
 /*
  * find executable file in dirpath.
@@ -37,61 +45,51 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 	return (free_and_rtn_ptr(dir, NULL));
 }
 
-/*
- * Find filename in directories which is listed in dirpaths_str.
- *
- * filename: program name that is searched.
- * dirpaths_str: string that has directory paths which is delimited with colon.
- *
- * return: filepath if executable file is found, otherwise return NULL.
+/* dirs の各ディレクトリを検索して実行する.
  */
-static char	*get_executable_filepath(char *filename, const char *dirpaths_str)
+static char	*search_and_exec_file_from_dirs(char *filename,
+	char **argv, char **dirs)
 {
-	char	*executable_path;
-	size_t	path_len;
-	char	*dirpath;
+	extern char	**environ;
+	int			i;
+	char		*executable_path;
+	char		*last_executable_path;
 
-	path_len = 0;
-	executable_path = NULL;
-	while (!executable_path)
+	i = 0;
+	last_executable_path = NULL;
+	while (dirs[i])
 	{
-		if (dirpaths_str[path_len] == ':' || dirpaths_str[path_len] == '\0')
+		if (dirs[i])
+			executable_path = find_executable_file_in_dir(filename, dirs[i]);
+		if (executable_path)
 		{
-			if (path_len == 0)
-				dirpath = getcwd(NULL, 0);
-			else
-				dirpath = ft_substr(dirpaths_str, 0, path_len);
-			executable_path = find_executable_file_in_dir(filename, dirpath);
-			free(dirpath);
-			if (dirpaths_str[path_len] == '\0')
-				break ;
-			dirpaths_str += path_len + 1;
-			path_len = 0;
+			free(last_executable_path);
+			last_executable_path = ft_strdup(executable_path);
+			execve(executable_path, argv, environ);
 		}
-		else
-			path_len++;
+		free(executable_path);
+		i++;
 	}
-	return (executable_path);
+	return (last_executable_path);
 }
 
-/*
- * Find executable file in directories which is listed in $PATH.
- *
- * filename: program name that is searched.
- *
- * return: filepath if executable file is found, otherwise return NULL.
+/* $PATH のディレクトリを検索して実行する.
  */
-char	*find_executable_file_from_path_env(char *filename)
+char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 {
-	char	*path_env_val;
-	char	*executable_path;
+	extern char	**environ;
+	char		*path_env_val;
+	char		**dirs;
+	char		*last_executable_path;
 
 	path_env_val = get_env_val("PATH");
 	if (!path_env_val)
 		return (NULL);
-	executable_path = get_executable_filepath(filename, path_env_val);
+	dirs = get_colon_units(path_env_val, "./");
 	free(path_env_val);
-	return (executable_path);
+	last_executable_path = search_and_exec_file_from_dirs(filename, argv, dirs);
+	free_ptrarr((void **)dirs);
+	return (last_executable_path);
 }
 
 /*
@@ -105,13 +103,26 @@ char	*find_executable_file_from_path_env(char *filename)
  */
 int	cmd_execvp(char *filename, char **argv)
 {
-	char		*executable_path;
 	extern char	**environ;
+	char		*executable_path;
 
+	errno = 0;
+	executable_path = filename;
 	if (ft_strchr(filename, '/'))
-		executable_path = filename;
+		execve(filename, argv, environ);
 	else
-		executable_path = find_executable_file_from_path_env(filename);
-	execve(executable_path, argv, environ);
-	return (ERROR);
+		executable_path = search_and_exec_file_from_path_env(filename, argv);
+	if (executable_path && is_directory(executable_path))
+		put_minish_err_msg_and_exit(126, executable_path, "Is a directory");
+	if (errno == ENOEXEC && is_executable(executable_path))
+		exit(0);
+	else if (errno == ENOEXEC && !is_executable(executable_path))
+		errno = EACCES;
+	if (errno && executable_path)
+		put_minish_err_msg(executable_path, strerror(errno));
+	else
+		put_minish_err_msg(filename, "command not found");
+	if (errno && errno != ENOENT)
+		exit(126);
+	exit(127);
 }

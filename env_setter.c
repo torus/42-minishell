@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include "libft/libft.h"
 #include "env.h"
 
 /*

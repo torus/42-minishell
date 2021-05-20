@@ -42,17 +42,19 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 {
 	int			redirection_type;
 	const char	*text;
+	int			fd;
 
 	redirection_type = redirection_node->type;
 	text = string_node2string(redirection_node->string_node->content.string);
+	fd = redirection_node->fd;
 	if (!text)
 		return (ERROR);
 	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
-		cmd_add_inredirect(command, text);
+		cmd_add_inredirect(command, text, fd);
 	else if (redirection_type == TOKTYPE_OUTPUT_REDIRECTION)
-		cmd_add_outredirect(command, text, false);
+		cmd_add_outredirect(command, text, fd, false);
 	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
-		cmd_add_outredirect(command, text, true);
+		cmd_add_outredirect(command, text, fd, true);
 	return (0);
 }
 

@@ -1,8 +1,9 @@
+#include <string.h>
+#include <stdio.h>
 #include "builtin.h"
 #include "env.h"
 #include "path.h"
 #include "minishell.h"
-#include <string.h>
 
 /* $CDPATH を検索するかどうかを返す
  *
@@ -80,7 +81,7 @@ int	cd_cdpath_env(char *dest_path)
 	cdpath = get_env_val("CDPATH");
 	if (!cdpath)
 		return (false);
-	sources = get_colon_units(cdpath);
+	sources = get_colon_units(cdpath, "");
 	status = cd_from_sources(dest_path, sources);
 	free(cdpath);
 	free_ptrarr((void **)sources);

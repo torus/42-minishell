@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <sys/wait.h>
 #include "env.h"
 #include "execution.h"
 #include "builtin.h"
@@ -46,10 +48,10 @@ int	cmd_wait_commands(t_command_invocation *command)
 	while (command)
 	{
 		waitpid(command->pid, &status, 0);
-		if (!command->piped_command)
-			set_status(status);
+		status = WEXITSTATUS(status);
 		command = command->piped_command;
 	}
+	set_status(status);
 	return (status);
 }
 
@@ -66,7 +68,7 @@ int	cmd_exec_commands(t_command_invocation *command)
 	t_command_invocation	*current_cmd;
 
 	current_cmd = command;
-	if (!command->piped_command
+	if (!command->piped_command && command->exec_and_args
 		&& is_builtin_command((char *)command->exec_and_args[0]))
 		return (cmd_exec_builtin(current_cmd));
 	cmd_init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);

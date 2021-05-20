@@ -3,18 +3,19 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #define CHECK(val) test_check((int64_t)val, #val)
 #define CHECK_EQ(actual, expected) test_check(actual == expected, #actual " == " #expected)
 #define CHECK_EQ_STR(actual, expected) \
   do { \
-	printf("  |%s| == |%s|\n", actual, expected); \
-	test_check(strcmp(actual, expected) == 0, #actual " == " #expected); \
-  } while(0);
+	if (!test_check(strcmp(actual, expected) == 0, #actual " == " #expected)) \
+		printf("    |%s| == |%s|\n", actual, expected); \
+  } while(0)
 #define TEST_CHAPTER(message) printf("#\n# " message "\n#\n")
 #define TEST_SECTION(message) printf("- " message "\n")
 
-void	test_check(int64_t val, const char *msg);
+bool	test_check(int64_t val, const char *msg);
 int	print_result();
 
 extern int	g_success_count;

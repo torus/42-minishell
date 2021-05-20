@@ -1,7 +1,10 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
 #include "path.h"
 #include "env.h"
 #include "minishell.h"
-#include <string.h>
 
 bool	is_directory(char *path)
 {
@@ -49,4 +52,20 @@ char	*get_parent_dir(char *path)
 		result = ft_strdup("/");
 	}
 	return (result);
+}
+
+/* ユーザー が path のファイルの実行アクセス許可
+ *   を持っているか
+ */
+bool	is_executable(char *path)
+{
+	struct stat	buf;
+
+	if (stat(path, &buf) == -1)
+		return (false);
+	if (!(buf.st_mode & S_IXUSR))
+		return (false);
+	if (!(buf.st_mode & S_IRUSR))
+		return (false);
+	return (true);
 }

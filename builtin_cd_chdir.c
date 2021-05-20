@@ -1,8 +1,9 @@
+#include <string.h>
+#include <errno.h>
 #include "builtin.h"
 #include "env.h"
 #include "path.h"
 #include "minishell.h"
-#include <string.h>
 
 /* get_cd_dest_from_argv() で取得した移動先パス(絶対or相対) を元に
  * 移動先の絶対パスを返す.
@@ -18,7 +19,7 @@ static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
 	char	*physical_path;
 	char	*canon_path;
 
-	if (dest[0] =='/')
+	if (dest[0] == '/')
 		physical_path = ft_strdup(dest);
 	else
 		physical_path = path_join(g_cwd, dest);

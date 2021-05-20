@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "libft/libft.h"
 #include "minishell.h"
 #include "parse.h"
@@ -17,6 +18,7 @@ void	init_buffer_with_string(t_parse_buffer *buf, char *str)
 	len = ft_strlen(str);
 	buf->cur_pos = 0;
 	buf->size = len;
+	buf->lex_stat = LEXSTAT_NORMAL;
 	ft_strlcpy(buf->buffer, str, len + 1);
 }
 
@@ -74,9 +76,9 @@ int	main(int argc, char **argv)
 	t_token					tok;
 	t_parse_ast				*seqcmd;
 
+	initialize_shell();
 	if (argc == 3 && ft_strncmp(argv[1], "-c", 3) == 0)
 		return (do_command(argv[2]));
-	set_shell_sighandlers();
 	init_buffer_with_string(&buf, "");
 	printf("Welcome to Minishell\n");
 	while (1)

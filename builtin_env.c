@@ -1,4 +1,6 @@
+#include <unistd.h>
 #include "builtin.h"
+#include "libft/libft.h"
 
 int	builtin_env(char **argv)
 {

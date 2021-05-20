@@ -1,4 +1,7 @@
+#include <signal.h>
+#include <stdio.h>
 #include "minishell.h"
+#include "env.h"
 
 static void	sigint_sighandler(int sig)
 {
@@ -12,7 +15,7 @@ static void	sigquit_sighandler(int sig)
 	ft_putstr_fd("\b\b  \b\b", STDOUT_FILENO);
 }
 
-void	set_sighandlers(__sighandler_t sighandler)
+void	set_sighandlers(t_sighandler sighandler)
 {
 	if (signal(SIGQUIT, sighandler) == SIG_ERR
 		|| signal(SIGINT, sighandler) == SIG_ERR)

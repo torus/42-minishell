@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "libft/libft.h"
 #include "parse.h"
 
 int	lex_getc(t_parse_buffer *buf)
@@ -27,7 +28,10 @@ int	lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch)
 	else if (ch == '|')
 		result->type = TOKTYPE_PIPE;
 	else if (ch == '<')
+	{
 		result->type = TOKTYPE_INPUT_REDIRECTION;
+		result->length = 0;
+	}
 	else if (ch == '>')
 	{
 		ch = lex_getc(buf);
@@ -39,6 +43,7 @@ int	lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch)
 			if (ch != EOF)
 				lex_ungetc(buf);
 		}
+		result->length = 1;
 	}
 	else
 		return (0);
@@ -47,13 +52,17 @@ int	lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch)
 
 int	lex_get_quoted(t_parse_buffer *buf, t_token *result, int ch)
 {
+	if (buf->lex_stat != LEXSTAT_NORMAL)
+		parse_die();
 	if (ch == '"')
 	{
+		buf->lex_stat = LEXSTAT_DOUBLE_QUOTED;
 		result->type = TOKTYPE_EXPANDABLE_QUOTED;
 		return (lex_read_double_quoted(buf, result));
 	}
 	else if (ch == '\'')
 	{
+		buf->lex_stat = LEXSTAT_SINGLE_QUOTED;
 		result->type = TOKTYPE_NON_EXPANDABLE;
 		return (lex_read_single_quoted(buf, result));
 	}
@@ -63,21 +72,27 @@ int	lex_get_quoted(t_parse_buffer *buf, t_token *result, int ch)
 int	lex_get_token(t_parse_buffer *buf, t_token *result)
 {
 	int	ch;
-	int	ret;
 
-	ret = 0;
-	ch = lex_getc(buf);
-	if (lex_get_spaces(buf, result, ch))
-		ret = 1;
-	else if (lex_get_symbols(buf, result, ch))
-		ret = 1;
-	else if (lex_get_quoted(buf, result, ch))
-		ret = 1;
-	else if (ch != EOF)
+	if (buf->lex_stat == LEXSTAT_NORMAL)
 	{
+		ch = lex_getc(buf);
+		if (ch == EOF)
+			return (0);
+		if (lex_get_spaces(buf, result, ch)
+			|| lex_get_symbols(buf, result, ch)
+			|| lex_get_quoted(buf, result, ch))
+			return (1);
 		result->type = TOKTYPE_EXPANDABLE;
 		lex_ungetc(buf);
-		ret = lex_read_word(buf, result);
+		return (
+			lex_read_word(buf, result)
+			&& (lex_check_redirection_with_fd(buf, result) || 1));
 	}
-	return (ret);
+	if (buf->lex_stat == LEXSTAT_DOUBLE_QUOTED)
+	{
+		result->type = TOKTYPE_EXPANDABLE_QUOTED;
+		return (lex_read_double_quoted(buf, result));
+	}
+	result->type = TOKTYPE_NON_EXPANDABLE;
+	return (lex_read_single_quoted(buf, result));
 }

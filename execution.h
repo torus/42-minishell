@@ -2,21 +2,13 @@
 # define EXECUTION_H
 
 # include <unistd.h>
-# include <stdio.h>
-# include <sys/types.h>
-# include <sys/wait.h>
-# include <sys/stat.h>
-# include <fcntl.h>
-# include <signal.h>
-# include <dirent.h>
-# include <stdbool.h>
 # include "libft/libft.h"
-# include "path.h"
 
 typedef struct s_cmd_redirection
 {
 	const char	*filepath;
 	bool		is_append;
+	int			fd;
 }	t_cmd_redirection;
 
 typedef struct s_command_invocation
@@ -47,9 +39,9 @@ t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args);
 t_command_invocation	*cmd_cmdinvo_add_pipcmd(t_command_invocation **cmds,
 							t_command_invocation *newcmd);
 int						cmd_add_inredirect(t_command_invocation *command,
-							const char *filepath);
+							const char *filepath, int fd);
 int						cmd_add_outredirect(t_command_invocation *command,
-							const char *filepath, bool is_append);
+							const char *filepath, int fd, bool is_append);
 void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
 char					*expand_env_var(char *str);
