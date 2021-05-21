@@ -186,6 +186,30 @@ int main(){
 		remove("multiple_fd_out");
 	}
 
+	TEST_SECTION("複数fd入力リダイレクション");
+	{
+		// 複数fd出力を行うプログラムを作成
+		system("printf '#include<unistd.h>\nint main(){int size, buf[500]; size=read(0, buf, 100); write(1, buf, size); size=read(3, buf, 100); write(1, buf, size);}' > multiple_fd_in.c && gcc multiple_fd_in.c -o multiple_fd_in");
+		t_command_invocation *command = cmd_init_cmdinvo((const char **)ft_split("./multiple_fd_in", ' '));
+		system("echo this_is_hoge > hoge && echo this_is_fuga > fuga");
+		// ./multiple_fd_in 0<hoge 3<fuga
+		cmd_add_inredirect(command, ft_strdup("hoge"), 0);
+		cmd_add_inredirect(command, ft_strdup("fuga"), 3);
+		cmd_add_outredirect(command, ft_strdup("actual"), 1, true);
+
+		int status = cmd_exec_commands(command);
+		CHECK_EQ(status, 0);
+		system("./multiple_fd_in 0<hoge 3<fuga > expected");
+		CHECK(system("diff --color -u expected actual") == 0);
+		cmd_free_cmdinvo(command);
+		remove("actual");
+		remove("expected");
+		remove("multiple_fd_in.c");
+		remove("multiple_fd_in");
+		remove("hoge");
+		remove("fuga");
+	}
+
     TEST_SECTION("cat /etc/passwd | wc > output.txt  パイプが1つの場合");
     {
 		t_command_invocation *first_command = cmd_init_cmdinvo((const char**)ft_split("cat /etc/passwd", ' '));
