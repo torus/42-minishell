@@ -543,6 +543,24 @@ void test_parser(void)
 					 ->content.string->text, "file");
 	}
 
+	TEST_SECTION("parse_redirection　fdの最大デスクリプタ付き >");
+	{
+		// bashではfdの値がINTMAX以下の正の数の場合ファイルディスクリプタとして認識される
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "2147483647> file\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 2147483647);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					 ->content.string->text, "file");
+	}
+
 	TEST_SECTION("parse_redirection　>>");
 	{
 		t_parse_buffer	buf;
