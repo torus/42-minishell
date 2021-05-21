@@ -46,7 +46,8 @@ char	*expand_redirect_filepath(char *red_target)
 	return (filepath);
 }
 
-int	open_file_for_redirect(t_cmd_redirection *red, int open_flags, mode_t open_mode)
+int	open_file_for_redirect(t_cmd_redirection *red,
+	int open_flags, mode_t open_mode)
 {
 	char	*filepath;
 	int		fd;
@@ -78,7 +79,8 @@ int	cmd_set_input_file(t_command_invocation *command)
 		red = (t_cmd_redirection *)current->content;
 		fd = open_file_for_redirect(red, O_RDONLY, 0);
 		if (fd == -1)
-			return (put_minish_err_msg_and_ret(-1, "in_redirect", strerror(errno)));
+			return (put_minish_err_msg_and_ret(-1,
+					"in_redirect", strerror(errno)));
 		if (dup2(fd, red->fd) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
 		current = current->next;
@@ -106,9 +108,10 @@ int	cmd_set_output_file(t_command_invocation *command)
 		red = (t_cmd_redirection *)current->content;
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open,
-			S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
-			return (put_minish_err_msg_and_ret(-1, "out_redirect", strerror(errno)));
+			return (put_minish_err_msg_and_ret(-1,
+					"out_redirect", strerror(errno)));
 		if (dup2(fd, red->fd) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
 		current = current->next;
