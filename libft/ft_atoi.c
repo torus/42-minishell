@@ -6,13 +6,13 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 02:58:56 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/04/02 17:12:12 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/05/21 04:13:09 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	num_len(const char *str)
+int	num_len(const char *str)
 {
 	int	i;
 
@@ -22,7 +22,7 @@ static int	num_len(const char *str)
 	return (i);
 }
 
-static bool	is_overflow(const char *nptr, int sign)
+bool	is_long_overflow(const char *nptr, int sign)
 {
 	if (num_len(nptr) > 19)
 		return (true);
@@ -49,7 +49,7 @@ int	ft_atoi(const char *nptr)
 	if (*nptr == '+' || *nptr == '-')
 		if (*nptr++ == '-')
 			np = -1;
-	if (is_overflow(nptr, np))
+	if (is_long_overflow(nptr, np))
 	{
 		if (np == 1)
 			return (-1);
