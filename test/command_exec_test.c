@@ -192,7 +192,7 @@ int main(){
 		system("printf '#include<unistd.h>\nint main(){int size, buf[500]; size=read(0, buf, 100); write(1, buf, size); size=read(3, buf, 100); write(1, buf, size);}' > multiple_fd_in.c && gcc multiple_fd_in.c -o multiple_fd_in");
 		t_command_invocation *command = cmd_init_cmdinvo((const char **)ft_split("./multiple_fd_in", ' '));
 		system("echo this_is_hoge > hoge && echo this_is_fuga > fuga");
-		// ./multiple_fd_in 0<hoge 3<fuga
+		// ./multiple_fd_in 0<hoge 3<fuga > actual
 		cmd_add_inredirect(command, ft_strdup("hoge"), 0);
 		cmd_add_inredirect(command, ft_strdup("fuga"), 3);
 		cmd_add_outredirect(command, ft_strdup("actual"), 1, true);
