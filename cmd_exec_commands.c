@@ -14,7 +14,8 @@ static int	cmd_connect_pipe(
 }
 
 /* ビルトインコマンドを実行する
- * パイプではなく単体で実行されることを想定している
+ * パイプではなく単体(minishellと同じプロセス)
+ * で実行されることを想定している
  */
 int	cmd_exec_builtin(t_command_invocation *command)
 {
@@ -22,15 +23,18 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	int				stdinfd;
 	int				status;
 	t_builtin_cmd	*builtin_func;
+	t_fd_list		*fd_lst;
 
+	fd_lst = NULL;
 	stdoutfd = dup(STDOUT_FILENO);
 	stdinfd = dup(STDIN_FILENO);
 	if (cmd_set_input_file(command) == ERROR
-		|| cmd_set_output_file(command) == ERROR)
+		|| cmd_set_output_file(command, &fd_lst) == ERROR)
 		return (put_err_msg_and_ret("error parent input/output file"));
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
 	status = builtin_func((char **)command->exec_and_args);
 	set_status(status);
+	fd_list_close(&fd_lst);
 	if (dup2(stdoutfd, STDOUT_FILENO) == -1
 		|| dup2(stdinfd, STDIN_FILENO) == -1)
 		put_err_msg_and_exit("FDの復元に失敗");

@@ -41,7 +41,7 @@ void	cmd_exec_command(t_command_invocation *command,
 	set_sighandlers(SIG_DFL);
 	replace_stdio_with_pipe(command, pipe_prev_fd, pipe_fd);
 	if (cmd_set_input_file(command) == ERROR
-		|| cmd_set_output_file(command) == ERROR)
+		|| cmd_set_output_file(command, NULL) == ERROR)
 		put_err_msg_and_exit("error child input/output file");
 	if (!command->exec_and_args)
 		exit(0);

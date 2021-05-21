@@ -11,6 +11,19 @@ typedef struct s_cmd_redirection
 	int			fd;
 }	t_cmd_redirection;
 
+/* コマンド終了後に一気に解放するためにリストで開けたfdを記録する.
+ *
+ * プロセスが異なる外部コマンドでは気にしなくてもよいのだが,
+ * minishellと同じプロセスで動作するビルトインコマンドでは
+ * これが必要
+ */
+typedef struct s_fd_list {
+	int					fd;
+	struct s_fd_list	*next;
+} t_fd_list;
+void		fd_list_close(t_fd_list **lst);
+t_fd_list	*fd_list_add_fd(t_fd_list **lst, int fd);
+
 typedef struct s_command_invocation
 {
 	t_list						*output_redirections;
@@ -27,7 +40,7 @@ char					*find_executable_file_in_cwd(char *filename);
 int						cmd_execvp(char *filename, char **argv);
 int						cmd_exec_commands(t_command_invocation *command);
 int						cmd_set_input_file(t_command_invocation *command);
-int						cmd_set_output_file(t_command_invocation *command);
+int						cmd_set_output_file(t_command_invocation *command, t_fd_list **fd_lst);
 void					cmd_exec_command(t_command_invocation *command,
 							int pipe_prev_fd[2], int pipe_fd[2]);
 void					cmd_close_pipe(int pipe_fd[2]);

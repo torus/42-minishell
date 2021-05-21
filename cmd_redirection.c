@@ -4,8 +4,51 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "libft/libft.h"
+#include "execution.h"
 #include "env.h"
 #include "minishell.h"
+
+t_fd_list	*fd_list_add_fd(t_fd_list **lst, int fd)
+{
+	t_fd_list	*new_lst;
+	t_fd_list	*tmp;
+
+	if (!lst)
+		return (NULL);
+	new_lst = ft_calloc(1, sizeof(t_fd_list));
+	new_lst->fd = fd;
+	if (!new_lst)
+		return (NULL);
+	if (!*lst)
+		*lst = new_lst;
+	else
+	{
+		tmp = *lst;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new_lst;
+	}
+	return (new_lst);
+}
+
+#include <stdio.h>
+void		fd_list_close(t_fd_list **lst)
+{
+	t_fd_list	*current;
+	t_fd_list	*tmp;
+
+	if (!lst)
+		return ;
+	current = *lst;
+	while (current)
+	{
+		close(current->fd);
+		tmp = current;
+		current = current->next;
+		free(tmp);
+	}
+	*lst = NULL;
+}
 
 /*
  * リダイレクション用に渡された文字列の環境変数展開を行う.
@@ -82,7 +125,7 @@ int	cmd_set_input_file(t_command_invocation *command)
  *
  * return: return -1 if error has occurred, otherwise, return 0.
  */
-int	cmd_set_output_file(t_command_invocation *command)
+int	cmd_set_output_file(t_command_invocation *command, t_fd_list **fd_lst)
 {
 	int					fd;
 	t_list				*current;
@@ -103,7 +146,8 @@ int	cmd_set_output_file(t_command_invocation *command)
 		free(filepath);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error output file open()"));
-		if (dup2(fd, red->fd) == -1)
+		if (dup2(fd, red->fd) == -1
+			|| (fd_lst && !fd_list_add_fd(fd_lst, fd) && !fd_list_add_fd(fd_lst, red->fd)))
 			return (put_err_msg_and_ret("error dup2(fd, STDOUT_NO)"));
 		current = current->next;
 	}
