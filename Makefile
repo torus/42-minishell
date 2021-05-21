@@ -1,6 +1,9 @@
 NAME = minishell
 CC = gcc
 CFLAGS = -Werror -Wall -Wextra -g
+ifeq ($(shell uname), Linux)
+	LINK_LIB = -lbsd
+endif
 
 LIBFT_PATH = libft
 LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
@@ -24,7 +27,7 @@ all: $(NAME)
 
 $(NAME): ${HEADER_FILES} ${OBJS}
 	$(LIBFT_MAKE)
-	$(CC) -g -fsanitize=address -o $(NAME) $(OBJS) $(LIBFT_LIB) -lbsd
+	$(CC) -g -fsanitize=address -o $(NAME) $(OBJS) $(LIBFT_LIB) $(LINK_LIB)
 
 clean:
 	$(LIBFT_MAKE) clean
