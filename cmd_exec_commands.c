@@ -1,5 +1,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "env.h"
 #include "execution.h"
 #include "builtin.h"
@@ -11,32 +14,6 @@ static int	cmd_connect_pipe(
 		cmd_close_pipe(pipe_prev_fd);
 	cmd_copy_pipe(pipe_prev_fd, pipe_fd);
 	return (0);
-}
-
-/* ビルトインコマンドを実行する
- * パイプではなく単体で実行されることを想定している
- */
-int	cmd_exec_builtin(t_command_invocation *command)
-{
-	int				stdoutfd;
-	int				stdinfd;
-	int				status;
-	t_builtin_cmd	*builtin_func;
-
-	stdoutfd = dup(STDOUT_FILENO);
-	stdinfd = dup(STDIN_FILENO);
-	if (cmd_set_input_file(command) == ERROR
-		|| cmd_set_output_file(command) == ERROR)
-		return (put_err_msg_and_ret("error parent input/output file"));
-	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
-	status = builtin_func((char **)command->exec_and_args);
-	set_status(status);
-	if (dup2(stdoutfd, STDOUT_FILENO) == -1
-		|| dup2(stdinfd, STDIN_FILENO) == -1)
-		put_err_msg_and_exit("FDの復元に失敗");
-	close(stdoutfd);
-	close(stdinfd);
-	return (status);
 }
 
 /* コマンドが実行完了するまでwaitする.
