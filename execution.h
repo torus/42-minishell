@@ -11,6 +11,17 @@ typedef struct s_cmd_redirection
 	int			fd;
 }	t_cmd_redirection;
 
+/* コマンド終了後に一気に解放するためにリストで開けたfdを記録する.
+ *
+ * プロセスが異なる外部コマンドでは気にしなくてもよいのだが,
+ * minishellと同じプロセスで動作するビルトインコマンドでは
+ * これが必要
+ */
+typedef struct s_fd_list {
+	int					fd;
+	struct s_fd_list	*next;
+}	t_fd_list;
+
 typedef struct s_command_invocation
 {
 	t_list						*output_redirections;
@@ -26,10 +37,14 @@ char					*find_executable_file_from_path_env(char *filename);
 char					*find_executable_file_in_cwd(char *filename);
 int						cmd_execvp(char *filename, char **argv);
 int						cmd_exec_commands(t_command_invocation *command);
+char					*expand_redirect_filepath(char *red_target);
+int						open_file_for_redirect(t_cmd_redirection *red,
+							int open_flags, mode_t open_mode);
 int						cmd_set_input_file(t_command_invocation *command);
 int						cmd_set_output_file(t_command_invocation *command);
 void					cmd_exec_command(t_command_invocation *command,
 							int pipe_prev_fd[2], int pipe_fd[2]);
+int						cmd_exec_builtin(t_command_invocation *command);
 void					cmd_close_pipe(int pipe_fd[2]);
 void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 void					cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
@@ -45,5 +60,7 @@ int						cmd_add_outredirect(t_command_invocation *command,
 void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
 char					*expand_env_var(char *str);
+void					fd_list_close(t_fd_list **lst);
+t_fd_list				*fd_list_add_fd(t_fd_list **lst, int fd);
 
 #endif

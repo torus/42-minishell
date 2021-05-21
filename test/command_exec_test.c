@@ -159,6 +159,57 @@ int main(){
 		remove("expected_b");
     }
 
+	TEST_SECTION("複数fd出力リダイレクション");
+	{
+		// 複数fd出力を行うプログラムを作成
+		system("printf '#include<unistd.h>\nint main(){write(1, \"fd1\", 3);write(2, \"fd2\", 3);write(3, \"fd3\", 3);}' > multiple_fd_out.c && gcc multiple_fd_out.c -o multiple_fd_out");
+		t_command_invocation *command = cmd_init_cmdinvo((const char **)ft_split("./multiple_fd_out", ' '));
+		// ./a.out 3> file3 2> file2 1> file1; cat file3 file2 file1
+		cmd_add_outredirect(command, ft_strdup("actual_3"), 3, true);
+		cmd_add_outredirect(command, ft_strdup("actual_2"), 2, true);
+		cmd_add_outredirect(command, ft_strdup("actual_1"), 1, true);
+
+		int status = cmd_exec_commands(command);
+		CHECK_EQ(status, 0);
+		system("./multiple_fd_out 3> expected_3 2> expected_2 1> expected_1");
+		CHECK(system("diff --color -u expected_3 actual_3"
+			  "&& diff --color -u expected_2 actual_2"
+			  "&& diff --color -u expected_1 actual_1") == 0);
+		cmd_free_cmdinvo(command);
+		remove("actual_3");
+		remove("actual_2");
+		remove("actual_1");
+		remove("expected_3");
+		remove("expected_2");
+		remove("expected_1");
+		remove("multiple_fd_out.c");
+		remove("multiple_fd_out");
+	}
+
+	TEST_SECTION("複数fd入力リダイレクション");
+	{
+		// 複数fd出力を行うプログラムを作成
+		system("printf '#include<unistd.h>\nint main(){int size, buf[500]; size=read(0, buf, 100); write(1, buf, size); size=read(3, buf, 100); write(1, buf, size);}' > multiple_fd_in.c && gcc multiple_fd_in.c -o multiple_fd_in");
+		t_command_invocation *command = cmd_init_cmdinvo((const char **)ft_split("./multiple_fd_in", ' '));
+		system("echo this_is_hoge > hoge && echo this_is_fuga > fuga");
+		// ./multiple_fd_in 0<hoge 3<fuga > actual
+		cmd_add_inredirect(command, ft_strdup("hoge"), 0);
+		cmd_add_inredirect(command, ft_strdup("fuga"), 3);
+		cmd_add_outredirect(command, ft_strdup("actual"), 1, true);
+
+		int status = cmd_exec_commands(command);
+		CHECK_EQ(status, 0);
+		system("./multiple_fd_in 0<hoge 3<fuga > expected");
+		CHECK(system("diff --color -u expected actual") == 0);
+		cmd_free_cmdinvo(command);
+		remove("actual");
+		remove("expected");
+		remove("multiple_fd_in.c");
+		remove("multiple_fd_in");
+		remove("hoge");
+		remove("fuga");
+	}
+
     TEST_SECTION("cat /etc/passwd | wc > output.txt  パイプが1つの場合");
     {
 		t_command_invocation *first_command = cmd_init_cmdinvo((const char**)ft_split("cat /etc/passwd", ' '));
