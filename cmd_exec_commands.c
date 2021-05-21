@@ -29,7 +29,7 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	stdoutfd = dup(STDOUT_FILENO);
 	stdinfd = dup(STDIN_FILENO);
 	if (cmd_set_input_file(command) == ERROR
-		|| cmd_set_output_file(command, &fd_lst) == ERROR)
+		|| cmd_set_output_file(command) == ERROR)
 		return (put_err_msg_and_ret("error parent input/output file"));
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
 	status = builtin_func((char **)command->exec_and_args);

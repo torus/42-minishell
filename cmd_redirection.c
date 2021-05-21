@@ -125,7 +125,7 @@ int	cmd_set_input_file(t_command_invocation *command)
  *
  * return: return -1 if error has occurred, otherwise, return 0.
  */
-int	cmd_set_output_file(t_command_invocation *command, t_fd_list **fd_lst)
+int	cmd_set_output_file(t_command_invocation *command)
 {
 	int					fd;
 	t_list				*current;
@@ -146,8 +146,7 @@ int	cmd_set_output_file(t_command_invocation *command, t_fd_list **fd_lst)
 		free(filepath);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error output file open()"));
-		if (dup2(fd, red->fd) == -1
-			|| (fd_lst && !fd_list_add_fd(fd_lst, fd) && !fd_list_add_fd(fd_lst, red->fd)))
+		if (dup2(fd, red->fd) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDOUT_NO)"));
 		current = current->next;
 	}
