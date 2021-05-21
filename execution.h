@@ -20,7 +20,7 @@ typedef struct s_cmd_redirection
 typedef struct s_fd_list {
 	int					fd;
 	struct s_fd_list	*next;
-} t_fd_list;
+}	t_fd_list;
 
 typedef struct s_command_invocation
 {
@@ -38,7 +38,8 @@ char					*find_executable_file_in_cwd(char *filename);
 int						cmd_execvp(char *filename, char **argv);
 int						cmd_exec_commands(t_command_invocation *command);
 char					*expand_redirect_filepath(char *red_target);
-int						open_file_for_redirect(t_cmd_redirection *red, int open_flags, mode_t open_mode);
+int						open_file_for_redirect(t_cmd_redirection *red,
+							int open_flags, mode_t open_mode);
 int						cmd_set_input_file(t_command_invocation *command);
 int						cmd_set_output_file(t_command_invocation *command);
 void					cmd_exec_command(t_command_invocation *command,
@@ -61,6 +62,5 @@ void					cmd_free_cmdinvo(t_command_invocation *cmds);
 char					*expand_env_var(char *str);
 void					fd_list_close(t_fd_list **lst);
 t_fd_list				*fd_list_add_fd(t_fd_list **lst, int fd);
-
 
 #endif
