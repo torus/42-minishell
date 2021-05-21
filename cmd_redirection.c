@@ -108,9 +108,9 @@ int	cmd_set_output_file(t_command_invocation *command)
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open,
 			S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
-			return (put_err_msg_and_ret("error output file open()"));
-		if (dup2(fd, red->fd) == -1)
 			return (put_minish_err_msg_and_ret(-1, "out_redirect", strerror(errno)));
+		if (dup2(fd, red->fd) == -1)
+			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
 		current = current->next;
 	}
 	return (0);
