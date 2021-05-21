@@ -31,7 +31,6 @@ t_fd_list	*fd_list_add_fd(t_fd_list **lst, int fd)
 	return (new_lst);
 }
 
-#include <stdio.h>
 void		fd_list_close(t_fd_list **lst)
 {
 	t_fd_list	*current;
