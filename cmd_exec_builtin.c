@@ -33,7 +33,7 @@ t_fd_list	*fd_list_add_fd(t_fd_list **lst, int fd)
 	return (new_lst);
 }
 
-void		fd_list_close(t_fd_list **lst)
+void	fd_list_close(t_fd_list **lst)
 {
 	t_fd_list	*current;
 	t_fd_list	*tmp;
@@ -55,7 +55,8 @@ void		fd_list_close(t_fd_list **lst)
  * command: コマンド
  * stdinfd: ビルトインコマンド終了後にSTDINを元に戻す用
  */
-static int	cmd_set_builtin_input_file(t_command_invocation *command, t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
+static int	builtin_set_in_red(t_command_invocation *command,
+	t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
 {
 	int					fd;
 	t_list				*current;
@@ -68,15 +69,15 @@ static int	cmd_set_builtin_input_file(t_command_invocation *command, t_fd_list *
 		red = (t_cmd_redirection *)current->content;
 		fd = open_file_for_redirect(red, O_RDONLY, 0);
 		if (fd == -1)
-			return (put_minish_err_msg_and_ret(-1, "in_redirect", strerror(errno)));
+			return (put_minish_err_msg_and_ret(-1,
+					"in_redirect", strerror(errno)));
 		if (red->fd == *stdinfd)
 			*stdinfd = dup(*stdinfd);
 		if (red->fd == *stdoutfd)
 			*stdoutfd = dup(*stdoutfd);
-		if (dup2(fd, red->fd) == -1)
+		if (dup2(fd, red->fd) == -1 || close(fd) == -1
+			|| !fd_list_add_fd(fd_list, red->fd))
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
-		close(fd);
-		fd_list_add_fd(fd_list, red->fd);
 		current = current->next;
 	}
 	return (0);
@@ -86,7 +87,8 @@ static int	cmd_set_builtin_input_file(t_command_invocation *command, t_fd_list *
  * command: コマンド
  * stdoutfd: ビルトインコマンド終了後にSTDOUTを元に戻す用
  */
-static int	cmd_set_builtin_output_file(t_command_invocation *command, t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
+static int	builtin_set_out_red(t_command_invocation *command,
+	t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
 {
 	int					fd;
 	t_list				*current;
@@ -100,17 +102,16 @@ static int	cmd_set_builtin_output_file(t_command_invocation *command, t_fd_list 
 		red = (t_cmd_redirection *)current->content;
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open,
-			S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error output file open()"));
 		if (red->fd == *stdinfd)
 			*stdinfd = dup(*stdinfd);
 		if (red->fd == *stdoutfd)
 			*stdoutfd = dup(*stdoutfd);
-		if (dup2(fd, red->fd) == -1)
+		if (dup2(fd, red->fd) == -1 || close(fd) == -1
+			|| !fd_list_add_fd(fd_list, red->fd))
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
-		close(fd);
-		fd_list_add_fd(fd_list, red->fd);
 		current = current->next;
 	}
 	return (0);
@@ -129,8 +130,8 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	t_fd_list		*fd_lst;
 
 	fd_lst = NULL;
-	if (cmd_set_builtin_input_file(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR
-		|| cmd_set_builtin_output_file(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR)
+	if (builtin_set_in_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR
+		|| builtin_set_out_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR)
 		return (put_err_msg_and_ret("error parent input/output file"));
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
 	status = builtin_func((char **)command->exec_and_args);
