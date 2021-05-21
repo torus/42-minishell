@@ -1,5 +1,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "env.h"
 #include "execution.h"
 #include "builtin.h"
@@ -10,6 +13,44 @@ static int	cmd_connect_pipe(
 	if (pipe_prev_fd[1] != -1)
 		cmd_close_pipe(pipe_prev_fd);
 	cmd_copy_pipe(pipe_prev_fd, pipe_fd);
+	return (0);
+}
+
+/*
+ * command: コマンド
+ * stdoutfd: ビルトインコマンド終了後にSTDOUTを元に戻す用
+ * stdinfd: ビルトインコマンド終了後にSTDINを元に戻す用
+ */
+static int	cmd_set_builtin_output_file(t_command_invocation *command, t_fd_list **fd_list, int *stdoutfd, int *stdinfd)
+{
+	int					fd;
+	t_list				*current;
+	t_cmd_redirection	*red;
+	int					flag_open;
+	char				*filepath;
+
+	*stdoutfd = dup(STDOUT_FILENO);
+	*stdinfd = dup(STDIN_FILENO);
+	current = command->output_redirections;
+	while (current)
+	{
+		red = (t_cmd_redirection *)current->content;
+		filepath = expand_redirect_filepath((char *)red->filepath);
+		if (!filepath)
+			return (ERROR);
+		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
+		fd = open(filepath, O_WRONLY | O_CREAT | flag_open,
+				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+		free(filepath);
+		if (fd == -1)
+			return (put_err_msg_and_ret("error output file open()"));
+		if (red->fd == *stdoutfd)
+			*stdoutfd = dup(*stdoutfd);
+		dup2(fd, red->fd);
+		close(fd);
+		fd_list_add_fd(fd_list, red->fd);
+		current = current->next;
+	}
 	return (0);
 }
 
@@ -26,10 +67,8 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	t_fd_list		*fd_lst;
 
 	fd_lst = NULL;
-	stdoutfd = dup(STDOUT_FILENO);
-	stdinfd = dup(STDIN_FILENO);
 	if (cmd_set_input_file(command) == ERROR
-		|| cmd_set_output_file(command) == ERROR)
+		|| cmd_set_builtin_output_file(command, &fd_lst, &stdoutfd, &stdinfd) == ERROR)
 		return (put_err_msg_and_ret("error parent input/output file"));
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
 	status = builtin_func((char **)command->exec_and_args);

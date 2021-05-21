@@ -39,6 +39,7 @@ char					*find_executable_file_from_path_env(char *filename);
 char					*find_executable_file_in_cwd(char *filename);
 int						cmd_execvp(char *filename, char **argv);
 int						cmd_exec_commands(t_command_invocation *command);
+char					*expand_redirect_filepath(char *red_target);
 int						cmd_set_input_file(t_command_invocation *command);
 int						cmd_set_output_file(t_command_invocation *command);
 void					cmd_exec_command(t_command_invocation *command,

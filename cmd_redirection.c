@@ -61,7 +61,7 @@ void		fd_list_close(t_fd_list **lst)
  * return: 環境変数展開などが完了した文字列.
  *   展開した結果文字列が2つ以上の場合はエラーなのでNULLを返す.
  */
-static char	*expand_redirect_filepath(char *red_target)
+char	*expand_redirect_filepath(char *red_target)
 {
 	char	*expanded_str;
 	char	**splitted_expanded_str;
