@@ -68,7 +68,7 @@ int	cmd_set_input_file(t_command_invocation *command)
 		free(filepath);
 		if (fd == -1)
 			return (put_err_msg_and_ret("error input file open()"));
-		if (!current->next && dup2(fd, red->fd) == -1)
+		if (dup2(fd, red->fd) == -1)
 			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
 		current = current->next;
 	}
