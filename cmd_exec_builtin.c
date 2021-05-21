@@ -51,9 +51,12 @@ void	fd_list_close(t_fd_list **lst)
 	*lst = NULL;
 }
 
-/*
+/* ビルトインコマンド用に入力リダイレクションを設定
+ *
  * command: コマンド
+ * fd_list: ビルトインコマンド終了後にfdをcloseする用
  * stdinfd: ビルトインコマンド終了後にSTDINを元に戻す用
+ * stdoutfd: ビルトインコマンド終了後にSTDOUTを元に戻す用
  */
 static int	builtin_set_in_red(t_command_invocation *command,
 	t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
@@ -83,8 +86,11 @@ static int	builtin_set_in_red(t_command_invocation *command,
 	return (0);
 }
 
-/*
+/* ビルトインコマンド用に出力リダイレクションを設定
+ *
  * command: コマンド
+ * fd_list: ビルトインコマンド終了後にfdをcloseする用
+ * stdinfd: ビルトインコマンド終了後にSTDINを元に戻す用
  * stdoutfd: ビルトインコマンド終了後にSTDOUTを元に戻す用
  */
 static int	builtin_set_out_red(t_command_invocation *command,
