@@ -159,7 +159,7 @@ int main(){
 		remove("expected_b");
     }
 
-	TEST_SECTION("複数fdリダイレクション");
+	TEST_SECTION("複数fd出力リダイレクション");
 	{
 		// 複数fd出力を行うプログラムを作成
 		system("printf '#include<unistd.h>\nint main(){write(1, \"fd1\", 3);write(2, \"fd2\", 3);write(3, \"fd3\", 3);}' > multiple_fd_out.c && gcc multiple_fd_out.c -o multiple_fd_out");
