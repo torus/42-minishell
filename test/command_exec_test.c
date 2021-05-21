@@ -162,7 +162,7 @@ int main(){
 	TEST_SECTION("複数fdリダイレクション");
 	{
 		// 複数fd出力を行うプログラムを作成
-		system("printf '#include<unistd.h>\nint main(){write(1, \"fd1\", 4);write(2, \"fd2\", 4);write(3, \"fd3\", 4);}' > multiple_fd_out.c && gcc multiple_fd_out.c -o multiple_fd_out");
+		system("printf '#include<unistd.h>\nint main(){write(1, \"fd1\", 3);write(2, \"fd2\", 3);write(3, \"fd3\", 3);}' > multiple_fd_out.c && gcc multiple_fd_out.c -o multiple_fd_out");
 		t_command_invocation *command = cmd_init_cmdinvo((const char **)ft_split("./multiple_fd_out", ' '));
 		// ./a.out 3> file3 2> file2 1> file1; cat file3 file2 file1
 		cmd_add_outredirect(command, ft_strdup("actual_3"), 3, true);
