@@ -159,6 +159,33 @@ int main(){
 		remove("expected_b");
     }
 
+	TEST_SECTION("複数fdリダイレクション");
+	{
+		// 複数fd出力を行うプログラムを作成
+		system("printf '#include<unistd.h>\nint main(){write(1, \"fd1\", 4);write(2, \"fd2\", 4);write(3, \"fd3\", 4);}' > multiple_fd_out.c && gcc multiple_fd_out.c -o multiple_fd_out");
+		t_command_invocation *command = cmd_init_cmdinvo((const char **)ft_split("./multiple_fd_out", ' '));
+		// ./a.out 3> file3 2> file2 1> file1; cat file3 file2 file1
+		cmd_add_outredirect(command, ft_strdup("actual_3"), 3, true);
+		cmd_add_outredirect(command, ft_strdup("actual_2"), 2, true);
+		cmd_add_outredirect(command, ft_strdup("actual_1"), 1, true);
+
+		int status = cmd_exec_commands(command);
+		CHECK_EQ(status, 0);
+		system("./multiple_fd_out 3> expected_3 2> expected_2 1> expected_1");
+		CHECK(system("diff --color -u expected_3 actual_3"
+			  "&& diff --color -u expected_2 actual_2"
+			  "&& diff --color -u expected_1 actual_1") == 0);
+		cmd_free_cmdinvo(command);
+		remove("actual_3");
+		remove("actual_2");
+		remove("actual_1");
+		remove("expected_3");
+		remove("expected_2");
+		remove("expected_1");
+		remove("multiple_fd_out.c");
+		remove("multiple_fd_out");
+	}
+
     TEST_SECTION("cat /etc/passwd | wc > output.txt  パイプが1つの場合");
     {
 		t_command_invocation *first_command = cmd_init_cmdinvo((const char**)ft_split("cat /etc/passwd", ' '));
