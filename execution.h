@@ -21,8 +21,6 @@ typedef struct s_fd_list {
 	int					fd;
 	struct s_fd_list	*next;
 } t_fd_list;
-void		fd_list_close(t_fd_list **lst);
-t_fd_list	*fd_list_add_fd(t_fd_list **lst, int fd);
 
 typedef struct s_command_invocation
 {
@@ -44,6 +42,7 @@ int						cmd_set_input_file(t_command_invocation *command);
 int						cmd_set_output_file(t_command_invocation *command);
 void					cmd_exec_command(t_command_invocation *command,
 							int pipe_prev_fd[2], int pipe_fd[2]);
+int						cmd_exec_builtin(t_command_invocation *command);
 void					cmd_close_pipe(int pipe_fd[2]);
 void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 void					cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
@@ -59,5 +58,8 @@ int						cmd_add_outredirect(t_command_invocation *command,
 void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
 char					*expand_env_var(char *str);
+void					fd_list_close(t_fd_list **lst);
+t_fd_list				*fd_list_add_fd(t_fd_list **lst, int fd);
+
 
 #endif
