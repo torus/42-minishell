@@ -1,11 +1,12 @@
+#include <limits.h>
 #include "libft/libft.h"
 #include "parse.h"
 
 int	lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result)
 {
-	int	i;
-	int	ch;
-	int	fd;
+	int		i;
+	int		ch;
+	long	fd;
 
 	i = 0;
 	while (i < result->length)
@@ -16,11 +17,11 @@ int	lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result)
 	}
 	result->text[i] = '\0';
 	ch = lex_getc(buf);
-	if (ch == '<' || ch == '>')
+	if ((ch == '<' || ch == '>')
+		&& ft_atol(result->text, &fd) && fd <= INT_MAX)
 	{
-		fd = ft_atoi(result->text);
 		lex_get_symbols(buf, result, ch);
-		result->length = fd;
+		result->length = (int)fd;
 	}
 	else
 		lex_ungetc(buf);
