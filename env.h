@@ -13,5 +13,6 @@ int		ft_unsetenv(const char *name);
 // コマンドの終了ステータス
 int		get_status(void);
 void	set_status(int status_value);
+int		set_status_and_ret(int status_value, int ret_value);
 
 #endif

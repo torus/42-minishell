@@ -3,12 +3,24 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
 #include <errno.h>
+#include <string.h>
 #include "libft/libft.h"
 #include "execution.h"
 #include "env.h"
 #include "minishell.h"
+
+int	put_redirect_fd_err_msg_and_ret(int ret_value, int fd, char *msg)
+{
+	char	*fd_str;
+
+	fd_str = ft_itoa(fd);
+	if (!fd_str)
+		put_minish_err_msg_and_ret(ERROR, "redirection", "ft_strjoin() failed");
+	put_minish_err_msg(fd_str, msg);
+	free(fd_str);
+	return (ret_value);
+}
 
 /*
  * リダイレクション用に渡された文字列の環境変数展開を行う.
@@ -56,6 +68,8 @@ int	open_file_for_redirect(t_cmd_redirection *red,
 	if (!filepath)
 		return (ERROR);
 	fd = open(filepath, open_flags, open_mode);
+	if (fd == -1)
+		put_minish_err_msg(filepath, strerror(errno));
 	free(filepath);
 	return (fd);
 }
@@ -78,11 +92,11 @@ int	cmd_set_input_file(t_command_invocation *command)
 	{
 		red = (t_cmd_redirection *)current->content;
 		fd = open_file_for_redirect(red, O_RDONLY, 0);
-		if (fd == -1)
-			return (put_minish_err_msg_and_ret(-1,
-					"in_redirect", strerror(errno)));
+		if (fd == ERROR)
+			return (ERROR);
 		if (dup2(fd, red->fd) == -1)
-			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
+			return (put_redirect_fd_err_msg_and_ret(ERROR,
+					red->fd, strerror(errno)));
 		current = current->next;
 	}
 	return (0);
@@ -109,11 +123,11 @@ int	cmd_set_output_file(t_command_invocation *command)
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
-		if (fd == -1)
-			return (put_minish_err_msg_and_ret(-1,
-					"out_redirect", strerror(errno)));
+		if (fd == ERROR)
+			return (ERROR);
 		if (dup2(fd, red->fd) == -1)
-			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
+			return (put_redirect_fd_err_msg_and_ret(ERROR,
+					red->fd, strerror(errno)));
 		current = current->next;
 	}
 	return (0);

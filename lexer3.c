@@ -16,7 +16,7 @@ int	lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result)
 	}
 	result->text[i] = '\0';
 	ch = lex_getc(buf);
-	if (ch == '<' || ch == '>')
+	if ((ch == '<' || ch == '>') && !is_int_overflow(result->text, 1))
 	{
 		fd = ft_atoi(result->text);
 		lex_get_symbols(buf, result, ch);
