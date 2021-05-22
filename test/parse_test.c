@@ -569,7 +569,11 @@ void test_parser(void)
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
-
+		t_parse_ast *string_node = parse_string(&buf, &tok);
+		CHECK(string_node);
+		CHECK_EQ(string_node->type, ASTNODE_STRING);
+		CHECK_EQ(string_node->content.string->type, TOKTYPE_EXPANDABLE);
+		CHECK_EQ_STR(string_node->content.string->text, "2147483648");
 		t_parse_ast *node = parse_redirection(&buf, &tok);
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
