@@ -95,7 +95,7 @@ int	cmd_set_input_file(t_command_invocation *command)
 		if (fd == ERROR)
 			return (ERROR);
 		if (dup2(fd, red->fd) == -1)
-			return (put_redirect_fd_err_msg_and_ret(255,
+			return (put_redirect_fd_err_msg_and_ret(ERROR,
 					red->fd, strerror(errno)));
 		current = current->next;
 	}
@@ -126,7 +126,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 		if (fd == ERROR)
 			return (ERROR);
 		if (dup2(fd, red->fd) == -1)
-			return (put_redirect_fd_err_msg_and_ret(255,
+			return (put_redirect_fd_err_msg_and_ret(ERROR,
 					red->fd, strerror(errno)));
 		current = current->next;
 	}
