@@ -21,7 +21,7 @@ int	lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result)
 	{
 		fd = ft_atoi(result->text);
 		lex_get_symbols(buf, result, ch);
-		result->length = (int)fd;
+		result->length = fd;
 	}
 	else
 		lex_ungetc(buf);
