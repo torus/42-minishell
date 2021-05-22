@@ -5,12 +5,18 @@
 
 # define PARSE_BUFFER_SIZE 1024
 
+struct	t_parse_buffer;
+typedef int t_lexer_getc(t_parse_buffer *buf);
+typedef void t_lexer_ungetc(t_parse_buffer *buf);
+
 typedef struct s_parse_buffer
 {
 	char			buffer[PARSE_BUFFER_SIZE];
 	int				size;
 	int				cur_pos;
 	t_lexer_state	lex_stat;
+	t_lexer_getc	*getc;
+	t_lexer_ungetc	*ungetc;
 }	t_parse_buffer;
 
 typedef enum e_parse_ast_type

@@ -20,6 +20,8 @@ void	init_buffer_with_string(t_parse_buffer *buf, char *str)
 	buf->size = len;
 	buf->lex_stat = LEXSTAT_NORMAL;
 	ft_strlcpy(buf->buffer, str, len + 1);
+	buf->getc = NULL;
+	buf->ungetc = NULL;
 }
 
 int	invoke_sequential_commands(t_parse_ast *seqcmd)
