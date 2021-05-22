@@ -10,6 +10,18 @@
 #include "env.h"
 #include "minishell.h"
 
+int	put_redirect_fd_err_msg_and_ret(int ret_value, int fd, char *msg)
+{
+	char	*fd_str;
+
+	fd_str = ft_itoa(fd);
+	if (!fd_str)
+		put_minish_err_msg_and_ret(ERROR, "redirection", "ft_strjoin() failed");
+	put_minish_err_msg(fd_str, msg);
+	free(fd_str);
+	return (ret_value);
+}
+
 /*
  * リダイレクション用に渡された文字列の環境変数展開を行う.
  *
