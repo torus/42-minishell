@@ -6,7 +6,7 @@
 /*   By: jtanaka <jtanaka@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/09 02:58:56 by jtanaka           #+#    #+#             */
-/*   Updated: 2021/05/21 04:13:09 by jtanaka          ###   ########.fr       */
+/*   Updated: 2021/05/22 13:27:48 by jtanaka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,20 @@ bool	is_long_overflow(const char *nptr, int sign)
 		if (sign == -1 && ft_strncmp(nptr, "9223372036854775808", 19) > 0)
 			return (true);
 		if (sign == 1 && ft_strncmp(nptr, "9223372036854775807", 19) > 0)
+			return (true);
+	}
+	return (false);
+}
+
+bool	is_int_overflow(const char *nptr, int sign)
+{
+	if (num_len(nptr) > 10)
+		return (true);
+	if (num_len(nptr) == 10)
+	{
+		if (sign == -1 && ft_strncmp(nptr, "2147483648", 10) > 0)
+			return (true);
+		if (sign == 1 && ft_strncmp(nptr, "2147483647", 10) > 0)
 			return (true);
 	}
 	return (false);
