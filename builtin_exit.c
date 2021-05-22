@@ -16,31 +16,11 @@ static void	put_exit_errmsg_and_exit(char *exit_status)
 
 static void	exit_atol(char *str)
 {
-	char	*nptr;
 	long	num;
-	int		sign;
 
-	nptr = str;
-	sign = 1;
-	num = 0;
-	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\f'
-		|| *nptr == '\r' || *nptr == '\n' || *nptr == '\v')
-		nptr++;
-	if (*nptr == '-')
-	{
-		sign = -1;
-		nptr++;
-	}
-	if (!ft_isdigit(*nptr) || is_long_overflow(nptr, sign))
+	if (!ft_atol(str, &num))
 		put_exit_errmsg_and_exit(str);
-	while (ft_isdigit(*nptr))
-		num = num * 10 + (*nptr++ - '0');
-	while (*nptr == ' ' || *nptr == '\t' || *nptr == '\f'
-		|| *nptr == '\r' || *nptr == '\n' || *nptr == '\v')
-		nptr++;
-	if (*nptr)
-		put_exit_errmsg_and_exit(str);
-	exit((sign * num) & 255);
+	exit(num & 255);
 }
 
 /*

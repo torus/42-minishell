@@ -31,6 +31,7 @@ int					ft_strncmp(const char *s1, const char *s2, size_t n);
 int					num_len(const char *str);
 bool				is_long_overflow(const char *nptr, int sign);
 int					ft_atoi(const char *nptr);
+bool				ft_atol(const char *nptr, long *result);
 int					ft_isalpha(int c);
 int					ft_isdigit(int c);
 int					ft_isalnum(int c);
