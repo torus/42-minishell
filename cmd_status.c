@@ -23,7 +23,7 @@ void	set_status(int status_value)
 	*get_status_ptr() = status_value;
 }
 
-int		set_status_and_ret(int status_value, int ret_value)
+int	set_status_and_ret(int status_value, int ret_value)
 {
 	set_status(status_value);
 	return (ret_value);
