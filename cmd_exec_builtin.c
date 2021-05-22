@@ -71,16 +71,16 @@ static int	builtin_set_in_red(t_command_invocation *command,
 	{
 		red = (t_cmd_redirection *)current->content;
 		fd = open_file_for_redirect(red, O_RDONLY, 0);
-		if (fd == -1)
-			return (put_minish_err_msg_and_ret(-1,
-					"in_redirect", strerror(errno)));
+		if (fd == ERROR)
+			return (ERROR);
 		if (red->fd == *stdinfd)
 			*stdinfd = dup(*stdinfd);
 		if (red->fd == *stdoutfd)
 			*stdoutfd = dup(*stdoutfd);
-		if (dup2(fd, red->fd) == -1 || close(fd) == -1
+		if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
 			|| !fd_list_add_fd(fd_list, red->fd))
-			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
+			return (put_redirect_fd_err_msg_and_ret(ERROR,
+					red->fd, strerror(errno)));
 		current = current->next;
 	}
 	return (0);
@@ -107,17 +107,17 @@ static int	builtin_set_out_red(t_command_invocation *command,
 	{
 		red = (t_cmd_redirection *)current->content;
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
-		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open,
-				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
-		if (fd == -1)
-			return (put_err_msg_and_ret("error output file open()"));
+		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open, 0644);
+		if (fd == ERROR)
+			return (ERROR);
 		if (red->fd == *stdinfd)
 			*stdinfd = dup(*stdinfd);
 		if (red->fd == *stdoutfd)
 			*stdoutfd = dup(*stdoutfd);
-		if (dup2(fd, red->fd) == -1 || close(fd) == -1
+		if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
 			|| !fd_list_add_fd(fd_list, red->fd))
-			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
+			return (put_redirect_fd_err_msg_and_ret(ERROR,
+					red->fd, strerror(errno)));
 		current = current->next;
 	}
 	return (0);
@@ -138,7 +138,7 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	fd_lst = NULL;
 	if (builtin_set_in_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR
 		|| builtin_set_out_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR)
-		return (put_err_msg_and_ret("error parent input/output file"));
+		return (set_status_and_ret(255, -1));
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
 	status = builtin_func((char **)command->exec_and_args);
 	set_status(status);
