@@ -140,8 +140,7 @@ int	print_history(t_command_history *his, int index)
 		while (i < len)
 		{
 			ch = rope_index(rope, i);
-			if (ch != '\n')
-				write(1, &ch, 1);
+			write(1, &ch, 1);
 			i++;
 		}
 	}
@@ -212,6 +211,7 @@ void	edit_enter(t_command_history *history, t_command_state *st)
 	history->ropes[history->current] = NULL;
 	st->cursor_x = 0;
 	st->length = 0;
+	edit_putc('\n');
 }
 
 int	handle_left_right(t_command_state *st, char c)
@@ -349,7 +349,6 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 			edit_normal_character(history, state, cbuf);
 		else if (cbuf[0] == '\n')
 		{
-			edit_normal_character(history, state, "\n");
 			rope = history->ropes[history->current];
 			edit_enter(history, state);
 			return (rope);
@@ -422,9 +421,10 @@ int	edit_main(void)
 	{
 		t_parse_buffer	buf;
 		rope = edit_get_line(&history, &state);
-		edit_init_parse_buffer_with_rope(&buf, rope);
 		if (rope)
 		{
+			rope = rope_concat(rope, rope_create("\n", NULL));
+			edit_init_parse_buffer_with_rope(&buf, rope);
 			lex_get_token(&buf, &tok);
 			cmdline = parse_command_line(&buf, &tok);
 			if (cmdline)
