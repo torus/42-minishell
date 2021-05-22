@@ -138,7 +138,7 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	fd_lst = NULL;
 	if (builtin_set_in_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR
 		|| builtin_set_out_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR)
-		return (set_status_and_ret(255, -1));
+		return (set_status_and_ret(1, 1));
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
 	status = builtin_func((char **)command->exec_and_args);
 	set_status(status);
