@@ -11,6 +11,10 @@
 #include "libft/libft.h"
 #include "rope.h"
 #include "input.h"
+#include "parse.h"
+#include "minishell.h"
+
+t_terminal_state	g_term_stat;
 
 void	terminal_state_init(t_terminal_state *st)
 {
@@ -136,7 +140,8 @@ int	print_history(t_command_history *his, int index)
 		while (i < len)
 		{
 			ch = rope_index(rope, i);
-			write(1, &ch, 1);
+			if (ch != '\n')
+				write(1, &ch, 1);
 			i++;
 		}
 	}
@@ -207,7 +212,6 @@ void	edit_enter(t_command_history *history, t_command_state *st)
 	history->ropes[history->current] = NULL;
 	st->cursor_x = 0;
 	st->length = 0;
-	edit_putc('\n');
 }
 
 int	handle_left_right(t_command_state *st, char c)
@@ -331,9 +335,10 @@ int	setup_terminal(void)
  * tputs
  */
 
-int	main_loop(t_command_history *history, t_command_state *state)
+t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 {
-	char				cbuf[2];
+	char	cbuf[2];
+	t_rope	*rope;
 
 	cbuf[1] = '\0';
 	while (1)
@@ -343,20 +348,68 @@ int	main_loop(t_command_history *history, t_command_state *state)
 		if (cbuf[0] >= 0x20 && cbuf[0] < 0x7f)
 			edit_normal_character(history, state, cbuf);
 		else if (cbuf[0] == '\n')
+		{
+			edit_normal_character(history, state, "\n");
+			rope = history->ropes[history->current];
 			edit_enter(history, state);
+			return (rope);
+		}
 		else if (cbuf[0] == 0x1b)
 		{
 			if (read(STDIN_FILENO, cbuf, 1) == 1 && cbuf[0] == '[')
 				handle_escape_sequence (history, state);
 		}
 	}
-	return (1);
+	return (NULL);
 }
 
-int	main(void)
+/*
+static void	print_rope(t_rope *rope)
+{
+	int	len;
+	int	i;
+
+	i = 0;
+	len = rope_length(rope);
+	while (i < len)
+	{
+		printf("%c", rope_index(rope, i));
+		i++;
+	}
+	printf("\n");
+}
+*/
+
+int	rope_getc(t_parse_buffer *buf)
+{
+	t_rope			*rope;
+	unsigned char	ch;
+
+	if (buf->cur_pos == buf->size)
+		return (EOF);
+	rope = buf->data;
+	ch = rope_index(rope, buf->cur_pos++);
+	return (ch);
+}
+
+void	edit_init_parse_buffer_with_rope(t_parse_buffer *buf, t_rope *rope)
+{
+	buf->cur_pos = 0;
+	buf->size = rope_length(rope);
+	buf->lex_stat = LEXSTAT_NORMAL;
+	buf->getc = rope_getc;
+	buf->ungetc = NULL;
+	buf->data = rope;
+}
+
+int	edit_main(void)
 {
 	t_command_history	history;
 	t_command_state		state;
+	t_rope				*rope;
+	t_token				tok;
+	t_parse_ast			*cmdline;
+	t_parse_ast			*seqcmd;
 
 	terminal_state_init(&g_term_stat);
 	init_history(&history);
@@ -365,7 +418,24 @@ int	main(void)
 	state.length = 0;
 	term_controls_init(&state.cnt);
 	tputs(state.cnt.c_enter_insert_mode, 1, edit_putc);
-	main_loop(&history, &state);
+	while (1)
+	{
+		t_parse_buffer	buf;
+		rope = edit_get_line(&history, &state);
+		edit_init_parse_buffer_with_rope(&buf, rope);
+		if (rope)
+		{
+			lex_get_token(&buf, &tok);
+			cmdline = parse_command_line(&buf, &tok);
+			if (cmdline)
+			{
+				seqcmd = cmdline->content.command_line->seqcmd_node;
+				invoke_sequential_commands(seqcmd);
+				parse_free_all_ast();
+			}
+
+		}
+	}
 	if (tty_reset(STDIN_FILENO) < 0)
 		error_exit("tty_reset error");
 	return (0);

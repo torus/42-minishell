@@ -17,6 +17,7 @@ typedef struct s_parse_buffer
 	t_lexer_state	lex_stat;
 	t_lexer_getc	*getc;
 	t_lexer_ungetc	*ungetc;
+	void			*data;
 }	t_parse_buffer;
 
 typedef enum e_parse_ast_type

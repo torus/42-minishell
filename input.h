@@ -1,6 +1,10 @@
 #ifndef INPUT_H
 # define INPUT_H
 
+# include <term.h>
+
+# include "rope.h"
+
 # define LINE_BUFFER_SIZE 8
 
 typedef enum e_tty_state
@@ -41,5 +45,7 @@ typedef struct s_command_state
 	int				length;
 	t_term_controls	cnt;
 }	t_command_state;
+
+int	edit_main(void);
 
 #endif
