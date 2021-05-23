@@ -53,6 +53,24 @@ static int	print_envs_with_declaration(void)
 	return (0);
 }
 
+static bool	is_valid_env_key(char *key)
+{
+	int	i;
+
+	if (!ft_strlen(key))
+		return (false);
+	i = 0;
+	while (key[i])
+	{
+		if ((!ft_isalnum(key[i]) && key[i] != '_')
+			|| (ft_isdigit(key[i]) && i == 0)
+			|| (key[i] == '+' && (i == 0 || key[i+1] != '\0')))
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
 /*
  * bashの挙動を見る限り,
  * "key=value"  (valueは空文字列でもOK) の場合のみ
@@ -67,13 +85,16 @@ static int	export_env(char *arg)
 	if (!ft_strchr(arg, '='))
 		return (0);
 	kvarr = split_first_c(arg, '=');
-	if (!ft_strlen(kvarr[0]))
+	if (!is_valid_env_key(kvarr[0]))
 	{
 		put_export_err_msg(arg);
 		free_ptrarr((void **)kvarr);
 		return (0);
 	}
-	ft_setenv(kvarr[0], kvarr[1], 1);
+	if (ft_strchr(kvarr[0], '+'))
+		export_update_env(kvarr[0], kvarr[1]);
+	else
+		ft_setenv(kvarr[0], kvarr[1], 1);
 	free_ptrarr((void **)kvarr);
 	return (0);
 }
