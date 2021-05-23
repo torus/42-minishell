@@ -71,6 +71,21 @@ static bool	is_valid_env_key(char *key)
 	return (true);
 }
 
+static int	export_update_env(char *key, char *value)
+{
+	char	*old_value;
+
+	// keyの最後の+を取り除く
+	key = ft_substr(key, 0, ft_strchr(key, '+') - key);
+	old_value = get_env_val(key);
+	if (!old_value || !ft_strlen(old_value))
+		ft_setenv(key, value, 1);
+	else
+		ft_setenv(key, ft_strjoin(old_value, value), 1);
+	free(old_value);
+	return (0);
+}
+
 /*
  * bashの挙動を見る限り,
  * "key=value"  (valueは空文字列でもOK) の場合のみ
