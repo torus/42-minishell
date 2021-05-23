@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "libft/libft.h"
 #include "env.h"
+#include "minishell.h"
 
 /*
  * keyname, value を元に "key=value" の文字列を作成する
@@ -69,18 +70,31 @@ static int	expand_and_add_env(const char *name, const char *value)
 {
 	extern char	**environ;
 	char		**new_environ;
-	int			environ_len;
+	int			i;
+	char		*kvstr;
 
-	environ_len = ptrarr_len((void **)environ);
-	new_environ = ft_calloc(environ_len + 2, sizeof(char *));
+	new_environ = ft_calloc(ptrarr_len((void **)environ) + 2, sizeof(char *));
 	if (!new_environ)
-		return (ERROR);
-	ft_memcpy(new_environ, environ, sizeof(char *) * environ_len);
-	new_environ[environ_len] = generate_kvstr(name, value);
-	if (!new_environ[environ_len])
+		put_minish_err_msg_and_exit(1, "environment", "failed expand environ");
+
+	kvstr = generate_kvstr(name, value);
+	i = 0;
+	while (environ[i])
 	{
-		free_ptrarr((void **)new_environ);
-		return (ERROR);
+		if (!environ[i + 1]
+			|| ft_strncmp(name, environ[i], ft_strlen(name) + 1) < 0)
+		{
+			new_environ[i] = kvstr;
+			break;
+		}
+		else
+			new_environ[i] = environ[i];
+		i++;
+	}
+	while (environ[i])
+	{
+		new_environ[i + 1] = environ[i];
+		i++;
 	}
 	if ((void *)environ < (void *)&new_environ)
 		free(environ);
