@@ -108,7 +108,7 @@ static int	export_env(char *arg)
 	{
 		put_export_err_msg(arg);
 		free_ptrarr((void **)kvarr);
-		return (0);
+		return (1);
 	}
 	if (ft_strchr(kvarr[0], '+'))
 		export_update_env(kvarr[0], kvarr[1]);
@@ -125,13 +125,16 @@ static int	export_env(char *arg)
  */
 int	builtin_export(char **argv)
 {
+	int	status;
+
 	if (ptrarr_len((void **)argv) < 2)
 		return (print_envs_with_declaration());
 	argv++;
+	status = 0;
 	while (*argv)
 	{
-		export_env(*argv);
+		status |= export_env(*argv);
 		argv++;
 	}
-	return (0);
+	return (status);
 }
