@@ -1,9 +1,28 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include "libft/libft.h"
 #include "builtin.h"
 #include "env.h"
-#include "libft/libft.h"
+#include "minishell.h"
+
+static void	put_export_err_msg(char *identifer)
+{
+	char	*tmp;
+	char	*errmsg;
+
+	// `=': not a valid identifier
+	tmp = ft_strjoin("`", identifer);
+	if (!tmp)
+		put_minish_err_msg_and_exit(1, "export", "failed malloc()");
+	errmsg = ft_strjoin(tmp, "': not a valid identifier");
+	free(tmp);
+	if (!errmsg)
+		put_minish_err_msg_and_exit(1, "export", "failed malloc()");
+	put_minish_err_msg("export", errmsg);
+	free(errmsg);
+}
 
 static int	print_envs_with_declaration(void)
 {
@@ -48,6 +67,12 @@ static int	export_env(char *arg)
 	if (!ft_strchr(arg, '='))
 		return (0);
 	kvarr = split_first_c(arg, '=');
+	if (!ft_strlen(kvarr[0]))
+	{
+		put_export_err_msg(arg);
+		free_ptrarr((void **)kvarr);
+		return (0);
+	}
 	ft_setenv(kvarr[0], kvarr[1], 1);
 	free_ptrarr((void **)kvarr);
 	return (0);
