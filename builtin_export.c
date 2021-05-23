@@ -74,15 +74,19 @@ static bool	is_valid_env_key(char *key)
 static int	export_update_env(char *key, char *value)
 {
 	char	*old_value;
+	char	*new_value;
 
 	// keyの最後の+を取り除く
 	key = ft_substr(key, 0, ft_strchr(key, '+') - key);
 	old_value = get_env_val(key);
 	if (!old_value || !ft_strlen(old_value))
-		ft_setenv(key, value, 1);
+		new_value = value;
 	else
-		ft_setenv(key, ft_strjoin(old_value, value), 1);
+		new_value = ft_strjoin(old_value, value);
+	ft_setenv(key, new_value, 1);
+	free(key);
 	free(old_value);
+	free(new_value);
 	return (0);
 }
 
