@@ -101,8 +101,10 @@ static int	export_env(char *arg)
 {
 	char	**kvarr;
 
+	if (!ft_strchr(arg, '='))
+		return (0);
 	kvarr = split_first_c(arg, '=');
-	if (!ft_strchr(arg, '=') || !is_valid_env_key(kvarr[0]))
+	if (!is_valid_env_key(kvarr[0]))
 	{
 		put_export_err_msg(arg);
 		free_ptrarr((void **)kvarr);
