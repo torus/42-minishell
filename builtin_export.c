@@ -80,7 +80,7 @@ static int	export_update_env(char *key, char *value)
 	key = ft_substr(key, 0, ft_strchr(key, '+') - key);
 	old_value = get_env_val(key);
 	if (!old_value || !ft_strlen(old_value))
-		new_value = value;
+		new_value = ft_strdup(value);
 	else
 		new_value = ft_strjoin(old_value, value);
 	ft_setenv(key, new_value, 1);
