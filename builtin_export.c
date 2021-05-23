@@ -62,7 +62,7 @@ static bool	is_valid_env_key(char *key)
 	i = 0;
 	while (key[i])
 	{
-		if ((!ft_isalnum(key[i]) && key[i] != '_')
+		if ((!ft_isalnum(key[i]) && key[i] != '_' && key[i] != '+')
 			|| (ft_isdigit(key[i]) && i == 0)
 			|| (key[i] == '+' && (i == 0 || key[i+1] != '\0')))
 			return (false);
