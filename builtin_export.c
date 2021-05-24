@@ -12,7 +12,6 @@ static void	put_export_err_msg(char *identifer)
 	char	*tmp;
 	char	*errmsg;
 
-	// `=': not a valid identifier
 	tmp = ft_strjoin("`", identifer);
 	if (!tmp)
 		put_minish_err_msg_and_exit(1, "export", "failed malloc()");
@@ -22,35 +21,6 @@ static void	put_export_err_msg(char *identifer)
 		put_minish_err_msg_and_exit(1, "export", "failed malloc()");
 	put_minish_err_msg("export", errmsg);
 	free(errmsg);
-}
-
-static int	print_envs_with_declaration(void)
-{
-	extern char	**environ;
-	int			i;
-	char		**kvarr;
-	char		*env_val;
-
-	i = 0;
-	while (environ[i])
-	{
-		kvarr = split_first_c(environ[i], '=');
-		if (!kvarr)
-			return (ERROR);
-		env_val = get_env_val(kvarr[0]);
-		free_ptrarr((void **)kvarr);
-		if (!env_val)
-			return (ERROR);
-		write(STDOUT_FILENO, "declare -x ", ft_strlen("declare -x "));
-		write(STDOUT_FILENO, environ[i],
-			ft_strchr(environ[i], '=') - environ[i] + 1);
-		write(STDOUT_FILENO, "\"", 1);
-		ft_putstr_fd(env_val, STDOUT_FILENO);
-		free(env_val);
-		write(STDOUT_FILENO, "\"\n", 2);
-		i++;
-	}
-	return (0);
 }
 
 static bool	is_valid_env_key(char *key)
@@ -64,7 +34,7 @@ static bool	is_valid_env_key(char *key)
 	{
 		if ((!ft_isalnum(key[i]) && key[i] != '_' && key[i] != '+')
 			|| (ft_isdigit(key[i]) && i == 0)
-			|| (key[i] == '+' && (i == 0 || key[i+1] != '\0')))
+			|| (key[i] == '+' && (i == 0 || key[i + 1] != '\0')))
 			return (false);
 		i++;
 	}
@@ -76,7 +46,6 @@ static int	export_update_env(char *key, char *value)
 	char	*old_value;
 	char	*new_value;
 
-	// keyの最後の+を取り除く
 	key = ft_substr(key, 0, ft_strchr(key, '+') - key);
 	old_value = get_env_val(key);
 	if (!old_value || !ft_strlen(old_value))
