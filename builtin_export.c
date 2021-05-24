@@ -41,7 +41,7 @@ static bool	is_valid_env_key(char *key)
 	return (true);
 }
 
-static int	export_update_env(char *key, char *value)
+static int	export_strjoin_env(char *key, char *value)
 {
 	char	*old_value;
 	char	*new_value;
@@ -80,7 +80,7 @@ static int	export_env(char *arg)
 		return (1);
 	}
 	if (ft_strchr(kvarr[0], '+'))
-		export_update_env(kvarr[0], kvarr[1]);
+		export_strjoin_env(kvarr[0], kvarr[1]);
 	else
 		ft_setenv(kvarr[0], kvarr[1], 1);
 	free_ptrarr((void **)kvarr);
