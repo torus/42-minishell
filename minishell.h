@@ -4,12 +4,14 @@
 # include <signal.h>
 # include "execution.h"
 # include "parse.h"
+# include "env.h"
 
 # define PROMPT "minish > "
 
 // グローバル構造体
 typedef struct	s_shell {
-	char	*cwd;
+	char		*cwd;
+	t_var	*vars;
 }				t_shell;
 extern t_shell	g_shell;
 
