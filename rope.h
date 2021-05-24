@@ -7,6 +7,7 @@ struct	s_splay_tree
 	void			*value;
 	t_splay_tree	*left;
 	t_splay_tree	*right;
+	int				refcount;
 };
 
 typedef enum e_splay_direction
@@ -22,8 +23,10 @@ struct	s_splay_path
 	t_splay_direction	dir;
 	t_splay_tree		*node;
 	t_splay_path		*next;
+	int					refcount;
 };
 
+void			splay_release(t_splay_tree *tree);
 t_splay_tree	*splay_create(
 					t_splay_tree *left, void *value, t_splay_tree *right);
 t_splay_tree	*splay_insert_left(
@@ -49,6 +52,8 @@ t_splay_tree	*splay_zig_zag_left(
 t_splay_tree	*splay(t_splay_path *path);
 t_splay_path	*splay_path_left(t_splay_path *path);
 t_splay_path	*splay_path_right(t_splay_path *path);
+
+void			splay_assign(t_splay_tree **var, t_splay_tree *val);
 
 # define ROPE_NOWEIGHT ((void*)-1L)
 

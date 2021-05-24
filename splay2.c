@@ -9,9 +9,13 @@
  */
 t_splay_tree	*splay_zig_right(t_splay_tree *x, t_splay_tree *p)
 {
-	return (
-		splay_create(
-			x->left, x->value, splay_create(x->right, p->value, p->right)));
+	t_splay_tree	*dest;
+
+	dest = splay_create(
+		x->left, x->value, splay_create(x->right, p->value, p->right));
+	splay_release(x);
+	splay_release(p);
+	return (dest);
 }
 
 /*
@@ -26,12 +30,17 @@ t_splay_tree	*splay_zig_right(t_splay_tree *x, t_splay_tree *p)
 t_splay_tree	*splay_zig_zig_right(
 					t_splay_tree *x, t_splay_tree *p, t_splay_tree *g)
 {
-	return (
+	t_splay_tree	*dest;
+
+	dest = splay_create(
+		x->left, x->value,
 		splay_create(
-			x->left, x->value,
-			splay_create(
-				x->right, p->value,
-				splay_create(p->right, g->value, g->right))));
+			x->right, p->value,
+			splay_create(p->right, g->value, g->right)));
+	splay_release(x);
+	splay_release(p);
+	splay_release(g);
+	return (dest);
 }
 
 /*
@@ -50,14 +59,18 @@ t_splay_tree	*splay_zig_zag_right(
 	t_splay_tree	*b;
 	t_splay_tree	*c;
 	t_splay_tree	*d;
+	t_splay_tree	*dest;
 
 	a = p->left;
 	b = x->left;
 	c = x->right;
 	d = g->right;
-	return (
-		splay_create(
-			splay_create(a, p->value, b),
-			x->value,
-			splay_create(c, g->value, d)));
+	dest = splay_create(
+		splay_create(a, p->value, b),
+		x->value,
+		splay_create(c, g->value, d));
+	splay_release(x);
+	splay_release(p);
+	splay_release(g);
+	return (dest);
 }

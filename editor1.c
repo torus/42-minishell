@@ -58,15 +58,19 @@ void	edit_init_parse_buffer_with_rope(t_parse_buffer *buf, t_rope *rope)
 int	edit_read_execute(t_command_history *history, t_command_state *state)
 {
 	t_rope				*rope;
+	t_rope				*new_rope;
 	t_token				tok;
 	t_parse_ast			*cmdline;
 	t_parse_ast			*seqcmd;
 	t_parse_buffer		buf;
 
 	rope = edit_get_line(history, state);
+	rope->refcount++;
 	if (rope)
 	{
-		rope = rope_concat(rope, rope_create("\n", NULL));
+		new_rope = rope_concat(rope, rope_create("\n", NULL));
+		splay_release(rope);
+		rope = new_rope;
 		edit_init_parse_buffer_with_rope(&buf, rope);
 		lex_get_token(&buf, &tok);
 		cmdline = parse_command_line(&buf, &tok);

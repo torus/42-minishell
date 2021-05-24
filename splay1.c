@@ -10,8 +10,13 @@ t_splay_tree	*splay_create(
 	if (tree)
 	{
 		tree->left = left;
+		if (left)
+			left->refcount++;
 		tree->right = right;
+		if (right)
+			right->refcount++;
 		tree->value = value;
+		tree->refcount = 0;
 	}
 	return (tree);
 }
@@ -42,7 +47,11 @@ t_splay_path	*splay_path_create(t_splay_direction dir, t_splay_tree *node,
 	{
 		path->dir = dir;
 		path->node = node;
+		node->refcount++;
 		path->next = next;
+		if (next)
+			next->refcount++;
+		path->refcount = 0;
 	}
 	return (path);
 }
