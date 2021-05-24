@@ -24,20 +24,13 @@ t_var	*add_new_var(t_var **vars, t_var *new_var)
 			prev = current;
 			current = current->next;
 		}
+		new_var->next = current;
 		if (!prev)  // 一番最初
-		{
-			new_var->next = current;
 			*vars = new_var;
-		}
 		else if (!current)  // 一番最後
-		{
 			prev->next = new_var;
-		}
 		else  // 途中に追加
-		{
 			prev->next = new_var;
-			new_var->next = current;
-		}
 	}
 	return (new_var);
 }
