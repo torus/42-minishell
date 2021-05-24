@@ -32,6 +32,7 @@ static int	partition_strarr(char **strarr, int p, int r)
 static void	quick_sort_strarr(char **strarr, int p, int r)
 {
 	int	q;
+
 	if (p < r)
 	{
 		q = partition_strarr(strarr, p, r);
