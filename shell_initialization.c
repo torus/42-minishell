@@ -46,7 +46,10 @@ static void	init_shlvl(void)
 /* シェルの環境を初期化する */
 int	initialize_shell(void)
 {
+	extern char	**environ;
+
 	set_shell_sighandlers();
+	sort_strarr(environ);
 	init_pwd();
 	init_shlvl();
 	return (0);
