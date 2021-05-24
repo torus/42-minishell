@@ -74,10 +74,9 @@ static int	expand_and_add_env(const char *name, const char *value)
 	char		*kvstr;
 
 	new_environ = ft_calloc(ptrarr_len((void **)environ) + 2, sizeof(char *));
-	if (!new_environ)
-		put_minish_err_msg_and_exit(1, "environment", "failed expand environ");
-
 	kvstr = generate_kvstr(name, value);
+	if (!new_environ || !kvstr)
+		put_minish_err_msg_and_exit(1, "environment", "failed expand environ");
 	i = 0;
 	while (environ[i])
 	{
