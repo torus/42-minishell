@@ -1,36 +1,61 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include "libft/libft.h"
 #include "builtin.h"
 #include "env.h"
-#include "libft/libft.h"
+#include "minishell.h"
 
-static int	print_envs_with_declaration(void)
+static void	put_export_err_msg(char *identifer)
 {
-	extern char	**environ;
-	int			i;
-	char		**kvarr;
-	char		*env_val;
+	char	*tmp;
+	char	*errmsg;
 
+	tmp = ft_strjoin("`", identifer);
+	if (!tmp)
+		put_minish_err_msg_and_exit(1, "export", "failed malloc()");
+	errmsg = ft_strjoin(tmp, "': not a valid identifier");
+	free(tmp);
+	if (!errmsg)
+		put_minish_err_msg_and_exit(1, "export", "failed malloc()");
+	put_minish_err_msg("export", errmsg);
+	free(errmsg);
+}
+
+static bool	is_valid_env_key(char *key)
+{
+	int	i;
+
+	if (!ft_strlen(key))
+		return (false);
 	i = 0;
-	while (environ[i])
+	while (key[i])
 	{
-		kvarr = split_first_c(environ[i], '=');
-		if (!kvarr)
-			return (ERROR);
-		env_val = get_env_val(kvarr[0]);
-		free_ptrarr((void **)kvarr);
-		if (!env_val)
-			return (ERROR);
-		write(STDOUT_FILENO, "declare -x ", ft_strlen("declare -x "));
-		write(STDOUT_FILENO, environ[i],
-			ft_strchr(environ[i], '=') - environ[i] + 1);
-		write(STDOUT_FILENO, "\"", 1);
-		ft_putstr_fd(env_val, STDOUT_FILENO);
-		free(env_val);
-		write(STDOUT_FILENO, "\"\n", 2);
+		if ((!ft_isalnum(key[i]) && key[i] != '_' && key[i] != '+')
+			|| (ft_isdigit(key[i]) && i == 0)
+			|| (key[i] == '+' && (i == 0 || key[i + 1] != '\0')))
+			return (false);
 		i++;
 	}
+	return (true);
+}
+
+static int	export_strjoin_env(char *key, char *value)
+{
+	char	*old_value;
+	char	*new_value;
+
+	key = ft_substr(key, 0, ft_strchr(key, '+') - key);
+	old_value = get_env_val(key);
+	if (!old_value || !ft_strlen(old_value))
+		new_value = ft_strdup(value);
+	else
+		new_value = ft_strjoin(old_value, value);
+	ft_setenv(key, new_value, 1);
+	free(key);
+	free(old_value);
+	free(new_value);
 	return (0);
 }
 
@@ -48,7 +73,16 @@ static int	export_env(char *arg)
 	if (!ft_strchr(arg, '='))
 		return (0);
 	kvarr = split_first_c(arg, '=');
-	ft_setenv(kvarr[0], kvarr[1], 1);
+	if (!is_valid_env_key(kvarr[0]))
+	{
+		put_export_err_msg(arg);
+		free_ptrarr((void **)kvarr);
+		return (1);
+	}
+	if (ft_strchr(kvarr[0], '+'))
+		export_strjoin_env(kvarr[0], kvarr[1]);
+	else
+		ft_setenv(kvarr[0], kvarr[1], 1);
 	free_ptrarr((void **)kvarr);
 	return (0);
 }
@@ -60,13 +94,16 @@ static int	export_env(char *arg)
  */
 int	builtin_export(char **argv)
 {
+	int	status;
+
 	if (ptrarr_len((void **)argv) < 2)
 		return (print_envs_with_declaration());
 	argv++;
+	status = 0;
 	while (*argv)
 	{
-		export_env(*argv);
+		status |= export_env(*argv);
 		argv++;
 	}
-	return (0);
+	return (status);
 }

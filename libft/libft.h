@@ -28,6 +28,9 @@ char				*ft_strnstr(const char *big, const char *little,
 						size_t len);
 int					ft_strcmp(const char *s1, const char *s2);
 int					ft_strncmp(const char *s1, const char *s2, size_t n);
+int					num_len(const char *str);
+bool				is_int_overflow(const char *nptr, int sign);
+bool				is_long_overflow(const char *nptr, int sign);
 int					ft_atoi(const char *nptr);
 int					ft_isalpha(int c);
 int					ft_isdigit(int c);
@@ -74,6 +77,7 @@ void				free_ptrarr_and_assign_null(void ***ptrarr);
 void				**ptrarr_add_ptr(void **ptrarr, void *ptr);
 void				**ptrarr_add_ptr_and_free(void **ptrarr, void *ptr);
 void				**ptrarr_merge(void **ptrarr_first, void **ptrarr_last);
+void				sort_strarr(char **strarr);
 int					wrap_malloc(void **p, size_t len);
 
 #endif

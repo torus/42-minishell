@@ -3,9 +3,24 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <string.h>
 #include "libft/libft.h"
+#include "execution.h"
 #include "env.h"
 #include "minishell.h"
+
+int	put_redirect_fd_err_msg_and_ret(int ret_value, int fd, char *msg)
+{
+	char	*fd_str;
+
+	fd_str = ft_itoa(fd);
+	if (!fd_str)
+		put_minish_err_msg_and_ret(ERROR, "redirection", "ft_strjoin() failed");
+	put_minish_err_msg(fd_str, msg);
+	free(fd_str);
+	return (ret_value);
+}
 
 /*
  * リダイレクション用に渡された文字列の環境変数展開を行う.
@@ -18,7 +33,7 @@
  * return: 環境変数展開などが完了した文字列.
  *   展開した結果文字列が2つ以上の場合はエラーなのでNULLを返す.
  */
-static char	*expand_redirect_filepath(char *red_target)
+char	*expand_redirect_filepath(char *red_target)
 {
 	char	*expanded_str;
 	char	**splitted_expanded_str;
@@ -43,6 +58,22 @@ static char	*expand_redirect_filepath(char *red_target)
 	return (filepath);
 }
 
+int	open_file_for_redirect(t_cmd_redirection *red,
+	int open_flags, mode_t open_mode)
+{
+	char	*filepath;
+	int		fd;
+
+	filepath = expand_redirect_filepath((char *)red->filepath);
+	if (!filepath)
+		return (ERROR);
+	fd = open(filepath, open_flags, open_mode);
+	if (fd == -1)
+		put_minish_err_msg(filepath, strerror(errno));
+	free(filepath);
+	return (fd);
+}
+
 /*
  * open input file as stdin if command->input_file_path is exist
  *
@@ -55,21 +86,17 @@ int	cmd_set_input_file(t_command_invocation *command)
 	int					fd;
 	t_list				*current;
 	t_cmd_redirection	*red;
-	char				*filepath;
 
 	current = command->input_redirections;
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
-		filepath = expand_redirect_filepath((char *)red->filepath);
-		if (!filepath)
+		fd = open_file_for_redirect(red, O_RDONLY, 0);
+		if (fd == ERROR)
 			return (ERROR);
-		fd = open(filepath, O_RDONLY);
-		free(filepath);
-		if (fd == -1)
-			return (put_err_msg_and_ret("error input file open()"));
-		if (!current->next && dup2(fd, red->fd) == -1)
-			return (put_err_msg_and_ret("error dup2(fd, STDIN_NO)"));
+		if (dup2(fd, red->fd) == -1)
+			return (put_redirect_fd_err_msg_and_ret(ERROR,
+					red->fd, strerror(errno)));
 		current = current->next;
 	}
 	return (0);
@@ -88,23 +115,19 @@ int	cmd_set_output_file(t_command_invocation *command)
 	t_list				*current;
 	int					flag_open;
 	t_cmd_redirection	*red;
-	char				*filepath;
 
 	current = command->output_redirections;
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
-		filepath = expand_redirect_filepath((char *)red->filepath);
-		if (!filepath)
-			return (ERROR);
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
-		fd = open(filepath, O_WRONLY | O_CREAT | flag_open,
+		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
-		free(filepath);
-		if (fd == -1)
-			return (put_err_msg_and_ret("error output file open()"));
-		if (!current->next && dup2(fd, red->fd) == -1)
-			return (put_err_msg_and_ret("error dup2(fd, STDOUT_NO)"));
+		if (fd == ERROR)
+			return (ERROR);
+		if (dup2(fd, red->fd) == -1)
+			return (put_redirect_fd_err_msg_and_ret(ERROR,
+					red->fd, strerror(errno)));
 		current = current->next;
 	}
 	return (0);
