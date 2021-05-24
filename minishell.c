@@ -3,6 +3,8 @@
 #include "minishell.h"
 #include "parse.h"
 
+t_shell	g_shell;
+
 void	die(void)
 {
 	int	*nullpo;

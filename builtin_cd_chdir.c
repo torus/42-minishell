@@ -22,7 +22,7 @@ static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
 	if (dest[0] == '/')
 		physical_path = ft_strdup(dest);
 	else
-		physical_path = path_join(g_cwd, dest);
+		physical_path = path_join(g_shell.cwd, dest);
 	if (!physical_path)
 		return (NULL);
 	canon_path = canonicalize_path(physical_path);
@@ -38,7 +38,7 @@ static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
 }
 
 /* cd で移動した先のパスとパス情報を元に
- *   g_cwd をセットする.
+ *   g_shell.cwd をセットする.
  *
  * path: 実際に chdir() が成功したパス.
  * is_canon_path: 正規化されたパスかどうか.

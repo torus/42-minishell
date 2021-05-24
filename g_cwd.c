@@ -4,9 +4,7 @@
 #include "env.h"
 #include "minishell.h"
 
-char	*g_cwd;
-
-/* g_cwd に新しいパスをセットする.
+/* shell.cwd に新しいパスをセットする.
  * chdir() などはしない.
  */
 int	set_cwd(char *abs_path)
@@ -16,8 +14,8 @@ int	set_cwd(char *abs_path)
 	oldpwd = get_env_val("PWD");
 	if (!oldpwd)
 		oldpwd = ft_strdup("");
-	free(g_cwd);
-	g_cwd = ft_strdup(abs_path);
+	free(g_shell.cwd);
+	g_shell.cwd = ft_strdup(abs_path);
 	ft_setenv("OLDPWD", oldpwd, 1);
 	ft_setenv("PWD", abs_path, 1);
 	free(oldpwd);
@@ -52,7 +50,7 @@ void	put_cwd_err_msg(char *for_whom)
 }
 
 /* 絶対パスを構築する
- * "{g_cwd}/{relative_path}" を返す
+ * "{shell.cwd}/{relative_path}" を返す
  * ex:
  *   - relative_path="dir/dir2/symlink2dir"
  *   - relative_path="./../dir/../././/.//////./"
@@ -64,7 +62,7 @@ char	*get_abs_path_from_cwd(char *relative_path)
 	char	*tmp;
 	int		i;
 
-	result = ft_strdup(g_cwd);
+	result = ft_strdup(g_shell.cwd);
 	dirs = ft_split(relative_path, '/');
 	if (!dirs)
 		return (NULL);

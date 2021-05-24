@@ -50,13 +50,13 @@ static bool	cd_from_sources(char *dest_path, char **sources)
 	while (sources[i])
 	{
 		if (sources[i][0] != '/')
-			abs_path = path_join3(g_cwd, sources[i], dest_path);
+			abs_path = path_join3(g_shell.cwd, sources[i], dest_path);
 		else
 			abs_path = path_join(sources[i], dest_path);
 		if (change_directory(abs_path))
 		{
 			if (ft_strlen(sources[i]))
-				printf("%s\n", g_cwd);
+				printf("%s\n", g_shell.cwd);
 			free(abs_path);
 			return (true);
 		}

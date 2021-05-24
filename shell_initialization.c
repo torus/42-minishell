@@ -43,11 +43,17 @@ static void	init_shlvl(void)
 	free(shlvl);
 }
 
+static void	init_env(void)
+{
+	g_shell.cwd = NULL;
+}
+
 /* シェルの環境を初期化する */
 int	initialize_shell(void)
 {
 	extern char	**environ;
 
+	init_env();
 	set_shell_sighandlers();
 	sort_strarr(environ);
 	init_pwd();

@@ -7,6 +7,12 @@
 
 # define PROMPT "minish > "
 
+// グローバル構造体
+typedef struct	s_shell {
+	char	*cwd;
+}				t_shell;
+extern t_shell	g_shell;
+
 // AST から exec_and_args に変換する時に使う構造体
 typedef struct s_cmd_str_node {
 	char					*text;

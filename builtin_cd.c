@@ -49,8 +49,8 @@ int	builtin_cd(char **argv)
 {
 	char	*dest;
 
-	if (!g_cwd)
-		g_cwd = getcwd(NULL, 0);
+	if (!g_shell.cwd)
+		g_shell.cwd = getcwd(NULL, 0);
 	if (ptrarr_len((void **)argv) > 2)
 		return (put_minish_err_msg_and_ret(1, argv[0], "too many arguments"));
 	dest = get_cd_dest_from_argv(argv);
