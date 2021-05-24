@@ -6,7 +6,7 @@
 /*
  * keyname, value を元に "key=value" の文字列を作成する
  */
-static char	*generate_kvstr(const char *key, const char *value)
+char	*generate_kvstr(const char *key, const char *value)
 {
 	char	*tmp;
 	char	*kvstr;
