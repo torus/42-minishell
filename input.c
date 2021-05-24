@@ -16,7 +16,7 @@
 
 t_terminal_state	g_term_stat;
 
-void	terminal_state_init(t_terminal_state *st)
+void	edit_terminal_state_init(t_terminal_state *st)
 {
 	st->ttystate = TTY_RESET;
 }
@@ -44,14 +44,14 @@ int	tty_reset(int fd)
 	return (0);
 }
 
-static void	sig_catch(int signo)
+static void	edit_sig_catch(int signo)
 {
 	printf("signal caught %d\n", signo);
 	tty_reset(STDIN_FILENO);
 	exit(0);
 }
 
-void	error_exit(const char *message)
+void	edit_error_exit(const char *message)
 {
 	char	*error_message;
 
@@ -112,7 +112,7 @@ int	tty_cbreak(int fd)
 	return (0);
 }
 
-void	init_history(t_command_history *his)
+void	edit_init_history(t_command_history *his)
 {
 	int	i;
 
@@ -124,7 +124,7 @@ void	init_history(t_command_history *his)
 		his->ropes[i++] = NULL;
 }
 
-int	print_history(t_command_history *his, int index)
+int	edit_print_history(t_command_history *his, int index)
 {
 	t_rope	*rope;
 	int		len;
@@ -147,7 +147,7 @@ int	print_history(t_command_history *his, int index)
 	return (len);
 }
 
-void	dump_history(t_command_history *his)
+void	edit_dump_history(t_command_history *his)
 {
 	int	index;
 
@@ -157,13 +157,13 @@ void	dump_history(t_command_history *his)
 	while (index != his->end)
 	{
 		fprintf(stderr, "| '");
-		print_history(his, index);
+		edit_print_history(his, index);
 		fprintf(stderr, "'\n");
 		index = (index + 1) % LINE_BUFFER_SIZE;
 	}
 }
 
-void	add_new_rope(t_command_history *history, char *cbuf)
+void	edit_add_new_rope(t_command_history *history, char *cbuf)
 {
 	if (history->current == history->end)
 	{
@@ -198,7 +198,7 @@ void	edit_normal_character(
 {
 	edit_putc(cbuf[0]);
 	if (!history->ropes[history->current])
-		add_new_rope(history, cbuf);
+		edit_add_new_rope(history, cbuf);
 	else
 		edit_insert_character(history, cbuf, st->cursor_x, st->length);
 	st->cursor_x++;
@@ -214,7 +214,7 @@ void	edit_enter(t_command_history *history, t_command_state *st)
 	edit_putc('\n');
 }
 
-int	handle_left_right(t_command_state *st, char c)
+int	edit_handle_left_right(t_command_state *st, char c)
 {
 	if (c == 'D')
 	{
@@ -236,7 +236,7 @@ int	handle_left_right(t_command_state *st, char c)
 	return (0);
 }
 
-int	handle_up_down(t_command_history *history, t_command_state *st, char c)
+int	edit_handle_up_down(t_command_history *history, t_command_state *st, char c)
 {
 	if (c != 'A' && c != 'B')
 		return (0);
@@ -247,7 +247,7 @@ int	handle_up_down(t_command_history *history, t_command_state *st, char c)
 			history->current = (history->current + 1) % LINE_BUFFER_SIZE;
 			tputs(st->cnt.c_clr_bol, 1, edit_putc);
 			edit_putc('\r');
-			st->cursor_x = print_history(history, history->current);
+			st->cursor_x = edit_print_history(history, history->current);
 			st->length = st->cursor_x;
 		}
 		return (1);
@@ -258,7 +258,7 @@ int	handle_up_down(t_command_history *history, t_command_state *st, char c)
 			% LINE_BUFFER_SIZE;
 		tputs(st->cnt.c_clr_bol, 1, edit_putc);
 		edit_putc('\r');
-		st->cursor_x = print_history(history, history->current);
+		st->cursor_x = edit_print_history(history, history->current);
 		st->length = st->cursor_x;
 	}
 	return (1);
@@ -268,7 +268,7 @@ int	handle_up_down(t_command_history *history, t_command_state *st, char c)
  * '\x1b[5~' => F5 key for debugging
  */
 
-void	handle_escape_sequence (t_command_history *history, t_command_state *st)
+void	edit_handle_escape_sequence(t_command_history *history, t_command_state *st)
 {
 	int		i;
 	char	cbuf[2];
@@ -276,8 +276,8 @@ void	handle_escape_sequence (t_command_history *history, t_command_state *st)
 	i = read(STDIN_FILENO, cbuf, 1);
 	if (i != 1)
 		return ;
-	if (handle_left_right(st, cbuf[0])
-		|| handle_up_down(history, st, cbuf[0]))
+	if (edit_handle_left_right(st, cbuf[0])
+		|| edit_handle_up_down(history, st, cbuf[0]))
 		;
 	else if (cbuf[0] == '1')
 	{
@@ -287,13 +287,13 @@ void	handle_escape_sequence (t_command_history *history, t_command_state *st)
 			i = read(STDIN_FILENO, cbuf, 1);
 			if (cbuf[0] == '~')
 			{
-				dump_history(history);
+				edit_dump_history(history);
 			}
 		}
 	}
 }
 
-void	term_controls_init(t_term_controls *t)
+void	edit_term_controls_init(t_term_controls *t)
 {
 	char	*area;
 
@@ -305,22 +305,22 @@ void	term_controls_init(t_term_controls *t)
 	t->c_exit_insert_mode = tgetstr("ei", &area);
 }
 
-int	setup_terminal(void)
+int	edit_setup_terminal(void)
 {
 	const char	*term = getenv("TERM");
 
 	if (!term)
-		error_exit("getenv(TERM) error");
+		edit_error_exit("getenv(TERM) error");
 	fprintf(stderr, "TERM = '%s'\n", term);
 	tgetent(NULL, term);
-	if (signal(SIGINT, sig_catch) == SIG_ERR)
-		error_exit("signal(SIGINT) error");
-	if (signal(SIGQUIT, sig_catch) == SIG_ERR)
-		error_exit("signal(SIGQUIT) error");
-	if (signal(SIGTERM, sig_catch) == SIG_ERR)
-		error_exit("signal(SIGTERM) error");
+	if (signal(SIGINT, edit_sig_catch) == SIG_ERR)
+		edit_error_exit("signal(SIGINT) error");
+	if (signal(SIGQUIT, edit_sig_catch) == SIG_ERR)
+		edit_error_exit("signal(SIGQUIT) error");
+	if (signal(SIGTERM, edit_sig_catch) == SIG_ERR)
+		edit_error_exit("signal(SIGTERM) error");
 	if (tty_cbreak(STDIN_FILENO) < 0)
-		error_exit("tty_cbreak error");
+		edit_error_exit("tty_cbreak error");
 	return (1);
 }
 
@@ -356,7 +356,7 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 		else if (cbuf[0] == 0x1b)
 		{
 			if (read(STDIN_FILENO, cbuf, 1) == 1 && cbuf[0] == '[')
-				handle_escape_sequence (history, state);
+				edit_handle_escape_sequence (history, state);
 		}
 	}
 	return (NULL);
@@ -410,12 +410,12 @@ int	edit_main(void)
 	t_parse_ast			*cmdline;
 	t_parse_ast			*seqcmd;
 
-	terminal_state_init(&g_term_stat);
-	init_history(&history);
-	setup_terminal();
+	edit_terminal_state_init(&g_term_stat);
+	edit_init_history(&history);
+	edit_setup_terminal();
 	state.cursor_x = 0;
 	state.length = 0;
-	term_controls_init(&state.cnt);
+	edit_term_controls_init(&state.cnt);
 	tputs(state.cnt.c_enter_insert_mode, 1, edit_putc);
 	while (1)
 	{
@@ -437,6 +437,6 @@ int	edit_main(void)
 		}
 	}
 	if (tty_reset(STDIN_FILENO) < 0)
-		error_exit("tty_reset error");
+		edit_error_exit("tty_reset error");
 	return (0);
 }
