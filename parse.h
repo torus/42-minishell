@@ -5,9 +5,9 @@
 
 # define PARSE_BUFFER_SIZE 1024
 
-struct	t_parse_buffer;
-typedef int t_lexer_getc(t_parse_buffer *buf);
-typedef void t_lexer_ungetc(t_parse_buffer *buf);
+struct						s_parse_buffer;
+typedef int					t_lexer_getc(struct s_parse_buffer *buf);
+typedef void				t_lexer_ungetc(struct s_parse_buffer *buf);
 
 typedef struct s_parse_buffer
 {
