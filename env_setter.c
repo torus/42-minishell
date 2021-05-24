@@ -78,23 +78,14 @@ static int	expand_and_add_env(const char *name, const char *value)
 	if (!new_environ || !kvstr)
 		put_minish_err_msg_and_exit(1, "environment", "failed expand environ");
 	i = 0;
-	while (environ[i])
-	{
-		if (!environ[i + 1]
-			|| ft_strncmp(name, environ[i], ft_strlen(name) + 1) < 0)
-		{
-			new_environ[i] = kvstr;
-			break;
-		}
-		else
-			new_environ[i] = environ[i];
+	while (environ[i]
+		&& ft_strncmp(name, environ[i], ft_strlen(name) + 1) >= 0)
 		i++;
-	}
-	while (environ[i])
-	{
-		new_environ[i + 1] = environ[i];
-		i++;
-	}
+	ft_memcpy(new_environ, environ,
+		sizeof(char *) * i);
+	new_environ[i] = kvstr;
+	ft_memcpy(&new_environ[i + 1], &environ[i],
+		sizeof(char *) * ptrarr_len((void**)&environ[i]));
 	if ((void *)environ < (void *)&new_environ)
 		free(environ);
 	environ = new_environ;
