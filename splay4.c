@@ -78,10 +78,13 @@ t_splay_tree	*splay(t_splay_path *path)
 	return (path->node);
 }
 
-t_splay_path	*splay_path_left(t_splay_path *path)
+t_splay_path	*splay_path_left(t_splay_path *path_orig)
 {
 	t_splay_tree	*current;
+	t_splay_path	*path;
 
+	path = path_orig;
+	path->refcount++;
 	current = path->node;
 	if (current->left)
 	{
@@ -93,17 +96,22 @@ t_splay_path	*splay_path_left(t_splay_path *path)
 			splay_path_assign(
 				&path, splay_path_create(SPLAY_RIGHT, current, path));
 		}
-		return (path);
 	}
-	if (path->dir == SPLAY_RIGHT)
-		return (path->next);
-	return (path->next->next);
+	else if (path->dir == SPLAY_RIGHT)
+		splay_path_assign(&path, path->next);
+	else
+		splay_path_assign(&path, path->next->next);
+	path->refcount--;
+	return (path);
 }
 
-t_splay_path	*splay_path_right(t_splay_path *path)
+t_splay_path	*splay_path_right(t_splay_path *path_orig)
 {
 	t_splay_tree	*current;
+	t_splay_path	*path;
 
+	path = path_orig;
+	path->refcount++;
 	current = path->node;
 	if (current->right)
 	{
@@ -115,9 +123,11 @@ t_splay_path	*splay_path_right(t_splay_path *path)
 			splay_path_assign(
 				&path, splay_path_create(SPLAY_LEFT, current, path));
 		}
-		return (path);
 	}
-	if (path->dir == SPLAY_LEFT)
-		return (path->next);
-	return (path->next->next);
+	else if (path->dir == SPLAY_LEFT)
+		splay_path_assign(&path, path->next);
+	else
+		splay_path_assign(&path, path->next->next);
+	path->refcount--;
+	return (path);
 }
