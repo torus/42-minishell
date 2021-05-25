@@ -11,6 +11,7 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 	char	cbuf[2];
 	t_rope	*rope;
 
+	rope = NULL;
 	cbuf[1] = '\0';
 	while (1)
 	{
@@ -20,7 +21,7 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 			edit_normal_character(history, state, cbuf);
 		else if (cbuf[0] == '\n')
 		{
-			rope = history->ropes[history->current];
+			splay_assign(&rope, history->ropes[history->current]);
 			edit_enter(history, state);
 			return (rope);
 		}
@@ -30,6 +31,7 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 				edit_handle_escape_sequence (history, state);
 		}
 	}
+	splay_release(rope);
 	return (NULL);
 }
 
@@ -38,10 +40,12 @@ int	rope_getc(t_parse_buffer *buf)
 	t_rope			*rope;
 	unsigned char	ch;
 
+	rope = NULL;
 	if (buf->cur_pos == buf->size)
 		return (EOF);
-	rope = buf->data;
+	splay_assign(&rope, buf->data);
 	ch = rope_index(rope, buf->cur_pos++);
+	splay_release(rope);
 	return (ch);
 }
 
@@ -64,13 +68,13 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 	t_parse_ast			*seqcmd;
 	t_parse_buffer		buf;
 
-	rope = edit_get_line(history, state);
-	rope->refcount++;
+	rope = NULL;
+	splay_assign(&rope, edit_get_line(history, state));
+	new_rope = NULL;
 	if (rope)
 	{
-		new_rope = rope_concat(rope, rope_create("\n", NULL));
-		splay_release(rope);
-		rope = new_rope;
+		splay_assign(&new_rope, rope_concat(rope, rope_create("\n", NULL)));
+		splay_assign(&rope, new_rope);
 		edit_init_parse_buffer_with_rope(&buf, rope);
 		lex_get_token(&buf, &tok);
 		cmdline = parse_command_line(&buf, &tok);
@@ -81,6 +85,8 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 			parse_free_all_ast();
 		}
 	}
+	splay_release(new_rope);
+	splay_release(rope);
 	return (1);
 }
 
