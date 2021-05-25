@@ -44,6 +44,7 @@ void	test_rope()
 		CHECK_EQ(rope_index(rope, 3), 'l');
 		CHECK_EQ(rope_index(rope, 4), 'o');
 		CHECK_EQ(rope_length(rope), 5);
+		splay_release(rope);
 	}
 
 	TEST_SECTION("rope_concat");
@@ -58,6 +59,8 @@ void	test_rope()
 		CHECK_EQ(rope_length(rope), 13);
 		CHECK_EQ(rope_index(rope, 4), 'o');
 		CHECK_EQ(rope_index(rope, 5), ',');
+
+		splay_release(rope);
 	}
 
 	TEST_SECTION("rope_weight");
@@ -70,17 +73,22 @@ void	test_rope()
 		CHECK_EQ(rope_weight(left), 4);
 		CHECK_EQ(rope_weight(right), 2);
 		CHECK_EQ(rope_weight(rope), 5);
+
+		splay_release(rope);
 	}
 
 	TEST_SECTION("splay");
 	{
 		t_rope	*rope = brownfox();
+		rope->refcount++;
 
 		t_splay_path	*path;
 		t_splay_path	*cur;
 		t_rope			*splayed;
 
+		path = NULL;
 		rope_index_with_path(rope, 9, &path);
+		path->refcount++;
 		cur = path->next;
 		while (cur)
 		{
@@ -88,17 +96,23 @@ void	test_rope()
 			cur = cur->next;
 		}
 		splayed = splay(path->next);
+		splayed->refcount++;
 
 		CHECK_EQ(rope_index(splayed, 0), 'q');
 		CHECK_EQ(rope_index(splayed, 9), 'w');
 		CHECK_EQ(rope_index(splayed, 10), 'n');
 		CHECK_EQ(rope_index(splayed, 20), 's');
 		CHECK_EQ(rope_length(splayed), 21);
+
+		splay_release(rope);
+		splay_release(splayed);
+		splay_path_release(path);
 	}
 
 	TEST_SECTION("rope_split");
 	{
 		t_rope	*rope = brownfox();
+		rope->refcount++;
 		// quick brown fox jumps
 		CHECK(rope);
 		CHECK_EQ(rope_index(rope, 0), 'q');
@@ -109,6 +123,8 @@ void	test_rope()
 
 		t_rope	*left = NULL, *right = NULL;
 		rope_split(rope, 9, &left, &right);
+		left->refcount++;
+		right->refcount++;
 
 		CHECK(left);
 		CHECK_EQ(rope_length(left), 9);
@@ -119,6 +135,12 @@ void	test_rope()
 		CHECK_EQ(rope_index(left, 8), 'o');
 		CHECK_EQ(rope_index(right, 0), 'w');
 		CHECK_EQ(rope_index(right, 11), 's');
+
+		printf("refcount: rope %d, left %d right %d\n", rope->refcount, left->refcount, right->refcount);
+
+		splay_release(left);
+		splay_release(right);
+		splay_release(rope);
 	}
 
 	TEST_SECTION("rope_insert");

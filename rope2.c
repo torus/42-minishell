@@ -9,13 +9,15 @@ static char	rope_index_with_path_iter(
 	if (weight <= index && rope->right)
 	{
 		if (path)
-			*path = splay_path_create(SPLAY_RIGHT, rope->right, *path);
+			splay_path_assign(path, splay_path_create(SPLAY_RIGHT, rope->right, *path));
+			/* *path = splay_path_create(SPLAY_RIGHT, rope->right, *path); */
 		return (rope_index_with_path_iter(rope->right, index - weight, path));
 	}
 	if (rope->left)
 	{
 		if (path)
-			*path = splay_path_create(SPLAY_LEFT, rope->left, *path);
+			splay_path_assign(path, splay_path_create(SPLAY_LEFT, rope->left, *path));
+			/* *path = splay_path_create(SPLAY_LEFT, rope->left, *path); */
 		return (rope_index_with_path_iter(rope->left, index, path));
 	}
 	return (((char *)&rope->value)[index]);
@@ -24,7 +26,8 @@ static char	rope_index_with_path_iter(
 char	rope_index_with_path(t_rope *rope, int index, t_splay_path **path)
 {
 	if (path)
-		*path = splay_path_create(SPLAY_ROOT, rope, NULL);
+		splay_path_assign(path, splay_path_create(SPLAY_ROOT, rope, NULL));
+		/* *path = splay_path_create(SPLAY_ROOT, rope, NULL); */
 	return (rope_index_with_path_iter(rope, index, path));
 }
 
