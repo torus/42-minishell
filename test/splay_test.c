@@ -115,6 +115,8 @@ void test_tree()
 		CHECK_EQ(result->right->left->value, V(B));
 		CHECK_EQ(result->right->right->value, V(C));
 		splay_release(result);
+		splay_release(x);
+		splay_release(p);
 	}
 
 	TEST_SECTION("splay_zig_zig_right");
@@ -147,6 +149,9 @@ void test_tree()
 		CHECK_EQ(result->right->right->right->value, V(D));
 
 		splay_release(result);
+		splay_release(x);
+		splay_release(p);
+		splay_release(g);
 	}
 
 	TEST_SECTION("splay_zig_zag_right");
@@ -178,6 +183,9 @@ void test_tree()
 		CHECK_EQ(result->right->left->value, V(C));
 		CHECK_EQ(result->right->right->value, V(D));
 		splay_release(result);
+		splay_release(x);
+		splay_release(p);
+		splay_release(g);
 	}
 
 	TEST_SECTION("splay_zig_left");
@@ -202,6 +210,8 @@ void test_tree()
 		CHECK_EQ(result->left->right->value, V(B));
 		CHECK_EQ(result->left->left->value, V(C));
 		splay_release(result);
+		splay_release(x);
+		splay_release(p);
 	}
 
 	TEST_SECTION("splay_zig_zig_left");
@@ -233,6 +243,9 @@ void test_tree()
 		CHECK_EQ(result->left->left->right->value, V(C));
 		CHECK_EQ(result->left->left->left->value, V(D));
 		splay_release(result);
+		splay_release(x);
+		splay_release(p);
+		splay_release(g);
 	}
 
 	TEST_SECTION("splay_zig_zag_left");
@@ -264,6 +277,9 @@ void test_tree()
 		CHECK_EQ(result->left->right->value, V(C));
 		CHECK_EQ(result->left->left->value, V(D));
 		splay_release(result);
+		splay_release(x);
+		splay_release(p);
+		splay_release(g);
 	}
 
 	TEST_SECTION("splay zig 右");
@@ -294,6 +310,8 @@ void test_tree()
 		CHECK_EQ(result->right->right->value, V(C));
 		splay_release(result);
 		splay_path_release(path);
+		splay_release(x);
+		splay_release(p);
 	}
 
 	TEST_SECTION("splay zig 左");
@@ -354,15 +372,22 @@ void test_tree()
 				NULL, V(b),
 				splay_create(
 					NULL, V(c), NULL)));
+		a->refcount++;
 
 		t_splay_path	*path_b = splay_path_create(
 			SPLAY_RIGHT, a->right,
 			splay_path_create(SPLAY_ROOT, a, NULL));
+		path_b->refcount++;
 
 		t_splay_path	*result = splay_path_left(path_b);
+		result->refcount++;
 
 		CHECK_EQ(result->dir, SPLAY_ROOT);
 		CHECK_EQ(result->node, a);
+
+		splay_path_release(result);
+		splay_path_release(path_b);
+		splay_release(a);
 	}
 
 	TEST_SECTION("splay_path_right");
@@ -380,15 +405,25 @@ void test_tree()
 			splay_path_create(SPLAY_ROOT, a, NULL));
 		path_b->refcount++;
 
+		printf("refcount path_b: %d, a: %d\n", path_b->refcount, a->refcount);
+
 		t_splay_path	*result = splay_path_right(path_b);
 		result->refcount++;
+
+		printf("refcount path_b: %d, a: %d\n", path_b->refcount, a->refcount);
 
 		CHECK_EQ(result->dir, SPLAY_RIGHT);
 		CHECK_EQ(result->node, a->right->right);
 		CHECK_EQ(result->next, path_b);
 
+		printf("refcount result: %d, path_b: %d, a: %d\n", result->refcount, path_b->refcount, a->refcount);
+
 		splay_path_release(result);
+		printf("* path_b: %d, a: %d\n", path_b->refcount, a->refcount);
 		splay_path_release(path_b);
+
+		printf("refcount a: %d, a->right: %d, a->right->right: %d\n",
+			   a->refcount, a->right->refcount, a->right->right->refcount);
 		splay_release(a);
 	}
 
@@ -398,13 +433,18 @@ void test_tree()
 			splay_create(NULL, V(a), NULL),
 			V(b),
 			splay_create(NULL, V(c), NULL));
+		b->refcount++;
 
 		t_splay_tree	*result = splay_insert_left(b, V(d));
+		result->refcount++;
 
 		CHECK_EQ(result->value, V(d));
 		CHECK_EQ(result->left->value, V(a));
 		CHECK_EQ(result->right->right->value, V(c));
 		CHECK_EQ(result->right->value, V(b));
+
+		splay_release(b);
+		splay_release(result);
 	}
 
 	TEST_SECTION("splay_insert_right");
@@ -413,13 +453,18 @@ void test_tree()
 			splay_create(NULL, V(a), NULL),
 			V(b),
 			splay_create(NULL, V(c), NULL));
+		b->refcount++;
 
 		t_splay_tree	*result = splay_insert_right(b, V(d));
+		result->refcount++;
 
 		CHECK_EQ(result->value, V(d));
 		CHECK_EQ(result->left->value, V(b));
 		CHECK_EQ(result->left->left->value, V(a));
 		CHECK_EQ(result->right->value, V(c));
+
+		splay_release(b);
+		splay_release(result);
 	}
 }
 

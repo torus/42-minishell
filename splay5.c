@@ -33,7 +33,8 @@ void	splay_assign(t_splay_tree **var, t_splay_tree *val)
 
 	old_value = *var;
 	*var = val;
-	val->refcount++;
+	if (val)
+		val->refcount++;
 	splay_release(old_value);
 }
 
