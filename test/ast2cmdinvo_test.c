@@ -10,6 +10,8 @@ void	init_buf_with_string(t_parse_buffer *buf, const char* str)
 	strcpy(buf->buffer, str);
 	buf->size = strlen(str);
 	buf->lex_stat = LEXSTAT_NORMAL;
+	buf->getc = NULL;
+	buf->ungetc = NULL;
 }
 
 void check_strarr(const char **actual_strarr, const char **expected_strarr)

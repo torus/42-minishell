@@ -39,6 +39,7 @@ int						put_minish_err_msg_and_ret(int ret_val,
 							const char *cmd_name, const char *msg);
 void					put_minish_err_msg_and_exit(int status,
 							const char *cmd_name, const char *msg);
+int						invoke_sequential_commands(t_parse_ast *seqcmd);
 
 // シェルの初期化
 int						initialize_shell(void);
