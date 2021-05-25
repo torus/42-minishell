@@ -18,7 +18,15 @@ static t_splay_tree	*splay_1(t_splay_path *path)
 	else
 		new_path = splay_path_create(
 				d2, splay_zig_left(x, p), path->next->next);
-	return (splay(new_path));
+	new_path->refcount++;
+
+	t_splay_tree	*result;
+
+	result = splay(new_path);
+	result->refcount++;
+	splay_path_release(new_path);
+	result->refcount--;
+	return (result);
 }
 
 static t_splay_tree	*splay_2(t_splay_path *path)
@@ -45,8 +53,18 @@ static t_splay_tree	*splay_2(t_splay_path *path)
 		else
 			rotated = splay_zig_zag_right(x, p, g);
 	}
-	return (splay(splay_path_create(
-				path->next->next->dir, rotated, path->next->next->next)));
+
+	t_splay_tree	*result;
+	t_splay_path	*new_path;
+
+	new_path = splay_path_create(
+		path->next->next->dir, rotated, path->next->next->next);
+	new_path->refcount++;
+	result = splay(new_path);
+	result->refcount++;
+	splay_path_release(new_path);
+	result->refcount--;
+	return (result);
 }
 
 t_splay_tree	*splay(t_splay_path *path)
@@ -68,11 +86,12 @@ t_splay_path	*splay_path_left(t_splay_path *path)
 	if (current->left)
 	{
 		current = current->left;
-		path = splay_path_create(SPLAY_LEFT, current, path);
+		splay_path_assign(&path, splay_path_create(SPLAY_LEFT, current, path));
 		while (current->right)
 		{
 			current = current->right;
-			path = splay_path_create(SPLAY_RIGHT, current, path);
+			splay_path_assign(
+				&path, splay_path_create(SPLAY_RIGHT, current, path));
 		}
 		return (path);
 	}
@@ -89,11 +108,12 @@ t_splay_path	*splay_path_right(t_splay_path *path)
 	if (current->right)
 	{
 		current = current->right;
-		path = splay_path_create(SPLAY_RIGHT, current, path);
+		splay_path_assign(&path, splay_path_create(SPLAY_RIGHT, current, path));
 		while (current->left)
 		{
 			current = current->left;
-			path = splay_path_create(SPLAY_LEFT, current, path);
+			splay_path_assign(
+				&path, splay_path_create(SPLAY_LEFT, current, path));
 		}
 		return (path);
 	}

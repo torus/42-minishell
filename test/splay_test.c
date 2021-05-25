@@ -284,7 +284,8 @@ void test_tree()
 		path->refcount++;
 
 		t_splay_tree	*result = splay(path);
-		CHECK_EQ(result->refcount, 1); /* path が掴んでる */
+		CHECK(result);
+		CHECK_EQ(result->refcount, 0);
 
 		CHECK_EQ(result->value, V(x));
 		CHECK_EQ(result->left->value, V(A));
@@ -308,14 +309,21 @@ void test_tree()
 			x);
 		p->refcount++;
 
+		printf("*** 0 x->refcount: %d\n", x->refcount);
+		printf("*** 0 p->refcount: %d\n", p->refcount);
+
 		t_splay_path	*path = splay_path_create(
 			SPLAY_RIGHT, x, splay_path_create(SPLAY_ROOT, p, NULL));
 		CHECK_EQ(path->refcount, 0);
 		path->refcount++;
+		printf("*** 1 x->refcount: %d\n", x->refcount);
+		printf("*** 1 p->refcount: %d\n", p->refcount);
 
 		t_splay_tree	*result = splay(path);
-		CHECK_EQ(result->refcount, 1); /* path が掴んでる */
+		CHECK_EQ(result->refcount, 0);
 		result->refcount++;
+		printf("*** 2 x->refcount: %d\n", x->refcount);
+		printf("*** 2 p->refcount: %d\n", p->refcount);
 
 		printf("path->refcount: %d\n", path->refcount);
 		CHECK_EQ(path->refcount, 1);
@@ -327,9 +335,13 @@ void test_tree()
 		CHECK_EQ(result->left->left->value, V(C));
 		CHECK_EQ(path->refcount, 1);
 		splay_path_release(path);
+		printf("*** 3 x->refcount: %d\n", x->refcount);
+		printf("*** 3 p->refcount: %d\n", p->refcount);
 		printf("result->refcount: %d\n", result->refcount);
 		CHECK_EQ(result->refcount, 1);
 		splay_release(result);
+		printf("*** 4 x->refcount: %d\n", x->refcount);
+		printf("*** 4 p->refcount: %d\n", p->refcount);
 		splay_release(x);
 		splay_release(p);
 	}
@@ -361,46 +373,53 @@ void test_tree()
 				NULL, V(b),
 				splay_create(
 					NULL, V(c), NULL)));
+		a->refcount++;
 
 		t_splay_path	*path_b = splay_path_create(
 			SPLAY_RIGHT, a->right,
 			splay_path_create(SPLAY_ROOT, a, NULL));
+		path_b->refcount++;
 
 		t_splay_path	*result = splay_path_right(path_b);
+		result->refcount++;
 
 		CHECK_EQ(result->dir, SPLAY_RIGHT);
 		CHECK_EQ(result->node, a->right->right);
 		CHECK_EQ(result->next, path_b);
+
+		splay_path_release(result);
+		splay_path_release(path_b);
+		splay_release(a);
 	}
 
 	TEST_SECTION("splay_insert_left");
 	{
-        t_splay_tree	*b = splay_create(
-            splay_create(NULL, V(a), NULL),
-            V(b),
-            splay_create(NULL, V(c), NULL));
+		t_splay_tree	*b = splay_create(
+			splay_create(NULL, V(a), NULL),
+			V(b),
+			splay_create(NULL, V(c), NULL));
 
-        t_splay_tree	*result = splay_insert_left(b, V(d));
+		t_splay_tree	*result = splay_insert_left(b, V(d));
 
-        CHECK_EQ(result->value, V(d));
-        CHECK_EQ(result->left->value, V(a));
-        CHECK_EQ(result->right->right->value, V(c));
-        CHECK_EQ(result->right->value, V(b));
+		CHECK_EQ(result->value, V(d));
+		CHECK_EQ(result->left->value, V(a));
+		CHECK_EQ(result->right->right->value, V(c));
+		CHECK_EQ(result->right->value, V(b));
 	}
 
 	TEST_SECTION("splay_insert_right");
 	{
-        t_splay_tree	*b = splay_create(
-            splay_create(NULL, V(a), NULL),
-            V(b),
-            splay_create(NULL, V(c), NULL));
+		t_splay_tree	*b = splay_create(
+			splay_create(NULL, V(a), NULL),
+			V(b),
+			splay_create(NULL, V(c), NULL));
 
-        t_splay_tree	*result = splay_insert_right(b, V(d));
+		t_splay_tree	*result = splay_insert_right(b, V(d));
 
-        CHECK_EQ(result->value, V(d));
-        CHECK_EQ(result->left->value, V(b));
-        CHECK_EQ(result->left->left->value, V(a));
-        CHECK_EQ(result->right->value, V(c));
+		CHECK_EQ(result->value, V(d));
+		CHECK_EQ(result->left->value, V(b));
+		CHECK_EQ(result->left->left->value, V(a));
+		CHECK_EQ(result->right->value, V(c));
 	}
 }
 
