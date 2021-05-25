@@ -6,6 +6,8 @@
 
 int	lex_getc(t_parse_buffer *buf)
 {
+	if (buf->getc)
+		return (buf->getc(buf));
 	if (buf->cur_pos == buf->size)
 	{
 		buf->size = read(STDIN_FILENO, buf->buffer, sizeof(buf->buffer));
@@ -18,6 +20,11 @@ int	lex_getc(t_parse_buffer *buf)
 
 void	lex_ungetc(t_parse_buffer *buf)
 {
+	if (buf->ungetc)
+	{
+		buf->ungetc(buf);
+		return ;
+	}
 	buf->cur_pos--;
 }
 

@@ -2,6 +2,7 @@
 #include "libft/libft.h"
 #include "minishell.h"
 #include "parse.h"
+#include "editor.h"
 
 void	die(void)
 {
@@ -20,6 +21,8 @@ void	init_buffer_with_string(t_parse_buffer *buf, char *str)
 	buf->size = len;
 	buf->lex_stat = LEXSTAT_NORMAL;
 	ft_strlcpy(buf->buffer, str, len + 1);
+	buf->getc = NULL;
+	buf->ungetc = NULL;
 }
 
 int	invoke_sequential_commands(t_parse_ast *seqcmd)
@@ -71,29 +74,8 @@ int	do_command(char *cmdstr)
 
 int	main(int argc, char **argv)
 {
-	t_parse_ast				*cmdline;
-	t_parse_buffer			buf;
-	t_token					tok;
-	t_parse_ast				*seqcmd;
-
 	initialize_shell();
 	if (argc == 3 && ft_strncmp(argv[1], "-c", 3) == 0)
 		return (do_command(argv[2]));
-	init_buffer_with_string(&buf, "");
-	printf("Welcome to Minishell\n");
-	while (1)
-	{
-		printf("\r"PROMPT);
-		fflush(stdout);
-		lex_get_token(&buf, &tok);
-		cmdline = parse_command_line(&buf, &tok);
-		if (cmdline)
-		{
-			seqcmd = cmdline->content.command_line->seqcmd_node;
-			invoke_sequential_commands(seqcmd);
-			parse_free_all_ast();
-		}
-		else
-			put_err_msg("Parse error.");
-	}
+	edit_main();
 }
