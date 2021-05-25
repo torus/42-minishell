@@ -52,8 +52,10 @@ t_splay_tree	*splay_zig_zag_left(
 t_splay_tree	*splay(t_splay_path *path);
 t_splay_path	*splay_path_left(t_splay_path *path);
 t_splay_path	*splay_path_right(t_splay_path *path);
+void			splay_path_release(t_splay_path *path);
 
 void			splay_assign(t_splay_tree **var, t_splay_tree *val);
+void			splay_path_assign(t_splay_path **var, t_splay_path *val);
 
 # define ROPE_NOWEIGHT ((void*)-1L)
 

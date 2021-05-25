@@ -36,3 +36,13 @@ void	splay_assign(t_splay_tree **var, t_splay_tree *val)
 	val->refcount++;
 	splay_release(old_value);
 }
+
+void	splay_path_assign(t_splay_path **var, t_splay_path *val)
+{
+	t_splay_path	*old_value;
+
+	old_value = *var;
+	*var = val;
+	val->refcount++;
+	splay_path_release(old_value);
+}

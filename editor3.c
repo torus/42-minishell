@@ -25,9 +25,11 @@ void	edit_add_new_rope(t_command_history *history, char *cbuf)
 		if (history->end == history->begin)
 			history->begin = (history->end + 1) % LINE_BUFFER_SIZE;
 	}
-	splay_release(history->ropes[history->current]);
-	history->ropes[history->current] = rope_create(cbuf, NULL);
-	history->ropes[history->current]->refcount++;
+	/* splay_release(history->ropes[history->current]); */
+	/* history->ropes[history->current] = rope_create(cbuf, NULL); */
+	/* history->ropes[history->current]->refcount++; */
+	splay_assign(
+		&history->ropes[history->current], rope_create(cbuf, NULL));
 }
 
 void	edit_insert_character(
@@ -35,31 +37,42 @@ void	edit_insert_character(
 			int cursor_x, int command_length)
 {
 	t_rope	*new_rope;
-	t_rope	*old_rope;
+	/* t_rope	*old_rope; */
 
-	new_rope = rope_create(cbuf, NULL);
-	old_rope = history->ropes[history->current];
-	new_rope->refcount++;
+	new_rope = NULL;
+	/* new_rope = rope_create(cbuf, NULL); */
+	splay_assign(&new_rope, rope_create(cbuf, NULL));
+	/* old_rope = history->ropes[history->current]; */
+	/* new_rope->refcount++; */
 	if (cursor_x == command_length)
 	{
-		history->ropes[history->current]
-			= rope_concat(history->ropes[history->current], new_rope);
-		history->ropes[history->current]->refcount++;
-		splay_release(old_rope);
+		/* history->ropes[history->current] */
+		/* 	= rope_concat(history->ropes[history->current], new_rope); */
+		/* history->ropes[history->current]->refcount++; */
+		/* splay_release(old_rope); */
+		splay_assign(
+			&history->ropes[history->current],
+			rope_concat(history->ropes[history->current], new_rope));
 	}
 	else if (cursor_x == 0)
 	{
-		history->ropes[history->current]
-			= rope_concat(new_rope, history->ropes[history->current]);
-		history->ropes[history->current]->refcount++;
-		splay_release(old_rope);
+		splay_assign(
+			&history->ropes[history->current],
+			rope_concat(new_rope, history->ropes[history->current]));
+		/* history->ropes[history->current] */
+		/* 	= rope_concat(new_rope, history->ropes[history->current]); */
+		/* history->ropes[history->current]->refcount++; */
+		/* splay_release(old_rope); */
 	}
 	else if (cursor_x < command_length)
 	{
-		history->ropes[history->current]
-			= rope_insert(history->ropes[history->current], cursor_x, new_rope);
-		history->ropes[history->current]->refcount++;
-		splay_release(old_rope);
+		splay_assign(
+			&history->ropes[history->current],
+			rope_insert(history->ropes[history->current], cursor_x, new_rope));
+		/* history->ropes[history->current] */
+		/* 	= rope_insert(history->ropes[history->current], cursor_x, new_rope); */
+		/* history->ropes[history->current]->refcount++; */
+		/* splay_release(old_rope); */
 	}
 	splay_release(new_rope);
 }

@@ -91,15 +91,19 @@ void	rope_split(t_rope *rope, int index, t_rope **left, t_rope **right)
 	t_splay_path	*cur;
 	t_rope			*splayed;
 
+	splayed = NULL;
 	rope_index_with_path(rope, index, &path);
+	path->refcount++;
 	cur = path->next;
 	while (cur)
 	{
 		cur->node->value = ROPE_NOWEIGHT;
 		cur = cur->next;
 	}
-	splayed = splay(path->next);
-	splayed->refcount++;
+	splay_assign(&splayed, splay(path->next));
+	/* splayed = splay(path->next); */
+	/* splayed->refcount++; */
 	rope_split_iter(splayed, index, left, right);
 	splay_release(splayed);
+	splay_path_release(path);
 }
