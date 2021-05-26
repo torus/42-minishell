@@ -5,8 +5,8 @@
 
 // 環境変数とシェル変数をリストとして保持する
 typedef struct	s_var {
-	const char			*key;
-	const char			*value;
+	char				*key;
+	char				*value;
 	bool				is_shell_var;
 	struct s_var		*next;
 }				t_var;
