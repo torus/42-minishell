@@ -24,14 +24,14 @@ bool	will_search_cdpath(char **argv, char *dest)
 	return (true);
 }
 
-static char	*path_join3(const char *path0, const char *path1, const char *path2)
+static const char	*path_join3(const char *path0, const char *path1, const char *path2)
 {
-	char	*tmp;
-	char	*result;
+	const char	*tmp;
+	const char	*result;
 
 	tmp = path_join(path0, path1);
 	result = path_join(tmp, path2);
-	free(tmp);
+	free((void *)tmp);
 	return (result);
 }
 
@@ -43,7 +43,7 @@ static char	*path_join3(const char *path0, const char *path1, const char *path2)
  */
 static bool	cd_from_sources(const char *dest_path, const char **sources)
 {
-	char	*abs_path;
+	const char	*abs_path;
 	int		i;
 
 	i = 0;
@@ -57,10 +57,10 @@ static bool	cd_from_sources(const char *dest_path, const char **sources)
 		{
 			if (ft_strlen(sources[i]))
 				printf("%s\n", g_shell.cwd);
-			free(abs_path);
+			free((void *)abs_path);
 			return (true);
 		}
-		free(abs_path);
+		free((void *)abs_path);
 		i++;
 	}
 	return (false);

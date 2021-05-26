@@ -14,10 +14,10 @@
  *
  * Return: 移動先ディレクトリの絶対パス.
  */
-static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
+static const char	*get_cd_abs_dest(const char *dest, bool *is_canon_path)
 {
-	char	*physical_path;
-	char	*canon_path;
+	const char	*physical_path;
+	const char	*canon_path;
 
 	if (dest[0] == '/')
 		physical_path = ft_strdup(dest);
@@ -28,11 +28,11 @@ static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
 	canon_path = canonicalize_path(physical_path);
 	if (canon_path)
 	{
-		free(physical_path);
+		free((void *)physical_path);
 		*is_canon_path = true;
 		return (canon_path);
 	}
-	free(canon_path);
+	free((void *)canon_path);
 	*is_canon_path = false;
 	return (physical_path);
 }
@@ -47,7 +47,7 @@ static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
  * Return: ヒープ領域の確保に失敗したら-1,
  *   成功したら0を返す.
  */
-static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
+static int	set_new_pwd(const char *path, bool is_canon_path, bool is_abs_path)
 {
 	char	*new_cwd;
 
@@ -82,7 +82,7 @@ static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
  *
  * Return: 移動に成功したかどうか.
  */
-static bool	change_dir_process(char *abs_dest,
+static bool	change_dir_process(const char *abs_dest,
 	const char *arg, bool is_canon_path)
 {
 	int	status;
@@ -111,14 +111,14 @@ static bool	change_dir_process(char *abs_dest,
  *
  * Return: 移動に成功したかどうか.
  */
-bool	change_directory(char *dest)
+bool	change_directory(const char *dest)
 {
-	char	*path;
+	const char	*path;
 	int		status;
 	bool	is_canon_path;
 
 	path = get_cd_abs_dest(dest, &is_canon_path);
 	status = change_dir_process(path, dest, is_canon_path);
-	free(path);
+	free((void *)path);
 	return (status);
 }
