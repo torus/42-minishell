@@ -45,7 +45,10 @@ static void	init_shlvl(void)
 
 static void	init_env(void)
 {
+	char	**environ;
+
 	g_shell.cwd = NULL;
+	g_shell.vars = environ2vars(environ);
 }
 
 /* シェルの環境を初期化する */

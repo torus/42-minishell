@@ -11,7 +11,7 @@
 // グローバル構造体
 typedef struct	s_shell {
 	char		*cwd;
-	t_var	*vars;
+	t_var		*vars;
 }				t_shell;
 extern t_shell	g_shell;
 
