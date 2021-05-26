@@ -8,7 +8,6 @@ static char	*expand_env_and_join(char *result,
 	char *str, int env_len)
 {
 	char	*keyname;
-	char	*keyval;
 	t_var	*env_var;
 	char	*tmp_result;
 
