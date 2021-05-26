@@ -4,6 +4,8 @@
 #include "../minishell.h"
 #include "../env.h"
 
+t_shell	g_shell;
+
 void	init_buf_with_string(t_parse_buffer *buf, const char* str)
 {
 	buf->cur_pos = 0;
@@ -81,6 +83,8 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 
 int main()
 {
+	init_g_shell();
+
 	TEST_CHAPTER("expand_env_var");
 
 	TEST_SECTION("expand_env_var(hoge)");

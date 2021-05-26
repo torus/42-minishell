@@ -1,23 +1,11 @@
 #include "test.h"
 #include "../execution.h"
+#include "../minishell.h"
 
-extern char **environ;
-char *original0;
-
-// 環境変数のテスト用
-// static void set_env_var(char *env_var)
-// {
-// 	environ[0] = env_var;
-// }
-//
-// static void restore_env_var(void)
-// {
-// 	environ[0] = original0;
-// }
+t_shell	g_shell;
 
 int main(){
-	// 元の環境変数を保持しておく
-	original0 = environ[0];
+	init_g_shell();
 
 	TEST_SECTION("find_executable_file_in_dir() 実行可能ファイルが存在する");
 	{

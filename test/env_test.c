@@ -5,13 +5,6 @@
 
 t_shell	g_shell;
 
-void init_g_shell(void)
-{
-	extern char **environ;
-	g_shell.cwd = NULL;
-	g_shell.vars = environ2vars(environ);
-}
-
 void check_strarr(const char **actual_strarr, const char **expected_strarr)
 {
 	int i = 0 ;

@@ -1,7 +1,11 @@
 #include "test.h"
 #include "../execution.h"
+#include "../minishell.h"
+
+t_shell	g_shell;
 
 int main(){
+	init_g_shell();
 
     TEST_SECTION("echo hello");
     {

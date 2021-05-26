@@ -41,9 +41,9 @@ static void	init_shlvl(void)
 	free(num_str);
 }
 
-static void	init_env(void)
+void	init_g_shell(void)
 {
-	extern char	**environ;
+	extern char **environ;
 
 	g_shell.cwd = NULL;
 	g_shell.vars = environ2vars(environ);
@@ -54,7 +54,7 @@ int	initialize_shell(void)
 {
 	extern char	**environ;
 
-	init_env();
+	init_g_shell();
 	set_shell_sighandlers();
 	sort_strarr(environ);
 	init_pwd();

@@ -42,6 +42,7 @@ void					put_minish_err_msg_and_exit(int status,
 int						invoke_sequential_commands(t_parse_ast *seqcmd);
 
 // シェルの初期化
+void					init_g_shell(void);
 int						initialize_shell(void);
 
 #endif

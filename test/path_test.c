@@ -1,8 +1,13 @@
 #include "test.h"
 #include "../execution.h"
 #include "../path.h"
+#include "../minishell.h"
+
+t_shell	g_shell;
 
 int main(){
+	init_g_shell();
+
 	TEST_SECTION("path_join() 最後スラッシュ無し");
 	{
 		char *fullpath = path_join("/usr/bin", "cat");
