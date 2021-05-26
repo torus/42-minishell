@@ -3,9 +3,9 @@
 #include "minishell.h"
 #include <string.h>
 
-static void	update_path(const char **path, const char *retrieve_path)
+static void	update_path(char **path, char *retrieve_path)
 {
-	const char	*tmp;
+	char	*tmp;
 
 	if (ft_strncmp(retrieve_path, ".", 2) == 0)
 		return ;
@@ -13,39 +13,39 @@ static void	update_path(const char **path, const char *retrieve_path)
 	{
 		tmp = *path;
 		*path = get_parent_dir(*path);
-		free((void *)tmp);
+		free(tmp);
 	}
 	else
 	{
 		tmp = *path;
 		*path = path_join(*path, retrieve_path);
-		free((void *)tmp);
+		free(tmp);
 	}
 }
 
-static bool	is_double_slash(const char *path)
+static bool	is_double_slash(char *path)
 {
 	return (ft_strlen(path) >= 2
 		&& path[0] == '/' && path[1] == '/' && path[2] != '/');
 }
 
-static void	add_double_slash(const char **path)
+static void	add_double_slash(char **path)
 {
-	const char	*tmp;
+	char	*tmp;
 
 	tmp = *path;
 	*path = ft_strjoin("/", *path);
-	free((void *)tmp);
+	free(tmp);
 }
 
 /* パスを正規化する.
  * ex:
  *   - "////hoge//fuga//../././//gaga" -> "/hoge/gaga"
  */
-const char	*canonicalize_path(const char *path)
+char	*canonicalize_path(char *path)
 {
 	char	**dirs;
-	const char	*result;
+	char	*result;
 	int		i;
 
 	dirs = ft_split(path, '/');
@@ -56,7 +56,7 @@ const char	*canonicalize_path(const char *path)
 		update_path(&result, dirs[i]);
 		if (!result || !is_directory(result))
 		{
-			free((void *)result);
+			free(result);
 			free_ptrarr((void **)dirs);
 			return (NULL);
 		}
