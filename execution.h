@@ -37,7 +37,7 @@ char					*find_executable_file_from_path_env(char *filename);
 char					*find_executable_file_in_cwd(char *filename);
 int						cmd_execvp(char *filename, char **argv);
 int						cmd_exec_commands(t_command_invocation *command);
-const char					*expand_redirect_filepath(const char *red_target);
+char					*expand_redirect_filepath(char *red_target);
 int						open_file_for_redirect(t_cmd_redirection *red,
 							int open_flags, mode_t open_mode);
 int						put_redirect_fd_err_msg_and_ret(int ret_value,
