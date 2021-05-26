@@ -17,7 +17,7 @@ t_var	*kvstr2var(char *kvstr, bool is_shell_var);
 t_var	*environ2vars(char **environ);
 char	**vars2environ(t_var *vars);
 
-char	*get_env(const char *env_key);
+t_var	*get_env(const char *env_key);
 char	**split_first_c(const char *str, char c);
 char	**get_colon_units(char *str, char *default_str);
 char	*get_val_from_kvstr(const char *kvstr, char delimiter);

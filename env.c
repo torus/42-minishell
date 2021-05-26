@@ -7,30 +7,19 @@
  *
  * env_key: key name of environment variable.
  *
- * return: value of environment variable.
- *         That forms "key=value"
+ * return: found t_var
  */
-char	*get_env(const char *env_key)
+t_var	*get_env(const char *env_key)
 {
-	size_t		idx;
-	char		**key_val;
-	extern char	**environ;
+	t_var	*current;
 
-	idx = 0;
-	while (environ[idx])
+	while (current)
 	{
-		key_val = ft_split(environ[idx], '=');
-		if (!key_val)
-			return (NULL);
-		if (ft_strncmp(key_val[0], env_key, ft_strlen(env_key) + 1) == 0)
-		{
-			free_ptrarr((void **)key_val);
-			break ;
-		}
-		free_ptrarr((void **)key_val);
-		idx++;
+		if (!ft_strcmp(env_key, current->key))
+			return (current);
+		current = current->next;
 	}
-	return (environ[idx]);
+	return (NULL);
 }
 
 /*
