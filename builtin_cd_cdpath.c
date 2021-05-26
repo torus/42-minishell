@@ -75,7 +75,7 @@ static bool	cd_from_sources(char *dest_path, char **sources)
 int	cd_cdpath_env(char *dest_path)
 {
 	t_var		*cdpath_var;
-	const char	**sources;
+	char	**sources;
 	bool		status;
 
 	cdpath_var = get_env("CDPATH");

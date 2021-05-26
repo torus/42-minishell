@@ -75,11 +75,11 @@ static char	*search_and_exec_file_from_dirs(char *filename,
 
 /* $PATH のディレクトリを検索して実行する.
  */
-const char	*search_and_exec_file_from_path_env(char *filename, char **argv)
+char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 {
 	t_var		*path_env_var;
-	const char		**dirs;
-	const char		*last_executable_path;
+	char		**dirs;
+	char		*last_executable_path;
 
 	path_env_var = get_env("PATH");
 	if (!path_env_var || !path_env_var->value)

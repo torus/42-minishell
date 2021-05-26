@@ -21,7 +21,7 @@ void	free_vars(t_var *vars)
 /* 新しい環境変数(or シェル変数)を追加する
  * 常にkeyでソートされた状態に保たれるように要素が追加される
  */
-t_var	*add_new_var(t_var **vars, char *key, char *value, bool is_shell_var)
+t_var	*add_new_var(t_var **vars, const char *key, const char *value, bool is_shell_var)
 {
 	t_var	*current;
 	t_var	*prev;

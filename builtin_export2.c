@@ -11,7 +11,7 @@ int	print_envs_with_declaration(void)
 {
 	extern char	**environ;
 	int			i;
-	const char	**kvarr;
+	char	**kvarr;
 	t_var		*env_var;
 
 	i = 0;

@@ -66,7 +66,7 @@ char	**split_first_c(const char *str, char c)
  * str: コロン(':')区切られた文字列
  * def_str: default string.
  */
-char	**get_colon_units(char *str, char *default_str)
+char	**get_colon_units(const char *str, const char *default_str)
 {
 	void	**result;
 	char	*next;
