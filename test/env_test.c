@@ -7,7 +7,7 @@ t_shell	g_shell;
 
 void init_g_shell(void)
 {
-	char **environ;
+	extern char **environ;
 	g_shell.cwd = NULL;
 	g_shell.vars = environ2vars(environ);
 }
@@ -31,7 +31,7 @@ int main(){
 	TEST_SECTION("split_first_c() 普通に\"Key=Value\"");
 	{
 		const char *input = "PATH=/bin/:/usr/bin/:/home/jun/bin";
-		const char **str_arr = split_first_c(input, '=');
+		char **str_arr = split_first_c(input, '=');
 		CHECK_EQ_STR(str_arr[0], "PATH");
 		CHECK_EQ_STR(str_arr[1], "/bin/:/usr/bin/:/home/jun/bin");
 		CHECK_EQ(str_arr[2], NULL);
@@ -42,7 +42,7 @@ int main(){
 	TEST_SECTION("split_first_c() 区切り文字が入っていない");
 	{
 		const char *input = "PATH/bin/:/usr/bin/:/home/jun/bin";
-		const char **str_arr = split_first_c(input, '=');
+		char **str_arr = split_first_c(input, '=');
 		CHECK_EQ_STR(str_arr[0], "PATH/bin/:/usr/bin/:/home/jun/bin");
 		CHECK_EQ(str_arr[1], NULL);
 		CHECK_EQ(str_arr[2], NULL);
@@ -53,7 +53,7 @@ int main(){
 	TEST_SECTION("split_first_c() 最後に区切り文字\"key=\"");
 	{
 		const char *input = "PATH=";
-		const char **str_arr = split_first_c(input, '=');
+		char **str_arr = split_first_c(input, '=');
 		CHECK_EQ_STR(str_arr[0], "PATH");
 		CHECK_EQ_STR(str_arr[1], "");
 		CHECK_EQ(str_arr[2], NULL);
@@ -65,7 +65,7 @@ int main(){
 	{
 		const char *input = ":/hoge/::/";
 		const char *default_str = "";
-		const char **str_arr = get_colon_units(input, default_str);
+		char **str_arr = get_colon_units(input, default_str);
 		CHECK_EQ_STR(str_arr[0], "");
 		CHECK_EQ_STR(str_arr[1], "/hoge/");
 		CHECK_EQ_STR(str_arr[2], "");
@@ -79,7 +79,7 @@ int main(){
 	{
 		const char *input = "/hoge/::/::";
 		const char *default_str = "./";
-		const char **str_arr = get_colon_units(input, default_str);
+		char **str_arr = get_colon_units(input, default_str);
 		CHECK_EQ_STR(str_arr[0], "/hoge/");
 		CHECK_EQ_STR(str_arr[1], "./");
 		CHECK_EQ_STR(str_arr[2], "/");
@@ -256,7 +256,6 @@ int main(){
 		char	**envarr_expected;
 		char	**envarr_actual;
 		t_var	*vars;
-		t_var	*new_var;
 
 		envarr_expected = ft_split("env1=env1 env2=env2 env3=env3", ' ');
 
