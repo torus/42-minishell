@@ -165,41 +165,41 @@ int main(){
 	TEST_SECTION("ft_setenv() update rewrite=0");
 	{
 		ft_setenv("ABC", "ft_setenv() update rewrite=0", 1);
-		char	*prev = getenv("ABC");
+		t_var	*prev = get_env("ABC");
 		CHECK(ft_setenv("ABC", "ft_setenv()", 0) == 0);
-		char	*new = getenv("ABC");
-		CHECK_EQ_STR(new, prev);
+		t_var	*new = get_env("ABC");
+		CHECK_EQ_STR(new->value, prev->value);
 		ft_unsetenv("ABC");
 	}
 
 	TEST_SECTION("ft_setenv() update rewrite=1");
 	{
 		ft_setenv("ABC", "ft_setenv() update rewrite=1", 1);
-		char	*prev = getenv("ABC");
+		t_var	*prev = get_env("ABC");
 		CHECK(prev);
 		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
-		char	*new = getenv("ABC");
-		CHECK_EQ_STR(new, "ft_setenv()");
+		t_var	*new = get_env("ABC");
+		CHECK_EQ_STR(new->value, "ft_setenv()");
 		ft_unsetenv("ABC");
 	}
 
 	TEST_SECTION("ft_setenv() expand_and_add_env");
 	{
 		ft_unsetenv("ABC");
-		char	*prev = getenv("ABC");
+		t_var	*prev = get_env("ABC");
 		CHECK(!prev);
 		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
-		char	*new = getenv("ABC");
-		CHECK_EQ_STR(new, "ft_setenv()");
+		t_var	*new = get_env("ABC");
+		CHECK_EQ_STR(new->value, "ft_setenv()");
 	}
 
 	TEST_SECTION("ft_unsetenv() unset env");
 	{
 		ft_setenv("ABC", "ft_unsetenv() unset env", 1);
-		char	*prev = getenv("ABC");
+		t_var	*prev = get_env("ABC");
 		CHECK(prev);
 		CHECK(ft_unsetenv("ABC") == 0);
-		char	*new = getenv("ABC");
+		t_var	*new = get_env("ABC");
 		CHECK(!new);
 		ft_unsetenv("ABC");
 	}
@@ -207,10 +207,10 @@ int main(){
 	TEST_SECTION("ft_unsetenv() unset env that doesn't exist");
 	{
 		ft_unsetenv("ABC");
-		char	*prev = getenv("ABC");
+		t_var	*prev = get_env("ABC");
 		CHECK(!prev);
 		CHECK(ft_unsetenv("ABC") == 0);
-		char	*new = getenv("ABC");
+		t_var	*new = get_env("ABC");
 		CHECK(!new);
 		ft_unsetenv("ABC");
 	}
