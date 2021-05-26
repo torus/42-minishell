@@ -31,18 +31,15 @@ int	ft_setenv(const char *key, const char *value, int rewrite)
 	t_var	*var;
 
 	var = get_env(key);
+	if (var && var->value && ft_strlen(var->value) && !rewrite)
+		return (0);
 	if (var)
 	{
 		free((void *)var->value);
 		var->value = value;
-		return (0);
 	}
-	var = malloc(sizeof(t_var));
-	if (!var)
-		return (-1);
-	var->key = ft_strdup(key);
-	var->value = ft_strdup(value);
-	var->is_shell_var = 0;
+	else
+		add_new_var(&g_shell.vars, key, value, 0);
 	return (0);
 }
 

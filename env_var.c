@@ -10,8 +10,8 @@ void	free_vars(t_var *vars)
 	current = vars;
 	while (current)
 	{
-		free(current->key);
-		free(current->value);
+		free((void *)current->key);
+		free((void *)current->value);
 		tmp = current;
 		current = current->next;
 		free(tmp);
@@ -21,11 +21,18 @@ void	free_vars(t_var *vars)
 /* 新しい環境変数(or シェル変数)を追加する
  * 常にkeyでソートされた状態に保たれるように要素が追加される
  */
-t_var	*add_new_var(t_var **vars, t_var *new_var)
+t_var	*add_new_var(t_var **vars, const char *key, const char *value, bool is_shell_var)
 {
 	t_var	*current;
 	t_var	*prev;
+	t_var	*new_var;
 
+	new_var = malloc(sizeof(t_var));
+	if (!new_var)
+		return (NULL);
+	new_var->key = ft_strdup(key);
+	new_var->value = ft_strdup(value);
+	new_var->is_shell_var = is_shell_var;
 	if (!*vars)
 		*vars = new_var;
 	else
@@ -35,7 +42,7 @@ t_var	*add_new_var(t_var **vars, t_var *new_var)
 		// AAA->ABC->ACC->BCC
 		prev = NULL;
 		current = *vars;
-		while (current && ft_strcmp(new_var->key, current->key) > 0)
+		while (current && ft_strcmp(key, current->key) > 0)
 		{
 			prev = current;
 			current = current->next;
