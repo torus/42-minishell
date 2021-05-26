@@ -11,6 +11,7 @@ typedef struct	s_var {
 	struct s_var		*next;
 }				t_var;
 
+void	free_vars(t_var *vars);
 t_var	*add_new_var(t_var **vars, t_var *new_var);
 t_var	*kvstr2t_var(char *kvstr, bool is_shell_var);
 t_var	*environ2t_var(char **environ);

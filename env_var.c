@@ -2,6 +2,22 @@
 #include "minishell.h"
 #include "env.h"
 
+void	free_vars(t_var *vars)
+{
+	t_var	*current;
+	t_var	*tmp;
+
+	current = vars;
+	while (current)
+	{
+		free(current->key);
+		free(current->value);
+		tmp = current;
+		current = current->next;
+		free(tmp);
+	}
+}
+
 /* 新しい環境変数(or シェル変数)を追加する
  * 常にkeyでソートされた状態に保たれるように要素が追加される
  */
