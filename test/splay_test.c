@@ -327,23 +327,14 @@ void test_tree()
 			x);
 		p->refcount++;
 
-		printf("*** 0 x->refcount: %d\n", x->refcount);
-		printf("*** 0 p->refcount: %d\n", p->refcount);
-
 		t_splay_path	*path = splay_path_create(
 			SPLAY_RIGHT, x, splay_path_create(SPLAY_ROOT, p, NULL));
 		CHECK_EQ(path->refcount, 0);
 		path->refcount++;
-		printf("*** 1 x->refcount: %d\n", x->refcount);
-		printf("*** 1 p->refcount: %d\n", p->refcount);
 
 		t_splay_tree	*result = splay(path);
 		CHECK_EQ(result->refcount, 0);
 		result->refcount++;
-		printf("*** 2 x->refcount: %d\n", x->refcount);
-		printf("*** 2 p->refcount: %d\n", p->refcount);
-
-		printf("path->refcount: %d\n", path->refcount);
 		CHECK_EQ(path->refcount, 1);
 
 		CHECK_EQ(result->value, V(x));
@@ -353,13 +344,8 @@ void test_tree()
 		CHECK_EQ(result->left->left->value, V(C));
 		CHECK_EQ(path->refcount, 1);
 		splay_path_release(path);
-		printf("*** 3 x->refcount: %d\n", x->refcount);
-		printf("*** 3 p->refcount: %d\n", p->refcount);
-		printf("result->refcount: %d\n", result->refcount);
 		CHECK_EQ(result->refcount, 1);
 		splay_release(result);
-		printf("*** 4 x->refcount: %d\n", x->refcount);
-		printf("*** 4 p->refcount: %d\n", p->refcount);
 		splay_release(x);
 		splay_release(p);
 	}
@@ -405,25 +391,16 @@ void test_tree()
 			splay_path_create(SPLAY_ROOT, a, NULL));
 		path_b->refcount++;
 
-		printf("refcount path_b: %d, a: %d\n", path_b->refcount, a->refcount);
-
 		t_splay_path	*result = splay_path_right(path_b);
 		result->refcount++;
-
-		printf("refcount path_b: %d, a: %d\n", path_b->refcount, a->refcount);
 
 		CHECK_EQ(result->dir, SPLAY_RIGHT);
 		CHECK_EQ(result->node, a->right->right);
 		CHECK_EQ(result->next, path_b);
 
-		printf("refcount result: %d, path_b: %d, a: %d\n", result->refcount, path_b->refcount, a->refcount);
-
 		splay_path_release(result);
-		printf("* path_b: %d, a: %d\n", path_b->refcount, a->refcount);
 		splay_path_release(path_b);
 
-		printf("refcount a: %d, a->right: %d, a->right->right: %d\n",
-			   a->refcount, a->right->refcount, a->right->right->refcount);
 		splay_release(a);
 	}
 
