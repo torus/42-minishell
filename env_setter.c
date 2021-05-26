@@ -36,7 +36,7 @@ int	ft_setenv(const char *key, const char *value, int rewrite)
 	if (var)
 	{
 		free((void *)var->value);
-		var->value = value;
+		var->value = ft_strdup(value);
 	}
 	else
 		add_new_var(&g_shell.vars, key, value, 0);
