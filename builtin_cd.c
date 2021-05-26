@@ -6,7 +6,7 @@
 #include "minishell.h"
 #include "libft/libft.h"
 
-static void	put_cd_errmsg(char *dest_path)
+static void	put_cd_errmsg(const char *dest_path)
 {
 	char	*tmp;
 	char	*errmsg;
@@ -30,17 +30,17 @@ static void	put_cd_errmsg(char *dest_path)
  */
 static char	*get_cd_dest_from_argv(char **argv)
 {
-	char	*dest_path;
+	t_var	*dest_path_var;
 
 	if (ptrarr_len((void **)argv) == 1)
 	{
-		dest_path = get_env_val("HOME");
-		if (!dest_path)
+		dest_path_var = get_env("HOME");
+		if (!dest_path_var || !dest_path_var->value)
 		{
 			put_minish_err_msg("cd", "HOME not set");
 			return (NULL);
 		}
-		return (dest_path);
+		return (ft_strdup(dest_path_var->value));
 	}
 	return (ft_strdup(argv[1]));
 }
