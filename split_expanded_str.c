@@ -3,10 +3,10 @@
 /*
  * from から len文字substrして dst にくっつける
  */
-static char	*substr_and_join(char *dst, char *from, int len)
+static const char	*substr_and_join(const char *dst, const char *from, int len)
 {
-	char	*tmp_dst;
-	char	*tmp_substr;
+	const char	*tmp_dst;
+	const char	*tmp_substr;
 
 	tmp_dst = dst;
 	tmp_substr = ft_substr(from, 0, len);
@@ -14,8 +14,8 @@ static char	*substr_and_join(char *dst, char *from, int len)
 		dst = ft_strjoin(dst, tmp_substr);
 	else
 		dst = ft_strdup(tmp_substr);
-	free(tmp_dst);
-	free(tmp_substr);
+	free((void *)tmp_dst);
+	free((void *)tmp_substr);
 	return (dst);
 }
 
@@ -36,8 +36,8 @@ static char	*substr_and_join(char *dst, char *from, int len)
  *
  * return: strからlen文字strdupしたものをくっつけたtext
  */
-static char	*update_text_and_str(char *quote_char,
-	char *text, char **str, int *len)
+static const char	*update_text_and_str(char *quote_char,
+	const char *text, char **str, int *len)
 {
 	if (*quote_char)
 		*quote_char = '\0';
@@ -56,11 +56,11 @@ static char	*update_text_and_str(char *quote_char,
  * out: |abc| を返し, *str を d まで進める
  * 次の呼び出しでは |defghi jkl| を返し, *str を \0 まで進める
  */
-static char	*get_str_from_expanded_str(char **str)
+static const char	*get_str_from_expanded_str(char **str)
 {
 	char	quote_char;
 	int		len;
-	char	*text;
+	const char	*text;
 
 	quote_char = '\0';
 	len = 0;
@@ -89,11 +89,11 @@ static char	*get_str_from_expanded_str(char **str)
  *   in($ABC="hoge"):       |'$''$'"ABC"'\'"$ABC""$ABC"|
  *   out:                   ["$$ABC\hogehoge"]
  */
-char	**split_expanded_str(char *str)
+const char	**split_expanded_str(char *str)
 {
-	char	**result;
-	char	*text;
-	char	**tmp;
+	const char	**result;
+	const char	*text;
+	const char	**tmp;
 
 	result = NULL;
 	while (*str)
@@ -106,7 +106,7 @@ char	**split_expanded_str(char *str)
 		if (text)
 		{
 			tmp = result;
-			result = (char **)ptrarr_add_ptr((void **)tmp, text);
+			result = (const char **)ptrarr_add_ptr((void **)tmp, (void *)text);
 			free(tmp);
 		}
 	}

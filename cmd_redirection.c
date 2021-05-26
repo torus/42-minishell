@@ -33,24 +33,24 @@ int	put_redirect_fd_err_msg_and_ret(int ret_value, int fd, char *msg)
  * return: 環境変数展開などが完了した文字列.
  *   展開した結果文字列が2つ以上の場合はエラーなのでNULLを返す.
  */
-char	*expand_redirect_filepath(char *red_target)
+const char	*expand_redirect_filepath(const char *red_target)
 {
-	char	*expanded_str;
-	char	**splitted_expanded_str;
-	char	*errmsg;
-	char	*filepath;
+	const char	*expanded_str;
+	const char	**splitted_expanded_str;
+	const char	*errmsg;
+	const char	*filepath;
 
 	expanded_str = expand_env_var(red_target);
-	splitted_expanded_str = split_expanded_str(expanded_str);
-	free(expanded_str);
+	splitted_expanded_str = split_expanded_str((char *)expanded_str);
+	free((void *)expanded_str);
 	if (!splitted_expanded_str
 		|| ptrarr_len((void **)splitted_expanded_str) != 1)
 	{
 		errmsg = ft_strjoin(red_target, ": ambiguous redirect\n");
 		if (errmsg)
-			put_err_msg(errmsg);
+			put_err_msg((char *)errmsg);
 		free_ptrarr((void **)splitted_expanded_str);
-		free(errmsg);
+		free((char *)errmsg);
 		return (NULL);
 	}
 	filepath = ft_strdup(splitted_expanded_str[0]);
