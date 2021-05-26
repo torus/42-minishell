@@ -1,6 +1,27 @@
 #include "test.h"
 #include "../env.h"
 #include "../libft/libft.h"
+#include "../minishell.h"
+
+t_shell	g_shell;
+
+void init_g_shell(void)
+{
+	g_shell.cwd = NULL;
+}
+
+void check_strarr(const char **actual_strarr, const char **expected_strarr)
+{
+	int i = 0 ;
+	while (actual_strarr[i] && expected_strarr[i])
+	{
+		printf("%d:\n", i);
+		CHECK_EQ_STR(actual_strarr[i], expected_strarr[i]);
+		i++;
+	}
+	printf("%d: |%s| == |%s|\n", i, actual_strarr[i], expected_strarr[i]);
+	CHECK(!(actual_strarr[i] || expected_strarr[i]));  // 両方ともNULLだよね?
+}
 
 int main(){
 	extern char **environ;
@@ -208,6 +229,47 @@ int main(){
 		char	*new = getenv("ABC");
 		CHECK(!new);
 		ft_unsetenv("ABC");
+	}
+
+	TEST_CHAPTER("t_var");
+
+	TEST_SECTION("kvstr2t_var");
+	{
+		char *kvstr = "env1=this is env1";
+		t_var *var = kvstr2t_var(kvstr, 0);
+		CHECK(var);
+		CHECK_EQ_STR(var->key, "env1");
+		CHECK_EQ_STR(var->value, "this is env1");
+		CHECK_EQ(var->is_shell_var, 0);
+		CHECK_EQ(var->next, NULL);
+	}
+
+	TEST_SECTION("文字列配列をt_varに変換して変数を追加し, 文字列配列に戻す");
+	{
+		char	**envarr_expected;
+		char	**envarr_actual;
+		t_var	*vars;
+		t_var	*new_var;
+
+		envarr_expected = ft_split("env1=env1 env2=env2 env3=env3", ' ');
+
+		vars = environ2t_var(envarr_expected);
+		new_var = ft_calloc(1, sizeof(t_var));
+		new_var->key = ft_strdup("NEW_ENV");
+		new_var->value = ft_strdup("new env");
+		new_var->is_shell_var = 0;
+		add_new_var(&vars, new_var);
+
+		envarr_actual = t_var2environ(vars);
+		CHECK(envarr_actual);
+
+		char	**tmp = envarr_expected;
+		envarr_expected = (char **)ptrarr_add_ptr((void **)envarr_expected, ft_strdup("NEW_ENV=new env"));
+		free(tmp);
+
+		sort_strarr(envarr_actual);
+		sort_strarr(envarr_expected);
+		check_strarr((const char**)envarr_actual, (const char**)envarr_expected);
 	}
 
 	char c;
