@@ -9,12 +9,13 @@ t_splay_tree	*splay_create(
 	tree = malloc(sizeof(t_splay_tree));
 	if (tree)
 	{
-		tree->left = left;
-		if (left)
-			left->refcount++;
-		tree->right = right;
-		if (right)
-			right->refcount++;
+		splay_init(&tree->left, left);
+		/* if (left) */
+		/* 	left->refcount++; */
+		splay_init(&tree->right, right);
+		/* tree->right = right; */
+		/* if (right) */
+		/* 	right->refcount++; */
 		tree->value = value;
 		tree->refcount = 0;
 	}

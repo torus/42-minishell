@@ -117,9 +117,11 @@ void	test_rope()
 
 	TEST_SECTION("rope_split");
 	{
-		t_rope	*rope = brownfox();
-		rope->refcount++;
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
 		// quick brown fox jumps
+		CHECK_EQ(rope->refcount, 1);
 		CHECK(rope);
 		CHECK_EQ(rope_index(rope, 0), 'q');
 		CHECK_EQ(rope_index(rope, 9), 'w');
@@ -129,8 +131,8 @@ void	test_rope()
 
 		t_rope	*left = NULL, *right = NULL;
 		rope_split(rope, 9, &left, &right);
-		left->refcount++;
-		right->refcount++;
+		CHECK_EQ(left->refcount, 1);
+		CHECK_EQ(right->refcount, 1);
 
 		CHECK(left);
 		CHECK_EQ(rope_length(left), 9);
@@ -141,8 +143,6 @@ void	test_rope()
 		CHECK_EQ(rope_index(left, 8), 'o');
 		CHECK_EQ(rope_index(right, 0), 'w');
 		CHECK_EQ(rope_index(right, 11), 's');
-
-		printf("refcount: rope %d, left %d right %d\n", rope->refcount, left->refcount, right->refcount);
 
 		splay_release(left);
 		splay_release(right);
