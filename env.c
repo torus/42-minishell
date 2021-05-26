@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "libft/libft.h"
 #include "env.h"
+#include "minishell.h"
 
 /*
  * Get environment variable with key.
@@ -13,7 +14,7 @@ t_var	*get_env(const char *env_key)
 {
 	t_var	*current;
 
-	current = NULL;
+	current = g_shell.vars;
 	while (current)
 	{
 		if (!ft_strcmp(env_key, current->key))
