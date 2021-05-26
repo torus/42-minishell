@@ -40,8 +40,8 @@ int	ft_setenv(const char *key, const char *value, int rewrite)
 	var = malloc(sizeof(t_var));
 	if (!var)
 		return (-1);
-	var->key = key;
-	var->value = value;
+	var->key = ft_strdup(key);
+	var->value = ft_strdup(value);
 	var->is_shell_var = 0;
 	return (0);
 }
