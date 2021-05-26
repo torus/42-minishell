@@ -24,7 +24,7 @@ const char	*get_val_from_kvstr(const char *kvstr, char delimiter);
 const char	*expand_env_var(const char *str);
 const char	*generate_kvstr(const char *key, const char *value);
 int		ft_setenv(const char *name, const char *value, int rewrite);
-int		ft_unsetenv(const char *name);
+int		ft_unsetenv(const char *key);
 
 // コマンドの終了ステータス
 int		get_status(void);

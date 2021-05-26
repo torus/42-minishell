@@ -47,35 +47,35 @@ int	ft_setenv(const char *key, const char *value, int rewrite)
 }
 
 /*
- * name で指定された環境変数が存在する場合, それを削除する.
+ * key で指定された環境変数が存在する場合, それを削除する.
  * 標準ライブラリの unsetenv() と同じ動作をする.
  *
- * name: 環境変数のキー名
+ * key: 環境変数のキー名
  *
  * return: 正常なら0. それ以外なら-1.
  */
-int	ft_unsetenv(const char *name)
+int	ft_unsetenv(const char *key)
 {
-	extern char	**environ;
-	int			idx;
-	int			env_len;
-	int			name_len;
+	t_var	*prev;
+	t_var	*current;
 
-	idx = 0;
-	name_len = ft_strlen(name);
-	env_len = ptrarr_len((void **)environ);
-	while (environ[idx])
+	current = g_shell.vars;
+	prev = NULL;
+	while (current)
 	{
-		if (ft_strncmp(environ[idx], name, name_len) == 0
-			&& environ[idx][name_len] == '=')
+		if (!ft_strcmp(current->key, key))
 		{
-			if ((void *)environ[idx] < (void *)&idx)
-				free(environ[idx]);
-			ft_memmove(environ + idx, environ + idx + 1,
-				sizeof(char *) * (env_len - idx));
-			return (0);
+			if (prev)
+				prev->next = current->next;
+			else
+				g_shell.vars = current->next;
+			free((void *)current->key);
+			free((void *)current->value);
+			free(current);
+			break;
 		}
-		idx++;
+		prev = current;
+		current = current->next;
 	}
 	return (0);
 }
