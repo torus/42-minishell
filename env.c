@@ -13,6 +13,7 @@ t_var	*get_env(const char *env_key)
 {
 	t_var	*current;
 
+	current = NULL;
 	while (current)
 	{
 		if (!ft_strcmp(env_key, current->key))
