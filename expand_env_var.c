@@ -4,12 +4,13 @@
 /*
  * 環境変数を展開してresultに連結させて引数をfreeする
  */
-static const char	*expand_env_and_join(const char *result,
-	const char *str, int env_len)
+static char	*expand_env_and_join(char *result,
+	char *str, int env_len)
 {
-	const char	*keyname;
+	char	*keyname;
+	char	*keyval;
 	t_var		*env_var;
-	const char	*tmp_result;
+	char	*tmp_result;
 
 	keyname = ft_substr(str, 0, env_len);
 	if (!keyname)
@@ -26,18 +27,18 @@ static const char	*expand_env_and_join(const char *result,
 		else
 			result = ft_strdup(env_var->value);
 	}
-	free((void *)keyname);
+	free(keyname);
 	return (result);
 }
 
 /*
  * 普通の文字列をresultに連結させて引数をfreeする
  */
-static const char	*result_join_normal_str(const char *result,
-	const char *str, int len)
+static char	*result_join_normal_str(char *result,
+	char *str, int len)
 {
-	const char	*tmp;
-	const char	*tmp2;
+	char	*tmp;
+	char	*tmp2;
 
 	tmp = ft_substr(str, 0, len);
 	if (!tmp)
@@ -48,8 +49,8 @@ static const char	*result_join_normal_str(const char *result,
 	{
 		tmp2 = result;
 		result = ft_strjoin(result, tmp);
-		free((void *)tmp);
-		free((void *)tmp2);
+		free(tmp);
+		free(tmp2);
 	}
 	return (result);
 }
@@ -64,7 +65,7 @@ static const char	*result_join_normal_str(const char *result,
  *   - 文字列の終端に達した.
  */
 static bool	will_toggle_env(bool is_in_env,
-	bool is_in_noexpand, const char *str, int len)
+	bool is_in_noexpand, char *str, int len)
 {
 	bool	will_start_env;
 	bool	will_end_env;
@@ -89,8 +90,8 @@ static bool	will_toggle_env(bool is_in_env,
  *
  * return: 文字列解析処理を続けるかどうか (is_continue)
  */
-static bool	join_str_or_env(const char **result,
-	const char **str, int *len, bool *is_in_env)
+static bool	join_str_or_env(char **result,
+	char **str, int *len, bool *is_in_env)
 {
 	if (*is_in_env)
 		*result = expand_env_and_join(*result, *str, *len);
@@ -114,13 +115,13 @@ static bool	join_str_or_env(const char **result,
  *   in($ABC="hoge"):       |'$''$'"ABC"'\'"$ABC""$ABC"|
  *   out:                   |'$''$'"ABC"'\'"hoge""hoge"|
  */
-const char	*expand_env_var(const char *str)
+char	*expand_env_var(char *str)
 {
-	int			len;
-	const char	*result;
-	bool		is_in_env;
-	bool		is_in_noexpand;
-	bool		is_continue;
+	int		len;
+	char	*result;
+	bool	is_in_env;
+	bool	is_in_noexpand;
+	bool	is_continue;
 
 	len = 0;
 	is_continue = true;

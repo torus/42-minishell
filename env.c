@@ -30,7 +30,7 @@ t_var	*get_env(const char *env_key)
  *
  * return: NULL-terminated char's pointer array.
  */
-const char	**split_first_c(const char *str, char c)
+char	**split_first_c(const char *str, char c)
 {
 	size_t	idx;
 	char	**result;
@@ -56,7 +56,7 @@ const char	**split_first_c(const char *str, char c)
 		if (!result[1])
 			return (free_ptrarr_and_rtn_null((void **)result));
 	}
-	return ((const char **)result);
+	return (result);
 }
 
 /* コロン(:)で区切る.
@@ -66,7 +66,7 @@ const char	**split_first_c(const char *str, char c)
  * str: コロン(':')区切られた文字列
  * def_str: default string.
  */
-const char	**get_colon_units(const char *str, const char *default_str)
+char	**get_colon_units(char *str, char *default_str)
 {
 	void	**result;
 	char	*next;
@@ -91,7 +91,7 @@ const char	**get_colon_units(const char *str, const char *default_str)
 	else
 		result = ptrarr_add_ptr(result, ft_strdup(str));
 	free(tmparr);
-	return ((const char **)result);
+	return ((char **)result);
 }
 
 /*
@@ -103,16 +103,16 @@ const char	**get_colon_units(const char *str, const char *default_str)
  *
  * return: value of key-value string.
  */
-const char	*get_val_from_kvstr(const char *kvstr, char delimiter)
+char	*get_val_from_kvstr(const char *kvstr, char delimiter)
 {
-	const char	**kvarr;
-	const char	*valstr;
+	char	**kvarr;
+	char	*valstr;
 
 	kvarr = split_first_c(kvstr, delimiter);
 	if (!kvarr)
 		return (NULL);
 	valstr = kvarr[1];
-	free((void *)kvarr[0]);
+	free(kvarr[0]);
 	free(kvarr);
 	return (valstr);
 }
