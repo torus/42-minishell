@@ -80,6 +80,7 @@ t_var	*environ2t_var(char **environ)
 	t_var	*vars;
 
 	i = 0;
+	vars = NULL;
 	while (environ[i])
 	{
 		if (!add_new_var(&vars, kvstr2t_var(environ[i++], false)))
