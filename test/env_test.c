@@ -7,7 +7,9 @@ t_shell	g_shell;
 
 void init_g_shell(void)
 {
+	char **environ;
 	g_shell.cwd = NULL;
+	g_shell.vars = environ2vars(environ);
 }
 
 void check_strarr(const char **actual_strarr, const char **expected_strarr)
@@ -24,12 +26,12 @@ void check_strarr(const char **actual_strarr, const char **expected_strarr)
 }
 
 int main(){
-	extern char **environ;
+	init_g_shell();
 
 	TEST_SECTION("split_first_c() 普通に\"Key=Value\"");
 	{
-		char *input = "PATH=/bin/:/usr/bin/:/home/jun/bin";
-		char **str_arr = split_first_c(input, '=');
+		const char *input = "PATH=/bin/:/usr/bin/:/home/jun/bin";
+		const char **str_arr = split_first_c(input, '=');
 		CHECK_EQ_STR(str_arr[0], "PATH");
 		CHECK_EQ_STR(str_arr[1], "/bin/:/usr/bin/:/home/jun/bin");
 		CHECK_EQ(str_arr[2], NULL);
@@ -39,8 +41,8 @@ int main(){
 
 	TEST_SECTION("split_first_c() 区切り文字が入っていない");
 	{
-		char *input = "PATH/bin/:/usr/bin/:/home/jun/bin";
-		char **str_arr = split_first_c(input, '=');
+		const char *input = "PATH/bin/:/usr/bin/:/home/jun/bin";
+		const char **str_arr = split_first_c(input, '=');
 		CHECK_EQ_STR(str_arr[0], "PATH/bin/:/usr/bin/:/home/jun/bin");
 		CHECK_EQ(str_arr[1], NULL);
 		CHECK_EQ(str_arr[2], NULL);
@@ -50,8 +52,8 @@ int main(){
 
 	TEST_SECTION("split_first_c() 最後に区切り文字\"key=\"");
 	{
-		char *input = "PATH=";
-		char **str_arr = split_first_c(input, '=');
+		const char *input = "PATH=";
+		const char **str_arr = split_first_c(input, '=');
 		CHECK_EQ_STR(str_arr[0], "PATH");
 		CHECK_EQ_STR(str_arr[1], "");
 		CHECK_EQ(str_arr[2], NULL);
@@ -61,9 +63,9 @@ int main(){
 
 	TEST_SECTION("get_colon_units() \":/hoge/::/\"");
 	{
-		char *input = ":/hoge/::/";
-		char *default_str = "";
-		char **str_arr = get_colon_units(input, default_str);
+		const char *input = ":/hoge/::/";
+		const char *default_str = "";
+		const char **str_arr = get_colon_units(input, default_str);
 		CHECK_EQ_STR(str_arr[0], "");
 		CHECK_EQ_STR(str_arr[1], "/hoge/");
 		CHECK_EQ_STR(str_arr[2], "");
@@ -75,9 +77,9 @@ int main(){
 
 	TEST_SECTION("get_colon_units() \"/hoge/::/::\"");
 	{
-		char *input = "/hoge/::/::";
-		char *default_str = "./";
-		char **str_arr = get_colon_units(input, default_str);
+		const char *input = "/hoge/::/::";
+		const char *default_str = "./";
+		const char **str_arr = get_colon_units(input, default_str);
 		CHECK_EQ_STR(str_arr[0], "/hoge/");
 		CHECK_EQ_STR(str_arr[1], "./");
 		CHECK_EQ_STR(str_arr[2], "/");
@@ -90,44 +92,45 @@ int main(){
 
 	TEST_SECTION("get_env() 通常ケース");
 	{
-		char *original0 = environ[0];
-		environ[0] = "GET_ENV_TEST=/bin/:/usr/bin/:/home/jun/bin";
-		char *kvstr = get_env("GET_ENV_TEST");
-		CHECK_EQ_STR(kvstr, environ[0]);
-		environ[0] = original0;
+		add_new_var(&g_shell.vars, "GET_ENV_TEST", "/bin/:/usr/bin/:/home/jun/bin", 0);
+		t_var *actual = get_env("GET_ENV_TEST");
+		CHECK_EQ_STR(actual->key, "GET_ENV_TEST");
+		CHECK_EQ_STR(actual->value, "/bin/:/usr/bin/:/home/jun/bin");
+		ft_unsetenv("GET_ENV_TEST");
 	}
 
 	TEST_SECTION("get_env() 指定した環境変数が存在しない場合");
 	{
-		char *kvstr = get_env("THIS_IS_NOT_EXIST_IN_ENVIRON");
-		CHECK_EQ(kvstr, NULL);
+		ft_unsetenv("THIS_IS_NOT_EXIST_IN_ENVIRON");
+		t_var *actual = get_env("THIS_IS_NOT_EXIST_IN_ENVIRON");
+		CHECK_EQ(actual, NULL);
 	}
 
 	TEST_SECTION("get_env() 途中まで同じ環境変数名な時");
 	{
-		char *original0 = environ[0];
-		environ[0] = "GET_ENV_TEST_TEST=/bin/:/usr/bin/:/home/jun/bin";
-		char *kvstr = get_env("GET_ENV_TEST");
-		CHECK_EQ(kvstr, NULL);
-		environ[0] = original0;
+		ft_unsetenv("GET_ENV_TEST");
+		ft_setenv("GET_ENV_TEST_TEST", "/bin/:/usr/bin/:/home/jun/bin", 1);
+		t_var *var = get_env("GET_ENV_TEST");
+		CHECK_EQ(var, NULL);
+		ft_unsetenv("GET_ENV_TEST_TEST");
 	}
 
 	TEST_SECTION("get_val_from_kvstr() 通常ケース");
 	{
-		char *kvstr = "PATH=/bin/:/usr/bin/:/home/jun/bin";
-		char *val_str = get_val_from_kvstr(kvstr, '=');
+		const char *kvstr = "PATH=/bin/:/usr/bin/:/home/jun/bin";
+		const char *val_str = get_val_from_kvstr(kvstr, '=');
 		CHECK_EQ_STR(val_str, "/bin/:/usr/bin/:/home/jun/bin");
 
-		free(val_str);
+		free((void*)val_str);
 	}
 
 	TEST_SECTION("get_val_from_kvstr() 区切り文字が無い");
 	{
-		char *kvstr = "PATH/bin/:/usr/bin/:/home/jun/bin";
-		char *val_str = get_val_from_kvstr(kvstr, '=');
+		const char *kvstr = "PATH/bin/:/usr/bin/:/home/jun/bin";
+		const char *val_str = get_val_from_kvstr(kvstr, '=');
 		CHECK_EQ(val_str, NULL);
 
-		free(val_str);
+		free((void*)val_str);
 	}
 
 	TEST_SECTION("get_val_from_kvstr() 区切り文字が連続で並ぶ");
@@ -136,7 +139,7 @@ int main(){
 		const char *val_str = get_val_from_kvstr(kvstr, '=');
 		CHECK_EQ_STR(val_str, "==/bin/:/usr/bin/:/home/jun/bin");
 
-		free(val_str);
+		free((void*)val_str);
 	}
 
 	TEST_SECTION("exit_status");
@@ -258,11 +261,7 @@ int main(){
 		envarr_expected = ft_split("env1=env1 env2=env2 env3=env3", ' ');
 
 		vars = environ2vars(envarr_expected);
-		new_var = ft_calloc(1, sizeof(t_var));
-		new_var->key = ft_strdup("NEW_ENV");
-		new_var->value = ft_strdup("new env");
-		new_var->is_shell_var = 0;
-		add_new_var(&vars, new_var);
+		add_new_var(&vars, "NEW_ENV", "new env", 0);
 
 		envarr_actual = vars2environ(vars);
 		CHECK(envarr_actual);
@@ -275,13 +274,6 @@ int main(){
 		sort_strarr(envarr_expected);
 		check_strarr((const char**)envarr_actual, (const char**)envarr_expected);
 	}
-
-	char c;
-	printf("environ: %p\n", environ);
-	printf("stack:   %p\n", &c);
-	// environ が heap領域 に配置されている時はfreeする
-	if ((void *)environ < (void *)&c)
-		free(environ);
 
 	int fail_count = print_result();
 	return (fail_count);
