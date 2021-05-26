@@ -74,16 +74,15 @@ static bool	cd_from_sources(char *dest_path, char **sources)
  */
 int	cd_cdpath_env(char *dest_path)
 {
-	char	*cdpath;
-	char	**sources;
-	bool	status;
+	t_var		*cdpath_var;
+	const char	**sources;
+	bool		status;
 
-	cdpath = get_env_val("CDPATH");
-	if (!cdpath)
+	cdpath_var = get_env("CDPATH");
+	if (!cdpath_var || !cdpath_var->value)
 		return (false);
-	sources = get_colon_units(cdpath, "");
+	sources = get_colon_units(cdpath_var->value, "");
 	status = cd_from_sources(dest_path, sources);
-	free(cdpath);
 	free_ptrarr((void **)sources);
 	return (status);
 }
