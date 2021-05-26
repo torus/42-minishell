@@ -96,8 +96,9 @@ t_var	*environ2vars(char **environ)
 		tmp = kvstr2var(environ[i], false);
 		if (!tmp)
 			put_minish_err_msg_and_exit(1, "environ2t_var", "failed add var");
-		last->next = tmp;
-		last = last->next;
+		if (last)
+			last->next = tmp;
+		last = tmp;
 		if (!first)
 			first = last;
 		i++;
