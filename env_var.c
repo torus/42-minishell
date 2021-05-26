@@ -61,7 +61,7 @@ t_var	*add_new_var(t_var **vars, const char *key, const char *value, bool is_she
 /* "key=value" 形式の文字列をt_varに変換する */
 t_var	*kvstr2var(char *kvstr, bool is_shell_var)
 {
-	char	**kvarr;
+	const char	**kvarr;
 	t_var	*new_var;
 
 	kvarr = split_first_c(kvstr, '=');
@@ -84,16 +84,25 @@ t_var	*kvstr2var(char *kvstr, bool is_shell_var)
 t_var	*environ2vars(char **environ)
 {
 	int		i;
-	t_var	*vars;
+	t_var	*first;
+	t_var	*last;
+	t_var	*tmp;
 
 	i = 0;
-	vars = NULL;
+	first = NULL;
+	last = NULL;
 	while (environ[i])
 	{
-		if (!add_new_var(&vars, kvstr2var(environ[i++], false)))
+		tmp = kvstr2var(environ[i], false);
+		if (!tmp)
 			put_minish_err_msg_and_exit(1, "environ2t_var", "failed add var");
+		last->next = tmp;
+		last = last->next;
+		if (!first)
+			first = last;
+		i++;
 	}
-	return (vars);
+	return (first);
 }
 
 /* t_var 内の環境変数を "key=value" 形式の文字列配列に変換する */
@@ -118,7 +127,7 @@ char		**vars2environ(t_var *vars)
 	while (i < vars_len)
 	{
 		if (!tmp->is_shell_var)
-			env_strarr[i++] = generate_kvstr(tmp->key, tmp->value);
+			env_strarr[i++] = (char *)generate_kvstr(tmp->key, tmp->value);
 		tmp = tmp->next;
 	}
 	return (env_strarr);
