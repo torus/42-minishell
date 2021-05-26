@@ -244,6 +244,29 @@ int main(){
 		CHECK_EQ(var->next, NULL);
 	}
 
+	TEST_SECTION("文字列配列をt_varに変換する");
+	{
+		char	**envarr;
+		t_var	*vars;
+
+		envarr = ft_split("env1=this_is_env1 env2=this_is_env2 env3=this_is_env3", ' ');
+
+		vars = environ2t_var(envarr);
+		t_var *tmp = vars;
+		CHECK_EQ_STR(tmp->key, "env1");
+		CHECK_EQ_STR(tmp->value, "this_is_env1");
+		CHECK_EQ(tmp->is_shell_var, 0);
+		tmp = tmp->next;
+		CHECK_EQ_STR(tmp->key, "env2");
+		CHECK_EQ_STR(tmp->value, "this_is_env2");
+		CHECK_EQ(tmp->is_shell_var, 0);
+		tmp = tmp->next;
+		CHECK_EQ_STR(tmp->key, "env3");
+		CHECK_EQ_STR(tmp->value, "this_is_env3");
+		CHECK_EQ(tmp->is_shell_var, 0);
+		free_vars(vars);
+	}
+
 	TEST_SECTION("文字列配列をt_varに変換して変数を追加し, 文字列配列に戻す");
 	{
 		char	**envarr_expected;
