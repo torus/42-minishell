@@ -13,9 +13,9 @@ typedef struct	s_var {
 
 void	free_vars(t_var *vars);
 t_var	*add_new_var(t_var **vars, t_var *new_var);
-t_var	*kvstr2t_var(char *kvstr, bool is_shell_var);
-t_var	*environ2t_var(char **environ);
-char	**t_var2environ(t_var *vars);
+t_var	*kvstr2var(char *kvstr, bool is_shell_var);
+t_var	*environ2vars(char **environ);
+char	**vars2environ(t_var *vars);
 
 char	*get_env(const char *env_key);
 char	**split_first_c(const char *str, char c);

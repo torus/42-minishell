@@ -236,7 +236,7 @@ int main(){
 	TEST_SECTION("kvstr2t_var");
 	{
 		char *kvstr = "env1=this is env1";
-		t_var *var = kvstr2t_var(kvstr, 0);
+		t_var *var = kvstr2var(kvstr, 0);
 		CHECK(var);
 		CHECK_EQ_STR(var->key, "env1");
 		CHECK_EQ_STR(var->value, "this is env1");
@@ -251,7 +251,7 @@ int main(){
 
 		envarr = ft_split("env1=this_is_env1 env2=this_is_env2 env3=this_is_env3", ' ');
 
-		vars = environ2t_var(envarr);
+		vars = environ2vars(envarr);
 		t_var *tmp = vars;
 		CHECK_EQ_STR(tmp->key, "env1");
 		CHECK_EQ_STR(tmp->value, "this_is_env1");
@@ -276,14 +276,14 @@ int main(){
 
 		envarr_expected = ft_split("env1=env1 env2=env2 env3=env3", ' ');
 
-		vars = environ2t_var(envarr_expected);
+		vars = environ2vars(envarr_expected);
 		new_var = ft_calloc(1, sizeof(t_var));
 		new_var->key = ft_strdup("NEW_ENV");
 		new_var->value = ft_strdup("new env");
 		new_var->is_shell_var = 0;
 		add_new_var(&vars, new_var);
 
-		envarr_actual = t_var2environ(vars);
+		envarr_actual = vars2environ(vars);
 		CHECK(envarr_actual);
 
 		char	**tmp = envarr_expected;

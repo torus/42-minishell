@@ -52,7 +52,7 @@ t_var	*add_new_var(t_var **vars, t_var *new_var)
 }
 
 /* "key=value" 形式の文字列をt_varに変換する */
-t_var	*kvstr2t_var(char *kvstr, bool is_shell_var)
+t_var	*kvstr2var(char *kvstr, bool is_shell_var)
 {
 	char	**kvarr;
 	t_var	*new_var;
@@ -74,7 +74,7 @@ t_var	*kvstr2t_var(char *kvstr, bool is_shell_var)
 }
 
 /* "key=value" 形式の文字列配列をt_varに変換する */
-t_var	*environ2t_var(char **environ)
+t_var	*environ2vars(char **environ)
 {
 	int		i;
 	t_var	*vars;
@@ -83,14 +83,14 @@ t_var	*environ2t_var(char **environ)
 	vars = NULL;
 	while (environ[i])
 	{
-		if (!add_new_var(&vars, kvstr2t_var(environ[i++], false)))
+		if (!add_new_var(&vars, kvstr2var(environ[i++], false)))
 			put_minish_err_msg_and_exit(1, "environ2t_var", "failed add var");
 	}
 	return (vars);
 }
 
 /* t_var 内の環境変数を "key=value" 形式の文字列配列に変換する */
-char		**t_var2environ(t_var *vars)
+char		**vars2environ(t_var *vars)
 {
 	t_var	*tmp;
 	int		vars_len;
