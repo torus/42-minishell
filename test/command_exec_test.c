@@ -322,6 +322,7 @@ int main(){
 		remove("output.txt");
     }
 
+	free_vars(g_shell.vars);
 	int fail_count = print_result();
 	return (fail_count);
 }

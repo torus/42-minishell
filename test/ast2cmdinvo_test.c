@@ -1188,6 +1188,7 @@ int main()
 		cmd_free_cmdinvo(expected_first);
 	}
 
+	free_vars(g_shell.vars);
 	parse_free_all_ast();
 	int fail_count = print_result();
 	return (fail_count);

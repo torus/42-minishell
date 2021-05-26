@@ -219,6 +219,7 @@ int main(){
 		CHECK_EQ_STR(var->value, "this is env1");
 		CHECK_EQ(var->is_shell_var, 0);
 		CHECK_EQ(var->next, NULL);
+		free_vars(var);
 	}
 
 	TEST_SECTION("文字列配列をt_varに変換する");
@@ -242,6 +243,7 @@ int main(){
 		CHECK_EQ_STR(tmp->value, "this_is_env3");
 		CHECK_EQ(tmp->is_shell_var, 0);
 		free_vars(vars);
+		free_ptrarr((void **)envarr);
 	}
 
 	TEST_SECTION("文字列配列をt_varに変換して変数を追加し, 文字列配列に戻す");
@@ -265,8 +267,12 @@ int main(){
 		sort_strarr(envarr_actual);
 		sort_strarr(envarr_expected);
 		check_strarr((const char**)envarr_actual, (const char**)envarr_expected);
+		free_ptrarr((void **)envarr_actual);
+		free_ptrarr((void **)envarr_expected);
+		free_vars(vars);
 	}
 
+	free_vars(g_shell.vars);
 	int fail_count = print_result();
 	return (fail_count);
 }

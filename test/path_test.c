@@ -118,6 +118,7 @@ int main(){
 		free(actual);
 	}
 
+	free_vars(g_shell.vars);
 	int fail_count = print_result();
 	return (fail_count);
 }
