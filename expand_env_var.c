@@ -9,7 +9,7 @@ static char	*expand_env_and_join(char *result,
 {
 	char	*keyname;
 	char	*keyval;
-	t_var		*env_var;
+	t_var	*env_var;
 	char	*tmp_result;
 
 	keyname = ft_substr(str, 0, env_len);
@@ -22,7 +22,7 @@ static char	*expand_env_and_join(char *result,
 		{
 			tmp_result = result;
 			result = ft_strjoin(result, env_var->value);
-			free((void *)tmp_result);
+			free(tmp_result);
 		}
 		else
 			result = ft_strdup(env_var->value);
