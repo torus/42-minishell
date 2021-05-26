@@ -61,7 +61,7 @@ int						cmd_add_outredirect(t_command_invocation *command,
 							const char *filepath, int fd, bool is_append);
 void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
-char					*expand_env_var(char *str);
+const char				*expand_env_var(const char *str);
 void					fd_list_close(t_fd_list **lst);
 t_fd_list				*fd_list_add_fd(t_fd_list **lst, int fd);
 

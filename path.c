@@ -6,7 +6,7 @@
 #include "env.h"
 #include "minishell.h"
 
-bool	is_directory(char *path)
+bool	is_directory(const char *path)
 {
 	struct stat	buf;
 
@@ -20,10 +20,10 @@ bool	is_directory(char *path)
 /*
  * concatenate dirpath, "/" and filename.
  */
-char	*path_join(char *dirpath, char *filename)
+const char	*path_join(const char *dirpath, const char *filename)
 {
-	char	*tmp;
-	char	*result;
+	const char	*tmp;
+	const char	*result;
 
 	if (ft_strlen(dirpath) == 0 || dirpath[ft_strlen(dirpath) - 1] != '/')
 		tmp = ft_strjoin(dirpath, "/");
@@ -32,7 +32,7 @@ char	*path_join(char *dirpath, char *filename)
 	if (!tmp)
 		return (NULL);
 	result = ft_strjoin(tmp, filename);
-	free(tmp);
+	free((void *)tmp);
 	return (result);
 }
 
@@ -41,14 +41,14 @@ char	*path_join(char *dirpath, char *filename)
  * path: 絶対パス.
  * Return: 親ディレクトリの絶対パス.
  */
-char	*get_parent_dir(char *path)
+const char	*get_parent_dir(const char *path)
 {
-	char	*result;
+	const char	*result;
 
 	result = ft_substr(path, 0, ft_strrchr(path, '/') - path);
 	if (result && ft_strlen(result) == 0)
 	{
-		free(result);
+		free((void *)result);
 		result = ft_strdup("/");
 	}
 	return (result);
@@ -57,7 +57,7 @@ char	*get_parent_dir(char *path)
 /* ユーザー が path のファイルの実行アクセス許可
  *   を持っているか
  */
-bool	is_executable(char *path)
+bool	is_executable(const char *path)
 {
 	struct stat	buf;
 
