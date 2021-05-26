@@ -57,6 +57,7 @@ void			splay_path_release(t_splay_path *path);
 void			splay_assign(t_splay_tree **var, t_splay_tree *val);
 void			splay_init(t_splay_tree **var, t_splay_tree *val);
 void			splay_path_assign(t_splay_path **var, t_splay_path *val);
+void			splay_path_init(t_splay_path **var, t_splay_path *val);
 
 # define ROPE_NOWEIGHT ((void*)-1L)
 

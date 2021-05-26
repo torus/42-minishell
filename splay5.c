@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include "rope.h"
 
-#include <stdio.h>
 void	splay_release(t_splay_tree *tree)
 {
 	if (!tree)
@@ -54,4 +53,11 @@ void	splay_path_assign(t_splay_path **var, t_splay_path *val)
 	*var = val;
 	val->refcount++;
 	splay_path_release(old_value);
+}
+
+void	splay_path_init(t_splay_path **var, t_splay_path *val)
+{
+	*var = val;
+	if (val)
+		val->refcount++;
 }

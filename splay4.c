@@ -42,27 +42,27 @@ static t_splay_tree	*splay_2(t_splay_path *path)
 	if (path->dir == SPLAY_LEFT)
 	{
 		if (path->next->dir == SPLAY_LEFT)
-			rotated = splay_zig_zig_right(x, p, g);
+			splay_init(&rotated, splay_zig_zig_right(x, p, g));
 		else
-			rotated = splay_zig_zag_left(x, p, g);
+			splay_init(&rotated, splay_zig_zag_left(x, p, g));
 	}
 	else
 	{
 		if (path->next->dir == SPLAY_RIGHT)
-			rotated = splay_zig_zig_left(x, p, g);
+			splay_init(&rotated, splay_zig_zig_left(x, p, g));
 		else
-			rotated = splay_zig_zag_right(x, p, g);
+			splay_init(&rotated, splay_zig_zag_right(x, p, g));
 	}
 
 	t_splay_tree	*result;
 	t_splay_path	*new_path;
 
-	new_path = splay_path_create(
-		path->next->next->dir, rotated, path->next->next->next);
-	new_path->refcount++;
-	result = splay(new_path);
-	result->refcount++;
+	splay_path_init(
+		&new_path, splay_path_create(
+			path->next->next->dir, rotated, path->next->next->next));
+	splay_init(&result, splay(new_path));
 	splay_path_release(new_path);
+	splay_release(rotated);
 	result->refcount--;
 	return (result);
 }

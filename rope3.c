@@ -75,7 +75,7 @@ void	rope_split(t_rope *rope, int index, t_rope **left, t_rope **right)
 	splayed = NULL;
 	path = NULL;
 	rope_index_with_path(rope, index, &path);
-	path->refcount++;
+	/* path->refcount++; */
 	cur = path->next;
 	while (cur)
 	{

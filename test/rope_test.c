@@ -146,21 +146,25 @@ void	test_rope()
 
 		splay_release(left);
 		splay_release(right);
+
+		CHECK_EQ(rope->refcount, 1);
 		splay_release(rope);
 	}
 
 	TEST_SECTION("rope_insert");
 	{
-		t_rope	*rope = brownfox();
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
 		// quick brown fox jumps
 		// -> quick brown lazy fox jumps
 
-		t_rope	*r01 = rope_create("l", "a");
-		t_rope	*r02 = rope_create("z", "y");
-		t_rope	*r03 = rope_create(" ", NULL);
-		t_rope	*lazy = rope_concat(rope_concat(r01, r02), r03);
+		t_rope	*r01; splay_init(&r01, rope_create("l", "a"));
+		t_rope	*r02; splay_init(&r02, rope_create("z", "y"));
+		t_rope	*r03; splay_init(&r03, rope_create(" ", NULL));
+		t_rope	*lazy; splay_init(&lazy, rope_concat(rope_concat(r01, r02), r03));
 
-		rope = rope_insert(rope, 12, lazy);
+		splay_assign(&rope, rope_insert(rope, 12, lazy));
 		CHECK_EQ(rope_length(rope), 26);
 
 		CHECK(rope);
@@ -172,15 +176,23 @@ void	test_rope()
 		CHECK_EQ(rope_index(rope, 16), ' ');
 		CHECK_EQ(rope_index(rope, 17), 'f');
 		CHECK_EQ(rope_index(rope, 25), 's');
+
+		splay_release(r01);
+		splay_release(r02);
+		splay_release(r03);
+		splay_release(lazy);
+		splay_release(rope);
 	}
 
 	TEST_SECTION("rope_delete");
 	{
-		t_rope	*rope = brownfox();
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
 		// quick brown fox jumps
 		// -> quick bx jumps
 
-		rope = rope_delete(rope, 7, 14);
+		splay_assign(&rope, rope_delete(rope, 7, 14));
 
 		CHECK(rope);
 		CHECK_EQ(rope_index(rope, 0), 'q');
@@ -188,6 +200,7 @@ void	test_rope()
 		CHECK_EQ(rope_index(rope, 7), 'x');
 		CHECK_EQ(rope_index(rope, 13), 's');
 		CHECK_EQ(rope_length(rope), 14);
+		splay_release(rope);
 	}
 
 }
