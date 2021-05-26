@@ -5,30 +5,29 @@
 
 static void	init_pwd(void)
 {
-	char	*pwd;
+	t_var	*pwd_var;
 	char	*tmp;
 
-	pwd = get_env_val("PWD");
-	if (!pwd)
+	pwd_var = get_env("PWD");
+	if (!pwd_var || !pwd_var->value)
 	{
 		tmp = getcwd(NULL, 0);
 		if (tmp)
 			ft_setenv("PWD", tmp, 1);
 		free(tmp);
 	}
-	free(pwd);
 }
 
 static void	init_shlvl(void)
 {
-	char	*shlvl;
+	t_var	*shlvl_var;
 	char	*num_str;
 	int		num;
 
-	shlvl = get_env_val("SHLVL");
-	if (shlvl)
+	shlvl_var = get_env("SHLVL");
+	if (shlvl_var && !shlvl_var->value)
 	{
-		num = ft_atoi(shlvl);
+		num = ft_atoi(shlvl_var->value);
 		if (num < 0)
 			num = 0;
 		else
@@ -40,7 +39,6 @@ static void	init_shlvl(void)
 	if (num_str)
 		ft_setenv("SHLVL", num_str, 1);
 	free(num_str);
-	free(shlvl);
 }
 
 static void	init_env(void)

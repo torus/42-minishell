@@ -116,25 +116,3 @@ const char	*get_val_from_kvstr(const char *kvstr, char delimiter)
 	free(kvarr);
 	return (valstr);
 }
-
-/*
- * Get value from environment variable with key ("key=value").
- *
- * env_key: key name of environment variable
- *
- * return: value of environment variable if env_key is found,
- *         or else, return NULL.
- */
-const char	*get_env_val(const char *env_key)
-{
-	char	*path_env_kv;
-	char	*path_env_val;
-
-	if (ft_strncmp(env_key, "?", 2) == 0)
-		return (ft_itoa(get_status()));
-	t_var	*var;
-	var = get_env(env_key);
-	if (!var)
-		return (NULL);
-	return (var->value);
-}

@@ -41,20 +41,19 @@ static bool	is_valid_env_key(const char *key)
 	return (true);
 }
 
-static int	export_strjoin_env(char *key, char *value)
+static int	export_strjoin_env(const char *key, const char *value)
 {
-	char	*old_value;
+	t_var	*env_var;
 	char	*new_value;
 
 	key = ft_substr(key, 0, ft_strchr(key, '+') - key);
-	old_value = get_env_val(key);
-	if (!old_value || !ft_strlen(old_value))
+	env_var = get_env(key);
+	if (!env_var || !env_var->value || !ft_strlen(env_var->value))
 		new_value = ft_strdup(value);
 	else
-		new_value = ft_strjoin(old_value, value);
+		new_value = ft_strjoin(env_var->value, value);
 	ft_setenv(key, new_value, 1);
-	free(key);
-	free(old_value);
+	free((void *)key);
 	free(new_value);
 	return (0);
 }

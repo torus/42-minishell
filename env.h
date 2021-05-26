@@ -21,7 +21,6 @@ t_var	*get_env(const char *env_key);
 const char	**split_first_c(const char *str, char c);
 const char	**get_colon_units(const char *str, const char *default_str);
 const char	*get_val_from_kvstr(const char *kvstr, char delimiter);
-const char	*get_env_val(const char *env_key);
 const char	*expand_env_var(const char *str);
 const char	*generate_kvstr(const char *key, const char *value);
 int		ft_setenv(const char *name, const char *value, int rewrite);

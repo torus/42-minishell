@@ -10,10 +10,13 @@
 int	set_cwd(char *abs_path)
 {
 	char	*oldpwd;
+	t_var	*pwd_var;
 
-	oldpwd = get_env_val("PWD");
-	if (!oldpwd)
+	pwd_var = get_env("PWD");
+	if (pwd_var && pwd_var->value)
 		oldpwd = ft_strdup("");
+	else
+		oldpwd = ft_strdup(pwd_var->value);
 	free(g_shell.cwd);
 	g_shell.cwd = ft_strdup(abs_path);
 	ft_setenv("OLDPWD", oldpwd, 1);

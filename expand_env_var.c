@@ -8,24 +8,23 @@ static const char	*expand_env_and_join(const char *result,
 	const char *str, int env_len)
 {
 	const char	*keyname;
-	const char	*keyval;
+	t_var		*env_var;
 	const char	*tmp_result;
 
 	keyname = ft_substr(str, 0, env_len);
 	if (!keyname)
 		return (NULL);
-	keyval = get_env_val(keyname);
-	if (keyval)
+	env_var = get_env(keyname);
+	if (env_var && env_var->value)
 	{
 		if (result)
 		{
 			tmp_result = result;
-			result = ft_strjoin(result, keyval);
-			free((void *)keyval);
+			result = ft_strjoin(result, env_var->value);
 			free((void *)tmp_result);
 		}
 		else
-			result = keyval;
+			result = ft_strdup(env_var->value);
 	}
 	free((void *)keyname);
 	return (result);
