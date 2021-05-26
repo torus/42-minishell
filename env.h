@@ -1,6 +1,8 @@
 #ifndef ENV_H
 # define ENV_H
 
+# include <stdbool.h>
+
 // 環境変数とシェル変数をリストとして保持する
 typedef struct	s_var {
 	char				*key;
@@ -8,10 +10,11 @@ typedef struct	s_var {
 	bool				is_shell_var;
 	struct s_var		*next;
 }				t_var;
+
 t_var	*add_new_var(t_var **vars, t_var *new_var);
 t_var	*kvstr2t_var(char *kvstr, bool is_shell_var);
-t_var	*environ2t_env_var();
-char	**t_env_var2environ();
+t_var	*environ2t_var(char **environ);
+char	**t_var2environ(t_var *vars);
 
 char	*get_env(const char *env_key);
 char	**split_first_c(const char *str, char c);
