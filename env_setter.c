@@ -17,99 +17,32 @@ char	*generate_kvstr(const char *key, const char *value)
 	return (kvstr);
 }
 
-/* 既に環境変数が存在している場合
- *   rewrite=1 なら書き換える.
- *   rewrite=0 なら書き換えない
- *
- * name: 環境変数のキー名
- * value: 環境変数の値
- * rewrite: 環境変数が存在していた場合に置き換えるかどうか
- * has_updated: 環境変数の更新が行われたらtrueが入る.
- *
- * return: 正常なら0. それ以外なら-1.
- */
-static int	update_env(const char *name,
-	const char *value, int rewrite, bool *has_updated)
-{
-	extern char	**environ;
-	int			idx;
-	char		*kvstr;
-	int			name_len;
-
-	idx = 0;
-	name_len = ft_strlen(name);
-	while (!*has_updated && environ[idx])
-	{
-		if (!ft_strncmp(environ[idx], name, name_len)
-			&& environ[idx][name_len] == '=')
-		{
-			*has_updated = true;
-			if (!rewrite)
-				return (0);
-			kvstr = generate_kvstr(name, value);
-			if (!kvstr)
-				return (ERROR);
-			if ((void *)environ[idx] < (void *)&idx)
-				free((void *)environ[idx]);
-			environ[idx] = kvstr;
-		}
-		idx++;
-	}
-	return (0);
-}
-
-/*
- * environ より+2大きい配列を確保して環境変数を追加する.
- *
- * name: 環境変数のキー名
- * value: 環境変数の値
- *
- * return: 正常なら0. それ以外なら-1.
- */
-static int	expand_and_add_env(const char *name, const char *value)
-{
-	extern char	**environ;
-	char		**new_environ;
-	int			i;
-	char		*kvstr;
-
-	new_environ = ft_calloc(ptrarr_len((void **)environ) + 2, sizeof(char *));
-	kvstr = generate_kvstr(name, value);
-	if (!new_environ || !kvstr)
-		put_minish_err_msg_and_exit(1, "environment", "failed expand environ");
-	i = 0;
-	while (environ[i]
-		&& ft_strncmp(name, environ[i], ft_strlen(name) + 1) >= 0)
-		i++;
-	ft_memcpy(new_environ, environ,
-		sizeof(char *) * i);
-	new_environ[i] = kvstr;
-	ft_memcpy(&new_environ[i + 1], &environ[i],
-		sizeof(char *) * ptrarr_len((void**)&environ[i]));
-	if ((void *)environ < (void *)&new_environ)
-		free(environ);
-	environ = new_environ;
-	return (0);
-}
-
 /*
  * 標準ライブラリの setenv() と同じ動作をする
  *
- * name: 環境変数のキー名
+ * key: 環境変数のキー名
  * value: 環境変数の値
  * rewrite: 環境変数が既に存在している場合に書き換えるかどうか
  *
  * return: 正常なら0. それ以外なら-1.
  */
-int	ft_setenv(const char *name, const char *value, int rewrite)
+int	ft_setenv(const char *key, const char *value, int rewrite)
 {
-	bool	has_updated;
+	t_var	*var;
 
-	has_updated = false;
-	if (update_env(name, value, rewrite, &has_updated) == ERROR)
-		return (ERROR);
-	if (!has_updated && expand_and_add_env(name, value) == ERROR)
-		return (ERROR);
+	var = get_env(key);
+	if (var)
+	{
+		free((void *)var->value);
+		var->value = value;
+		return (0);
+	}
+	var = malloc(sizeof(t_var));
+	if (!var)
+		return (-1);
+	var->key = key;
+	var->value = value;
+	var->is_shell_var = 0;
 	return (0);
 }
 
