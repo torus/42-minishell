@@ -82,21 +82,24 @@ void	test_rope()
 		t_rope	*rope = brownfox();
 		rope->refcount++;
 
+		CHECK_EQ(rope->refcount, 1);
+
 		t_splay_path	*path;
 		t_splay_path	*cur;
 		t_rope			*splayed;
 
 		path = NULL;
+		splayed = NULL;
 		rope_index_with_path(rope, 9, &path);
-		path->refcount++;
+		CHECK_EQ(path->refcount, 1);
+		CHECK_EQ(rope->refcount, 2);
 		cur = path->next;
 		while (cur)
 		{
 			cur->node->value = ROPE_NOWEIGHT;
 			cur = cur->next;
 		}
-		splayed = splay(path->next);
-		splayed->refcount++;
+		splay_assign(&splayed, splay(path->next));
 
 		CHECK_EQ(rope_index(splayed, 0), 'q');
 		CHECK_EQ(rope_index(splayed, 9), 'w');
@@ -104,8 +107,11 @@ void	test_rope()
 		CHECK_EQ(rope_index(splayed, 20), 's');
 		CHECK_EQ(rope_length(splayed), 21);
 
+		CHECK_EQ(rope->refcount, 2);
 		splay_release(rope);
+		CHECK_EQ(splayed->refcount, 1);
 		splay_release(splayed);
+		CHECK_EQ(path->refcount, 1);
 		splay_path_release(path);
 	}
 
