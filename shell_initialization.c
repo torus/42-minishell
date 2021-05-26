@@ -43,7 +43,7 @@ static void	init_shlvl(void)
 
 static void	init_env(void)
 {
-	char	**environ;
+	extern char	**environ;
 
 	g_shell.cwd = NULL;
 	g_shell.vars = environ2vars(environ);
