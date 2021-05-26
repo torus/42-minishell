@@ -2,7 +2,7 @@
 #include "utils.h"
 
 static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr,
-	const char *text, t_token_type tok_type)
+	char *text, t_token_type tok_type)
 {
 	t_cmd_str_node	*new_node;
 	t_cmd_str_node	**tmp;
@@ -10,7 +10,7 @@ static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr,
 	new_node = malloc(sizeof(t_cmd_str_node));
 	if (!new_node)
 		return (false);
-	new_node->text = (char *)text;
+	new_node->text = text;
 	new_node->type = tok_type;
 	tmp = *str_node_arr;
 	*str_node_arr = (t_cmd_str_node **)ptrarr_add_ptr(
@@ -26,7 +26,7 @@ static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr,
 static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 {
 	t_cmd_str_node	**result;
-	const char		*expanded_str;
+	char			*expanded_str;
 
 	result = NULL;
 	while (str_node)

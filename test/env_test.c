@@ -256,6 +256,7 @@ int main(){
 		char	**envarr_expected;
 		char	**envarr_actual;
 		t_var	*vars;
+		t_var	*new_var;
 
 		envarr_expected = ft_split("env1=env1 env2=env2 env3=env3", ' ');
 
