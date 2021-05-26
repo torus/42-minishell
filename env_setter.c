@@ -6,14 +6,14 @@
 /*
  * keyname, value を元に "key=value" の文字列を作成する
  */
-char	*generate_kvstr(const char *key, const char *value)
+const char	*generate_kvstr(const char *key, const char *value)
 {
-	char	*tmp;
-	char	*kvstr;
+	const char	*tmp;
+	const char	*kvstr;
 
 	tmp = ft_strjoin(key, "=");
 	kvstr = ft_strjoin(tmp, value);
-	free(tmp);
+	free((void *)tmp);
 	return (kvstr);
 }
 
