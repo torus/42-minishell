@@ -7,7 +7,7 @@
 #include "env.h"
 #include "minishell.h"
 
-static void	put_export_err_msg(const char *identifer)
+static void	put_export_err_msg(char *identifer)
 {
 	char	*tmp;
 	char	*errmsg;
@@ -23,7 +23,7 @@ static void	put_export_err_msg(const char *identifer)
 	free(errmsg);
 }
 
-static bool	is_valid_env_key(const char *key)
+static bool	is_valid_env_key(char *key)
 {
 	int	i;
 
@@ -67,7 +67,7 @@ static int	export_strjoin_env(const char *key, const char *value)
  */
 static int	export_env(char *arg)
 {
-	const char	**kvarr;
+	char	**kvarr;
 
 	if (!ft_strchr(arg, '='))
 		return (0);

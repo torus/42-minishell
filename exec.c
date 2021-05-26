@@ -47,8 +47,8 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 
 /* dirs の各ディレクトリを検索して実行する.
  */
-static char	*search_and_exec_file_from_dirs(const char *filename,
-	char **argv, const char **dirs)
+static char	*search_and_exec_file_from_dirs(char *filename,
+	char **argv, char **dirs)
 {
 	extern char	**environ;
 	int			i;

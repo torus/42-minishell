@@ -24,7 +24,7 @@ bool	will_search_cdpath(char **argv, char *dest)
 	return (true);
 }
 
-static char	*path_join3(const char *path0, const char *path1, const char *path2)
+static char	*path_join3(char *path0, char *path1, char *path2)
 {
 	char	*tmp;
 	char	*result;
@@ -41,7 +41,7 @@ static char	*path_join3(const char *path0, const char *path1, const char *path2)
  *
  * Return: 移動が成功したかどうか.
  */
-static bool	cd_from_sources(const char *dest_path, const char **sources)
+static bool	cd_from_sources(char *dest_path, char **sources)
 {
 	char	*abs_path;
 	int		i;
