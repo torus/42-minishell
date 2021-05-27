@@ -31,8 +31,11 @@ int	ft_setenv(const char *key, const char *value, bool is_shell_var)
 	var = get_env(key);
 	if (var)
 	{
-		free((void *)var->value);
-		var->value = ft_strdup(value);
+		if (value)
+		{
+			free((void *)var->value);
+			var->value = ft_strdup(value);
+		}
 		var->is_shell_var = is_shell_var;
 	}
 	else
