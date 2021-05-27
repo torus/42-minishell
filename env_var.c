@@ -119,7 +119,7 @@ char		**vars2environ(t_var *vars)
 	tmp = vars;
 	while (tmp)
 	{
-		if (!tmp->is_shell_var)
+		if (!tmp->is_shell_var && tmp->value)
 			vars_len++;
 		tmp = tmp->next;
 	}
@@ -128,7 +128,7 @@ char		**vars2environ(t_var *vars)
 	tmp = vars;
 	while (i < vars_len)
 	{
-		if (!tmp->is_shell_var)
+		if (!tmp->is_shell_var && tmp->value)
 			env_strarr[i++] = (char *)generate_kvstr(tmp->key, tmp->value);
 		tmp = tmp->next;
 	}
