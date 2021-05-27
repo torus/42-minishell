@@ -85,7 +85,6 @@ char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 	if (!path_env_var || !path_env_var->value)
 		return (NULL);
 	dirs = get_colon_units(path_env_var->value, "./");
-	free(path_env_var);
 	last_executable_path = search_and_exec_file_from_dirs(filename, argv, dirs);
 	free_ptrarr((void **)dirs);
 	return (last_executable_path);
