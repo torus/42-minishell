@@ -3,6 +3,18 @@
 #include "env.h"
 #include "minishell.h"
 
+char	*get_env_val(const char *env_key)
+{
+	t_var	*var;
+
+	if (!ft_strcmp(env_key, "?"))
+		return (ft_itoa(get_status()));
+	var = get_env(env_key);
+	if (!var || !var->value)
+		return (NULL);
+	return (ft_strdup(var->value));
+}
+
 /*
  * Get environment variable with key.
  *
