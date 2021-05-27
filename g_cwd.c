@@ -6,6 +6,8 @@
 
 /* shell.cwd に新しいパスをセットする.
  * chdir() などはしない.
+ *
+ * 環境変数$PWDが削除されていた場合はシェル変数としてセットする
  */
 int	set_cwd(char *abs_path)
 {
@@ -19,8 +21,8 @@ int	set_cwd(char *abs_path)
 		oldpwd = ft_strdup(pwd_var->value);
 	free(g_shell.cwd);
 	g_shell.cwd = ft_strdup(abs_path);
-	ft_setenv("OLDPWD", oldpwd, 1);
-	ft_setenv("PWD", abs_path, 1);
+	ft_setenv("OLDPWD", oldpwd, 0);
+	ft_setenv("PWD", abs_path, 0);
 	free(oldpwd);
 	return (0);
 }

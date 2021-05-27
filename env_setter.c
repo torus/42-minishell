@@ -17,29 +17,26 @@ char	*generate_kvstr(const char *key, const char *value)
 	return (kvstr);
 }
 
-/*
- * 標準ライブラリの setenv() と同じ動作をする
- *
+/* 環境変数(or シェル変数)に値をセットする
  * key: 環境変数のキー名
  * value: 環境変数の値
- * rewrite: 環境変数が既に存在している場合に書き換えるかどうか
+ * is_shell_var: 環境変数が既に存在している場合に書き換えるかどうか
  *
  * return: 正常なら0. それ以外なら-1.
  */
-int	ft_setenv(const char *key, const char *value, int rewrite)
+int	ft_setenv(const char *key, const char *value, bool is_shell_var)
 {
 	t_var	*var;
 
 	var = get_env(key);
-	if (var && var->value && ft_strlen(var->value) && !rewrite)
-		return (0);
 	if (var)
 	{
 		free((void *)var->value);
 		var->value = ft_strdup(value);
+		var->is_shell_var = is_shell_var;
 	}
 	else
-		add_new_var(&g_shell.vars, key, value, 0);
+		add_new_var(&g_shell.vars, key, value, is_shell_var);
 	return (0);
 }
 

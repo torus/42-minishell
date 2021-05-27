@@ -24,7 +24,7 @@ char	**get_colon_units(const char *str, const char *default_str);
 char	*get_val_from_kvstr(const char *kvstr, char delimiter);
 char	*expand_env_var(char *str);
 char	*generate_kvstr(const char *key, const char *value);
-int		ft_setenv(const char *name, const char *value, int rewrite);
+int	ft_setenv(const char *key, const char *value, bool is_shell_var);
 int		ft_unsetenv(const char *key);
 
 // コマンドの終了ステータス

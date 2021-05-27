@@ -13,12 +13,12 @@ static void	init_pwd(void)
 	{
 		tmp = getcwd(NULL, 0);
 		if (tmp)
-			ft_setenv("PWD", tmp, 1);
+			ft_setenv("PWD", tmp, 0);
 		free(tmp);
 	}
 	pwd_var = get_env("OLDPWD");
 	if (!pwd_var)
-		ft_setenv("PWD", NULL, 1);
+		ft_setenv("PWD", NULL, 0);
 }
 
 static void	init_shlvl(void)
@@ -40,7 +40,7 @@ static void	init_shlvl(void)
 		num = 1;
 	num_str = ft_itoa(num);
 	if (num_str)
-		ft_setenv("SHLVL", num_str, 1);
+		ft_setenv("SHLVL", num_str, 0);
 	free(num_str);
 }
 

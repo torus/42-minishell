@@ -102,7 +102,7 @@ int main(){
 	TEST_SECTION("get_env() 途中まで同じ環境変数名な時");
 	{
 		ft_unsetenv("GET_ENV_TEST");
-		ft_setenv("GET_ENV_TEST_TEST", "/bin/:/usr/bin/:/home/jun/bin", 1);
+		ft_setenv("GET_ENV_TEST_TEST", "/bin/:/usr/bin/:/home/jun/bin", 0);
 		t_var *var = get_env("GET_ENV_TEST");
 		CHECK_EQ(var, NULL);
 		ft_unsetenv("GET_ENV_TEST_TEST");
@@ -165,23 +165,12 @@ int main(){
 		ft_unsetenv("ABC");
 	}
 
-	TEST_SECTION("ft_setenv() update rewrite=1");
-	{
-		ft_setenv("ABC", "ft_setenv() update rewrite=1", 1);
-		t_var	*prev = get_env("ABC");
-		CHECK(prev);
-		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
-		t_var	*new = get_env("ABC");
-		CHECK_EQ_STR(new->value, "ft_setenv()");
-		ft_unsetenv("ABC");
-	}
-
 	TEST_SECTION("ft_setenv() expand_and_add_env");
 	{
 		ft_unsetenv("ABC");
 		t_var	*prev = get_env("ABC");
 		CHECK(!prev);
-		CHECK(ft_setenv("ABC", "ft_setenv()", 1) == 0);
+		CHECK(ft_setenv("ABC", "ft_setenv()", 0) == 0);
 		t_var	*new = get_env("ABC");
 		CHECK_EQ_STR(new->value, "ft_setenv()");
 	}

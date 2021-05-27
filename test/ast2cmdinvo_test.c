@@ -99,7 +99,7 @@ int main()
 
 	TEST_SECTION("expand_env_var($ABC)");
 	{
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		char *input = ft_strdup("$ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "abc def";
@@ -111,7 +111,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(hoge$ABC)");
 	{
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		char *input = ft_strdup("hoge$ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "hogeabc def";
@@ -123,7 +123,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(hoge$ABC) 環境変数の両端に空白がある");
 	{
-		ft_setenv("ABC", " abc def ", 1);
+		ft_setenv("ABC", " abc def ", 0);
 		char *input = ft_strdup("hoge$ABC");
 		char *actual = expand_env_var(input);
 		char *expected = "hoge abc def ";
@@ -135,7 +135,7 @@ int main()
 
 	TEST_SECTION("expand_env_var($ABC-hoge)");
 	{
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		char *input = ft_strdup("$ABC-hoge");
 		char *actual = expand_env_var(input);
 		char *expected = "abc def-hoge";
@@ -147,7 +147,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(hoge$ABC-abc)");
 	{
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		char *input = ft_strdup("hoge$ABC-abc");
 		char *actual = expand_env_var(input);
 		char *expected = "hogeabc def-abc";
@@ -159,7 +159,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(\"$ABC\"\'\\\'$ABC\') ダブルクオーテーションとシングルクオーテーション");
 	{
-		ft_setenv("ABC", " abc def ", 1);
+		ft_setenv("ABC", " abc def ", 0);
 		char *input = ft_strdup("\"$ABC\"\'\\\'$ABC\'");
 		char *actual = expand_env_var(input);
 		char *expected = "\" abc def \"\'\\\'$ABC\'";
@@ -194,7 +194,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(\"$?ABC\") 終了ステータスと文字列\n");
 	{
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		set_status(0);
 		char *input = ft_strdup("$?ABC");
 		char *actual = expand_env_var(input);
@@ -218,7 +218,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(\"$ABC?\") 終了ステータスは表示されない\n");
 	{
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		set_status(0);
 		char *input = ft_strdup("$ABC?");
 		char *actual = expand_env_var(input);
@@ -231,7 +231,7 @@ int main()
 
 	TEST_SECTION("expand_env_var(\"$?$ABC\") 終了ステータスと環境変数\n");
 	{
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		set_status(0);
 		char *input = ft_strdup("$?$ABC");
 		char *actual = expand_env_var(input);
@@ -245,7 +245,7 @@ int main()
 	TEST_SECTION("string_node2string()");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hoge\"'$ABC' \n");
 		t_token	tok;
@@ -277,7 +277,7 @@ int main()
 	TEST_SECTION("expand_string_node() 環境変数とクオーテーションマーク");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hoge\"'$ABC' \n");
 		t_token	tok;
@@ -322,7 +322,7 @@ int main()
 	TEST_SECTION("expand_string_node() エスケープされた環境変数");
 	{
 		/* 準備 */
-		ft_setenv("ABC", " abc def ", 1);
+		ft_setenv("ABC", " abc def ", 0);
 		t_parse_buffer	buf;
 		// echo "\$\$ABC\\$ABC""$ABC"
 		init_buf_with_string(&buf, "echo \"\\$\\$ABC\\\\$ABC\"\"$ABC\" \n");
@@ -767,7 +767,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 環境変数");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc", 1);
+		ft_setenv("ABC", "abc", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC \n");
 		t_token	tok;
@@ -798,7 +798,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo ダブルクオーテーションで囲まれた環境変数");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc", 1);
+		ft_setenv("ABC", "abc", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo \"$ABC\" \n");
 		t_token	tok;
@@ -829,7 +829,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo シングルクオーテーションで囲まれた環境変数");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc", 1);
+		ft_setenv("ABC", "abc", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo \'$ABC\' \n");
 		t_token	tok;
@@ -861,7 +861,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo スペースが含まれている環境変数");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC \n");
 		t_token	tok;
@@ -892,7 +892,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 文字列と環境変数");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC \n");
 		t_token	tok;
@@ -924,7 +924,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo スペースが含まれている環境変数とダブルクオーテーション");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc def", 1);
+		ft_setenv("ABC", "abc def", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC\"ghi jkl\" \n");
 		t_token	tok;
@@ -962,8 +962,8 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 環境変数が複数");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc def", 1);
-		ft_setenv("DEF", "ABC DEF", 1);
+		ft_setenv("ABC", "abc def", 0);
+		ft_setenv("DEF", "ABC DEF", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC$DEF \n");
 		t_token	tok;
@@ -995,7 +995,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc", 1);
+		ft_setenv("ABC", "abc", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hello > $ABC \n");
 		t_token	tok;
@@ -1030,7 +1030,7 @@ int main()
 	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数と文字列");
 	{
 		/* 準備 */
-		ft_setenv("ABC", "abc", 1);
+		ft_setenv("ABC", "abc", 0);
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hello > hoge$ABC \n");
 		t_token	tok;

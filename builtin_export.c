@@ -52,7 +52,7 @@ static int	export_strjoin_env(const char *key, const char *value)
 		new_value = ft_strdup(value);
 	else
 		new_value = ft_strjoin(env_var->value, value);
-	ft_setenv(key, new_value, 1);
+	ft_setenv(key, new_value, 0);
 	free((void *)key);
 	free(new_value);
 	return (0);
@@ -81,7 +81,7 @@ static int	export_env(char *arg)
 	if (ft_strchr(kvarr[0], '+'))
 		export_strjoin_env(kvarr[0], kvarr[1]);
 	else
-		ft_setenv(kvarr[0], kvarr[1], 1);
+		ft_setenv(kvarr[0], kvarr[1], 0);
 	free_ptrarr((void **)kvarr);
 	return (0);
 }
