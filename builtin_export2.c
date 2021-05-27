@@ -9,30 +9,25 @@
 
 int	print_envs_with_declaration(void)
 {
-	char		**envs;
-	int			i;
-	char	**kvarr;
-	t_var		*env_var;
+	t_var		*tmp_var;
 
-	i = 0;
-	envs = vars2environ(g_shell.vars);
-	sort_strarr(envs);
-	while (envs[i])
+	tmp_var = g_shell.vars;
+	while (tmp_var)
 	{
-		kvarr = split_first_c(envs[i], '=');
-		if (!kvarr)
-			return (ERROR);
-		env_var = get_env(kvarr[0]);
-		free_ptrarr((void **)kvarr);
-		if (!env_var || !env_var->value)
-			return (ERROR);
-		write(STDOUT_FILENO, "declare -x ", ft_strlen("declare -x "));
-		write(STDOUT_FILENO, envs[i],
-			ft_strchr(envs[i], '=') - envs[i] + 1);
-		write(STDOUT_FILENO, "\"", 1);
-		ft_putstr_fd((char *)env_var->value, STDOUT_FILENO);
-		write(STDOUT_FILENO, "\"\n", 2);
-		i++;
+		if (!tmp_var->is_shell_var)
+		{
+			write(STDOUT_FILENO, "declare -x ", 11);
+			write(STDOUT_FILENO, tmp_var->key, ft_strlen(tmp_var->key));
+			if (tmp_var->value)
+			{
+				write(STDOUT_FILENO, "=", 1);
+				write(STDOUT_FILENO, "\"", 1);
+				ft_putstr_fd((char *)tmp_var->value, STDOUT_FILENO);
+				write(STDOUT_FILENO, "\"", 1);
+			}
+			write(STDOUT_FILENO, "\n", 1);
+		}
+		tmp_var = tmp_var->next;
 	}
 	return (0);
 }
