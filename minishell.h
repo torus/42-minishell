@@ -12,6 +12,7 @@
 typedef struct	s_shell {
 	char		*cwd;
 	t_var		*vars;
+	int			status;
 }				t_shell;
 extern t_shell	g_shell;
 
