@@ -27,11 +27,12 @@ t_var	*add_new_var(t_var **vars, const char *key, const char *value, bool is_she
 	t_var	*prev;
 	t_var	*new_var;
 
-	new_var = malloc(sizeof(t_var));
+	new_var = ft_calloc(1, sizeof(t_var));
 	if (!new_var)
 		return (NULL);
 	new_var->key = ft_strdup(key);
-	new_var->value = ft_strdup(value);
+	if (value)
+		new_var->value = ft_strdup(value);
 	new_var->is_shell_var = is_shell_var;
 	if (!*vars)
 		*vars = new_var;
