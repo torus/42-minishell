@@ -25,7 +25,7 @@ static void	init_shlvl(void)
 	int		num;
 
 	shlvl_var = get_env("SHLVL");
-	if (shlvl_var && !shlvl_var->value)
+	if (shlvl_var && shlvl_var->value)
 	{
 		num = ft_atoi(shlvl_var->value);
 		if (num < 0)
