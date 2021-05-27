@@ -16,6 +16,7 @@ int	print_envs_with_declaration(void)
 
 	i = 0;
 	envs = vars2environ(g_shell.vars);
+	sort_strarr(envs);
 	while (envs[i])
 	{
 		kvarr = split_first_c(envs[i], '=');
