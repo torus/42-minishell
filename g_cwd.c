@@ -21,8 +21,9 @@ int	set_cwd(char *abs_path)
 		oldpwd = ft_strdup(pwd_var->value);
 	free(g_shell.cwd);
 	g_shell.cwd = ft_strdup(abs_path);
-	ft_setenv("OLDPWD", oldpwd, 0);
-	ft_setenv("PWD", abs_path, 0);
+	ft_setenv("PWD", abs_path, !pwd_var || pwd_var->is_shell_var);
+	pwd_var = get_env("OLDPWD");
+	ft_setenv("OLDPWD", oldpwd, !pwd_var || pwd_var->is_shell_var);
 	free(oldpwd);
 	return (0);
 }
