@@ -48,6 +48,7 @@ void	init_g_shell(void)
 {
 	extern char **environ;
 
+	sort_strarr(environ);
 	g_shell.cwd = NULL;
 	g_shell.vars = environ2vars(environ);
 	g_shell.status = 0;
