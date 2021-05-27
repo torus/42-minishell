@@ -9,15 +9,16 @@
 
 int	print_envs_with_declaration(void)
 {
-	extern char	**environ;
+	char		**envs;
 	int			i;
 	char	**kvarr;
 	t_var		*env_var;
 
 	i = 0;
-	while (environ[i])
+	envs = vars2environ(g_shell.vars);
+	while (envs[i])
 	{
-		kvarr = split_first_c(environ[i], '=');
+		kvarr = split_first_c(envs[i], '=');
 		if (!kvarr)
 			return (ERROR);
 		env_var = get_env(kvarr[0]);
@@ -25,8 +26,8 @@ int	print_envs_with_declaration(void)
 		if (!env_var || !env_var->value)
 			return (ERROR);
 		write(STDOUT_FILENO, "declare -x ", ft_strlen("declare -x "));
-		write(STDOUT_FILENO, environ[i],
-			ft_strchr(environ[i], '=') - environ[i] + 1);
+		write(STDOUT_FILENO, envs[i],
+			ft_strchr(envs[i], '=') - envs[i] + 1);
 		write(STDOUT_FILENO, "\"", 1);
 		ft_putstr_fd((char *)env_var->value, STDOUT_FILENO);
 		write(STDOUT_FILENO, "\"\n", 2);
