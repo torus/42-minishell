@@ -50,13 +50,14 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 static char	*search_and_exec_file_from_dirs(char *filename,
 	char **argv, char **dirs)
 {
-	extern char	**environ;
+	char		**envs;
 	int			i;
 	char		*executable_path;
 	char		*last_executable_path;
 
 	i = 0;
 	last_executable_path = NULL;
+	envs = vars2environ(g_shell.vars);
 	while (dirs[i])
 	{
 		if (dirs[i])
@@ -65,11 +66,12 @@ static char	*search_and_exec_file_from_dirs(char *filename,
 		{
 			free(last_executable_path);
 			last_executable_path = ft_strdup(executable_path);
-			execve(executable_path, argv, environ);
+			execve(executable_path, argv, envs);
 		}
 		free(executable_path);
 		i++;
 	}
+	free_ptrarr((void **)envs);
 	return (last_executable_path);
 }
 
@@ -101,13 +103,12 @@ char	*search_and_exec_file_from_path_env(char *filename, char **argv)
  */
 int	cmd_execvp(char *filename, char **argv)
 {
-	extern char	**environ;
 	char		*executable_path;
 
 	errno = 0;
 	executable_path = filename;
 	if (ft_strchr(filename, '/'))
-		execve(filename, argv, environ);
+		execve(filename, argv, vars2environ(g_shell.vars));
 	else
 		executable_path = search_and_exec_file_from_path_env(filename, argv);
 	if (executable_path && is_directory(executable_path))
