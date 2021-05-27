@@ -16,6 +16,9 @@ static void	init_pwd(void)
 			ft_setenv("PWD", tmp, 1);
 		free(tmp);
 	}
+	pwd_var = get_env("OLDPWD");
+	if (!pwd_var)
+		ft_setenv("PWD", NULL, 1);
 }
 
 static void	init_shlvl(void)
