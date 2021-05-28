@@ -329,6 +329,65 @@ int main(){
 		free_vars(vars);
 	}
 
+	TEST_SECTION("シェル変数から環境変数にexport");
+	{
+		free_vars(g_shell.vars);
+		g_shell.vars = NULL;
+
+		ft_setenv("VAR", "shell_var", 1);
+		CHECK_EQ_STR(g_shell.vars->key, "VAR");
+		CHECK_EQ_STR(g_shell.vars->value, "shell_var");
+		CHECK_EQ(g_shell.vars->is_shell_var, 1);
+
+		ft_setenv("VAR", "env_var", 0);
+		CHECK_EQ_STR(g_shell.vars->key, "VAR");
+		CHECK_EQ_STR(g_shell.vars->value, "env_var");
+		CHECK_EQ(g_shell.vars->is_shell_var, 0);
+		CHECK_EQ(g_shell.vars->next, NULL);
+		free_vars(g_shell.vars);
+		g_shell.vars = NULL;
+	}
+
+	TEST_SECTION("ft_setenv 同じ名前の環境変数");
+	{
+		free_vars(g_shell.vars);
+		g_shell.vars = NULL;
+
+		ft_setenv("VAR", "first", 0);
+		CHECK_EQ_STR(g_shell.vars->key, "VAR");
+		CHECK_EQ_STR(g_shell.vars->value, "first");
+		CHECK_EQ(g_shell.vars->is_shell_var, 0);
+		CHECK_EQ(g_shell.vars->next, NULL);
+
+		ft_setenv("VAR", "second", 0);
+		CHECK_EQ_STR(g_shell.vars->key, "VAR");
+		CHECK_EQ_STR(g_shell.vars->value, "second");
+		CHECK_EQ(g_shell.vars->is_shell_var, 0);
+		CHECK_EQ(g_shell.vars->next, NULL);
+		free_vars(g_shell.vars);
+		g_shell.vars = NULL;
+	}
+
+	TEST_SECTION("ft_setenv 同じ名前のシェル変数");
+	{
+		free_vars(g_shell.vars);
+		g_shell.vars = NULL;
+
+		ft_setenv("VAR", "first", 1);
+		CHECK_EQ_STR(g_shell.vars->key, "VAR");
+		CHECK_EQ_STR(g_shell.vars->value, "first");
+		CHECK_EQ(g_shell.vars->is_shell_var, 1);
+		CHECK_EQ(g_shell.vars->next, NULL);
+
+		ft_setenv("VAR", "second", 1);
+		CHECK_EQ_STR(g_shell.vars->key, "VAR");
+		CHECK_EQ_STR(g_shell.vars->value, "second");
+		CHECK_EQ(g_shell.vars->is_shell_var, 1);
+		CHECK_EQ(g_shell.vars->next, NULL);
+		free_vars(g_shell.vars);
+		g_shell.vars = NULL;
+	}
+
 	free_vars(g_shell.vars);
 	int fail_count = print_result();
 	return (fail_count);
