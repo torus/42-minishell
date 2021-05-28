@@ -44,6 +44,7 @@ void	test_rope()
 		CHECK_EQ(rope_index(rope, 3), 'l');
 		CHECK_EQ(rope_index(rope, 4), 'o');
 		CHECK_EQ(rope_length(rope), 5);
+		splay_release(rope);
 	}
 
 	TEST_SECTION("rope_concat");
@@ -58,6 +59,8 @@ void	test_rope()
 		CHECK_EQ(rope_length(rope), 13);
 		CHECK_EQ(rope_index(rope, 4), 'o');
 		CHECK_EQ(rope_index(rope, 5), ',');
+
+		splay_release(rope);
 	}
 
 	TEST_SECTION("rope_weight");
@@ -70,36 +73,55 @@ void	test_rope()
 		CHECK_EQ(rope_weight(left), 4);
 		CHECK_EQ(rope_weight(right), 2);
 		CHECK_EQ(rope_weight(rope), 5);
+
+		splay_release(rope);
 	}
 
 	TEST_SECTION("splay");
 	{
 		t_rope	*rope = brownfox();
+		rope->refcount++;
+
+		CHECK_EQ(rope->refcount, 1);
 
 		t_splay_path	*path;
 		t_splay_path	*cur;
 		t_rope			*splayed;
 
+		path = NULL;
+		splayed = NULL;
 		rope_index_with_path(rope, 9, &path);
+		CHECK_EQ(path->refcount, 1);
+		CHECK_EQ(rope->refcount, 2);
 		cur = path->next;
 		while (cur)
 		{
 			cur->node->value = ROPE_NOWEIGHT;
 			cur = cur->next;
 		}
-		splayed = splay(path->next);
+		splay_assign(&splayed, splay(path->next));
 
 		CHECK_EQ(rope_index(splayed, 0), 'q');
 		CHECK_EQ(rope_index(splayed, 9), 'w');
 		CHECK_EQ(rope_index(splayed, 10), 'n');
 		CHECK_EQ(rope_index(splayed, 20), 's');
 		CHECK_EQ(rope_length(splayed), 21);
+
+		CHECK_EQ(rope->refcount, 2);
+		splay_release(rope);
+		CHECK_EQ(splayed->refcount, 1);
+		splay_release(splayed);
+		CHECK_EQ(path->refcount, 1);
+		splay_path_release(path);
 	}
 
 	TEST_SECTION("rope_split");
 	{
-		t_rope	*rope = brownfox();
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
 		// quick brown fox jumps
+		CHECK_EQ(rope->refcount, 1);
 		CHECK(rope);
 		CHECK_EQ(rope_index(rope, 0), 'q');
 		CHECK_EQ(rope_index(rope, 9), 'w');
@@ -109,6 +131,8 @@ void	test_rope()
 
 		t_rope	*left = NULL, *right = NULL;
 		rope_split(rope, 9, &left, &right);
+		CHECK_EQ(left->refcount, 1);
+		CHECK_EQ(right->refcount, 1);
 
 		CHECK(left);
 		CHECK_EQ(rope_length(left), 9);
@@ -119,20 +143,47 @@ void	test_rope()
 		CHECK_EQ(rope_index(left, 8), 'o');
 		CHECK_EQ(rope_index(right, 0), 'w');
 		CHECK_EQ(rope_index(right, 11), 's');
+
+		splay_release(left);
+		splay_release(right);
+
+		CHECK_EQ(rope->refcount, 1);
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_insert 2 文字");
+	{
+		t_rope	*rope;
+		t_rope	*result;
+
+		splay_init(&rope,
+				   rope_concat(rope_create("a", NULL),
+							   rope_create("b", NULL)));
+		splay_init(&result, rope_insert(rope, 1, rope_create("c", NULL)));
+
+		CHECK(result);
+		CHECK_EQ(rope_index(result, 0), 'a');
+		CHECK_EQ(rope_index(result, 1), 'c');
+		CHECK_EQ(rope_index(result, 2), 'b');
+
+		splay_release(rope);
+		splay_release(result);
 	}
 
 	TEST_SECTION("rope_insert");
 	{
-		t_rope	*rope = brownfox();
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
 		// quick brown fox jumps
 		// -> quick brown lazy fox jumps
 
-		t_rope	*r01 = rope_create("l", "a");
-		t_rope	*r02 = rope_create("z", "y");
-		t_rope	*r03 = rope_create(" ", NULL);
-		t_rope	*lazy = rope_concat(rope_concat(r01, r02), r03);
+		t_rope	*r01; splay_init(&r01, rope_create("l", "a"));
+		t_rope	*r02; splay_init(&r02, rope_create("z", "y"));
+		t_rope	*r03; splay_init(&r03, rope_create(" ", NULL));
+		t_rope	*lazy; splay_init(&lazy, rope_concat(rope_concat(r01, r02), r03));
 
-		rope = rope_insert(rope, 12, lazy);
+		splay_assign(&rope, rope_insert(rope, 12, lazy));
 		CHECK_EQ(rope_length(rope), 26);
 
 		CHECK(rope);
@@ -144,15 +195,23 @@ void	test_rope()
 		CHECK_EQ(rope_index(rope, 16), ' ');
 		CHECK_EQ(rope_index(rope, 17), 'f');
 		CHECK_EQ(rope_index(rope, 25), 's');
+
+		splay_release(r01);
+		splay_release(r02);
+		splay_release(r03);
+		splay_release(lazy);
+		splay_release(rope);
 	}
 
 	TEST_SECTION("rope_delete");
 	{
-		t_rope	*rope = brownfox();
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
 		// quick brown fox jumps
 		// -> quick bx jumps
 
-		rope = rope_delete(rope, 7, 14);
+		splay_assign(&rope, rope_delete(rope, 7, 14));
 
 		CHECK(rope);
 		CHECK_EQ(rope_index(rope, 0), 'q');
@@ -160,6 +219,7 @@ void	test_rope()
 		CHECK_EQ(rope_index(rope, 7), 'x');
 		CHECK_EQ(rope_index(rope, 13), 's');
 		CHECK_EQ(rope_length(rope), 14);
+		splay_release(rope);
 	}
 
 }

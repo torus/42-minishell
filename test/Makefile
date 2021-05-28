@@ -29,8 +29,8 @@ run: parse_test env_test path_test exec_test command_exec_test ast2cmdinvo_test 
 	${VALGRIND} ./exec_test
 	${VALGRIND} ./command_exec_test
 	${VALGRIND} ./ast2cmdinvo_test
-	./splay_test
-	./rope_test
+	${VALGRIND} ./splay_test
+	${VALGRIND} ./rope_test
 
 # TODO: valgrind チェックする。
 

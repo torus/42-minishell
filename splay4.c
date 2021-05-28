@@ -1,5 +1,17 @@
 #include "rope.h"
 
+static t_splay_tree	*splay_1_result(t_splay_path *new_path)
+{
+	t_splay_tree	*result;
+
+	new_path->refcount++;
+	result = splay(new_path);
+	result->refcount++;
+	splay_path_release(new_path);
+	result->refcount--;
+	return (result);
+}
+
 static t_splay_tree	*splay_1(t_splay_path *path)
 {
 	t_splay_tree		*x;
@@ -18,7 +30,22 @@ static t_splay_tree	*splay_1(t_splay_path *path)
 	else
 		new_path = splay_path_create(
 				d2, splay_zig_left(x, p), path->next->next);
-	return (splay(new_path));
+	return (splay_1_result(new_path));
+}
+
+static t_splay_tree	*splay_2_result(t_splay_path *path, t_splay_tree *rotated)
+{
+	t_splay_tree	*result;
+	t_splay_path	*new_path;
+
+	splay_path_init(
+		&new_path, splay_path_create(
+			path->next->next->dir, rotated, path->next->next->next));
+	splay_init(&result, splay(new_path));
+	splay_path_release(new_path);
+	splay_release(rotated);
+	result->refcount--;
+	return (result);
 }
 
 static t_splay_tree	*splay_2(t_splay_path *path)
@@ -34,19 +61,18 @@ static t_splay_tree	*splay_2(t_splay_path *path)
 	if (path->dir == SPLAY_LEFT)
 	{
 		if (path->next->dir == SPLAY_LEFT)
-			rotated = splay_zig_zig_right(x, p, g);
+			splay_init(&rotated, splay_zig_zig_right(x, p, g));
 		else
-			rotated = splay_zig_zag_left(x, p, g);
+			splay_init(&rotated, splay_zig_zag_left(x, p, g));
 	}
 	else
 	{
 		if (path->next->dir == SPLAY_RIGHT)
-			rotated = splay_zig_zig_left(x, p, g);
+			splay_init(&rotated, splay_zig_zig_left(x, p, g));
 		else
-			rotated = splay_zig_zag_right(x, p, g);
+			splay_init(&rotated, splay_zig_zag_right(x, p, g));
 	}
-	return (splay(splay_path_create(
-				path->next->next->dir, rotated, path->next->next->next)));
+	return (splay_2_result(path, rotated));
 }
 
 t_splay_tree	*splay(t_splay_path *path)
@@ -58,46 +84,4 @@ t_splay_tree	*splay(t_splay_path *path)
 		return (splay_1(path));
 	}
 	return (path->node);
-}
-
-t_splay_path	*splay_path_left(t_splay_path *path)
-{
-	t_splay_tree	*current;
-
-	current = path->node;
-	if (current->left)
-	{
-		current = current->left;
-		path = splay_path_create(SPLAY_LEFT, current, path);
-		while (current->right)
-		{
-			current = current->right;
-			path = splay_path_create(SPLAY_RIGHT, current, path);
-		}
-		return (path);
-	}
-	if (path->dir == SPLAY_RIGHT)
-		return (path->next);
-	return (path->next->next);
-}
-
-t_splay_path	*splay_path_right(t_splay_path *path)
-{
-	t_splay_tree	*current;
-
-	current = path->node;
-	if (current->right)
-	{
-		current = current->right;
-		path = splay_path_create(SPLAY_RIGHT, current, path);
-		while (current->left)
-		{
-			current = current->left;
-			path = splay_path_create(SPLAY_LEFT, current, path);
-		}
-		return (path);
-	}
-	if (path->dir == SPLAY_LEFT)
-		return (path->next);
-	return (path->next->next);
 }

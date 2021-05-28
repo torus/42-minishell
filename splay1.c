@@ -9,9 +9,10 @@ t_splay_tree	*splay_create(
 	tree = malloc(sizeof(t_splay_tree));
 	if (tree)
 	{
-		tree->left = left;
-		tree->right = right;
+		splay_init(&tree->left, left);
+		splay_init(&tree->right, right);
 		tree->value = value;
+		tree->refcount = 0;
 	}
 	return (tree);
 }
@@ -42,7 +43,11 @@ t_splay_path	*splay_path_create(t_splay_direction dir, t_splay_tree *node,
 	{
 		path->dir = dir;
 		path->node = node;
+		node->refcount++;
 		path->next = next;
+		if (next)
+			next->refcount++;
+		path->refcount = 0;
 	}
 	return (path);
 }

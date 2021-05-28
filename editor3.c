@@ -25,7 +25,8 @@ void	edit_add_new_rope(t_command_history *history, char *cbuf)
 		if (history->end == history->begin)
 			history->begin = (history->end + 1) % LINE_BUFFER_SIZE;
 	}
-	history->ropes[history->current] = rope_create(cbuf, NULL);
+	splay_assign(
+		&history->ropes[history->current], rope_create(cbuf, NULL));
 }
 
 void	edit_insert_character(
@@ -34,16 +35,26 @@ void	edit_insert_character(
 {
 	t_rope	*new_rope;
 
-	new_rope = rope_create(cbuf, NULL);
+	splay_init(&new_rope, rope_create(cbuf, NULL));
 	if (cursor_x == command_length)
-		history->ropes[history->current]
-			= rope_concat(history->ropes[history->current], new_rope);
+	{
+		splay_assign(
+			&history->ropes[history->current],
+			rope_concat(history->ropes[history->current], new_rope));
+	}
 	else if (cursor_x == 0)
-		history->ropes[history->current]
-			= rope_concat(new_rope, history->ropes[history->current]);
+	{
+		splay_assign(
+			&history->ropes[history->current],
+			rope_concat(new_rope, history->ropes[history->current]));
+	}
 	else if (cursor_x < command_length)
-		history->ropes[history->current]
-			= rope_insert(history->ropes[history->current], cursor_x, new_rope);
+	{
+		splay_assign(
+			&history->ropes[history->current],
+			rope_insert(history->ropes[history->current], cursor_x, new_rope));
+	}
+	splay_release(new_rope);
 }
 
 void	edit_normal_character(
@@ -62,6 +73,7 @@ void	edit_normal_character(
 void	edit_enter(t_command_history *history, t_command_state *st)
 {
 	history->current = history->end;
+	splay_release(history->ropes[history->current]);
 	history->ropes[history->current] = NULL;
 	st->cursor_x = 0;
 	st->length = 0;
