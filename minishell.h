@@ -4,8 +4,17 @@
 # include <signal.h>
 # include "execution.h"
 # include "parse.h"
+# include "env.h"
 
 # define PROMPT "minish > "
+
+// グローバル構造体
+typedef struct s_shell {
+	char		*cwd;
+	t_var		*vars;
+	int			status;
+}				t_shell;
+extern t_shell	g_shell;
 
 // AST から exec_and_args に変換する時に使う構造体
 typedef struct s_cmd_str_node {
@@ -34,6 +43,7 @@ void					put_minish_err_msg_and_exit(int status,
 int						invoke_sequential_commands(t_parse_ast *seqcmd);
 
 // シェルの初期化
+void					init_g_shell(void);
 int						initialize_shell(void);
 
 #endif

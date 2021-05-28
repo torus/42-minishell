@@ -41,20 +41,19 @@ static bool	is_valid_env_key(char *key)
 	return (true);
 }
 
-static int	export_strjoin_env(char *key, char *value)
+static int	export_strjoin_env(const char *key, const char *value)
 {
-	char	*old_value;
+	t_var	*env_var;
 	char	*new_value;
 
 	key = ft_substr(key, 0, ft_strchr(key, '+') - key);
-	old_value = get_env_val(key);
-	if (!old_value || !ft_strlen(old_value))
+	env_var = get_env(key);
+	if (!env_var || !env_var->value || !ft_strlen(env_var->value))
 		new_value = ft_strdup(value);
 	else
-		new_value = ft_strjoin(old_value, value);
-	ft_setenv(key, new_value, 1);
-	free(key);
-	free(old_value);
+		new_value = ft_strjoin(env_var->value, value);
+	ft_setenv(key, new_value, 0);
+	free((void *)key);
 	free(new_value);
 	return (0);
 }
@@ -70,10 +69,9 @@ static int	export_env(char *arg)
 {
 	char	**kvarr;
 
-	if (!ft_strchr(arg, '='))
-		return (0);
 	kvarr = split_first_c(arg, '=');
-	if (!is_valid_env_key(kvarr[0]))
+	if (!is_valid_env_key(kvarr[0])
+		|| (ft_strchr(kvarr[0], '+') && !kvarr[1]))
 	{
 		put_export_err_msg(arg);
 		free_ptrarr((void **)kvarr);
@@ -82,7 +80,7 @@ static int	export_env(char *arg)
 	if (ft_strchr(kvarr[0], '+'))
 		export_strjoin_env(kvarr[0], kvarr[1]);
 	else
-		ft_setenv(kvarr[0], kvarr[1], 1);
+		ft_setenv(kvarr[0], kvarr[1], 0);
 	free_ptrarr((void **)kvarr);
 	return (0);
 }
