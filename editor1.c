@@ -23,6 +23,7 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 		{
 			splay_assign(&rope, history->ropes[history->current]);
 			edit_enter(history, state);
+			rope->refcount--;
 			return (rope);
 		}
 		else if (cbuf[0] == 0x1b)
@@ -68,8 +69,7 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 	t_parse_ast			*seqcmd;
 	t_parse_buffer		buf;
 
-	rope = NULL;
-	splay_assign(&rope, edit_get_line(history, state));
+	splay_init(&rope, edit_get_line(history, state));
 	new_rope = NULL;
 	if (rope)
 	{

@@ -151,6 +151,25 @@ void	test_rope()
 		splay_release(rope);
 	}
 
+	TEST_SECTION("rope_insert 2 文字");
+	{
+		t_rope	*rope;
+		t_rope	*result;
+
+		splay_init(&rope,
+				   rope_concat(rope_create("a", NULL),
+							   rope_create("b", NULL)));
+		splay_init(&result, rope_insert(rope, 1, rope_create("c", NULL)));
+
+		CHECK(result);
+		CHECK_EQ(rope_index(result, 0), 'a');
+		CHECK_EQ(rope_index(result, 1), 'c');
+		CHECK_EQ(rope_index(result, 2), 'b');
+
+		splay_release(rope);
+		splay_release(result);
+	}
+
 	TEST_SECTION("rope_insert");
 	{
 		t_rope	*rope;
