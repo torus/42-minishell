@@ -211,6 +211,30 @@ int main(){
 		free_vars(var);
 	}
 
+	TEST_SECTION("kvstr2t_var 空文字列");
+	{
+		char *kvstr = "env1=";
+		t_var *var = kvstr2var(kvstr, 0);
+		CHECK(var);
+		CHECK_EQ_STR(var->key, "env1");
+		CHECK_EQ_STR(var->value, "");
+		CHECK_EQ(var->is_shell_var, 0);
+		CHECK_EQ(var->next, NULL);
+		free_vars(var);
+	}
+
+	TEST_SECTION("kvstr2t_var 値なし");
+	{
+		char *kvstr = "env1";
+		t_var *var = kvstr2var(kvstr, 0);
+		CHECK(var);
+		CHECK_EQ_STR(var->key, "env1");
+		CHECK_EQ(var->value, NULL);
+		CHECK_EQ(var->is_shell_var, 0);
+		CHECK_EQ(var->next, NULL);
+		free_vars(var);
+	}
+
 	TEST_SECTION("文字列配列をt_varに変換する");
 	{
 		char	**envarr;
