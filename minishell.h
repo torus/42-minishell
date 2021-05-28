@@ -9,7 +9,7 @@
 # define PROMPT "minish > "
 
 // グローバル構造体
-typedef struct	s_shell {
+typedef struct s_shell {
 	char		*cwd;
 	t_var		*vars;
 	int			status;

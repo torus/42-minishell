@@ -46,7 +46,7 @@ static void	init_shlvl(void)
 
 void	init_g_shell(void)
 {
-	extern char **environ;
+	extern char	**environ;
 
 	sort_strarr(environ);
 	g_shell.cwd = NULL;

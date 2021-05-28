@@ -69,7 +69,7 @@ int	ft_unsetenv(const char *key)
 			free((void *)current->key);
 			free((void *)current->value);
 			free(current);
-			break;
+			break ;
 		}
 		prev = current;
 		current = current->next;
