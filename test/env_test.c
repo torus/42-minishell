@@ -285,6 +285,28 @@ int main(){
 		free_vars(vars);
 	}
 
+	TEST_SECTION("vars2environ");
+	{
+		t_var	*vars;
+
+		vars = NULL;
+		add_new_var(&vars, "ENV_VAR1", "env1", 0);
+		add_new_var(&vars, "ENV_VAR2", NULL, 0);  // これはenvironには含まれない
+		add_new_var(&vars, "ENV_VAR3", "", 0);
+		add_new_var(&vars, "SHELL_VAR1", "shell1", 1);
+		add_new_var(&vars, "SHELL_VAR2", "shell2", 1);
+		add_new_var(&vars, "SHELL_VAR3", "shell3", 1);
+
+		char	**envarr_expected;
+		char	**envarr_actual;
+		envarr_expected = ft_split("ENV_VAR1=env1 ENV_VAR3=", ' ');
+		envarr_actual = vars2environ(vars);
+		check_strarr((const char**)envarr_actual, (const char**)envarr_expected);
+		free_ptrarr((void **)envarr_actual);
+		free_ptrarr((void **)envarr_expected);
+		free_vars(vars);
+	}
+
 	TEST_SECTION("シェル変数");
 	{
 		t_var	*vars;
