@@ -4,6 +4,8 @@
 #include "parse.h"
 #include "editor.h"
 
+t_shell	g_shell;
+
 void	die(void)
 {
 	int	*nullpo;

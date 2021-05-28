@@ -4,22 +4,42 @@
 #include "env.h"
 #include "minishell.h"
 
-char	*g_cwd;
+static void	set_oldpwd(char *oldpwd)
+{
+	t_var	*oldpwd_var;
 
-/* g_cwd に新しいパスをセットする.
+	oldpwd_var = get_env("OLDPWD");
+	if (!oldpwd_var)
+		ft_setenv("OLDPWD", oldpwd, !oldpwd_var || oldpwd_var->is_shell_var);
+	else
+	{
+		free((void *)oldpwd_var->value);
+		if (oldpwd)
+			oldpwd_var->value = ft_strdup(oldpwd);
+		else
+			oldpwd_var->value = oldpwd;
+	}
+}
+
+/* shell.cwd に新しいパスをセットする.
  * chdir() などはしない.
+ *
+ * 環境変数$PWDが削除されていた場合はシェル変数としてセットする
  */
 int	set_cwd(char *abs_path)
 {
 	char	*oldpwd;
+	t_var	*pwd_var;
 
-	oldpwd = get_env_val("PWD");
-	if (!oldpwd)
-		oldpwd = ft_strdup("");
-	free(g_cwd);
-	g_cwd = ft_strdup(abs_path);
-	ft_setenv("OLDPWD", oldpwd, 1);
-	ft_setenv("PWD", abs_path, 1);
+	pwd_var = get_env("PWD");
+	if (!pwd_var || !pwd_var->value)
+		oldpwd = NULL;
+	else
+		oldpwd = ft_strdup(pwd_var->value);
+	free(g_shell.cwd);
+	g_shell.cwd = ft_strdup(abs_path);
+	ft_setenv("PWD", abs_path, !pwd_var || pwd_var->is_shell_var);
+	set_oldpwd(oldpwd);
 	free(oldpwd);
 	return (0);
 }
@@ -52,7 +72,7 @@ void	put_cwd_err_msg(char *for_whom)
 }
 
 /* 絶対パスを構築する
- * "{g_cwd}/{relative_path}" を返す
+ * "{shell.cwd}/{relative_path}" を返す
  * ex:
  *   - relative_path="dir/dir2/symlink2dir"
  *   - relative_path="./../dir/../././/.//////./"
@@ -64,7 +84,7 @@ char	*get_abs_path_from_cwd(char *relative_path)
 	char	*tmp;
 	int		i;
 
-	result = ft_strdup(g_cwd);
+	result = ft_strdup(g_shell.cwd);
 	dirs = ft_split(relative_path, '/');
 	if (!dirs)
 		return (NULL);

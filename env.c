@@ -1,36 +1,39 @@
 #include <stdlib.h>
 #include "libft/libft.h"
 #include "env.h"
+#include "minishell.h"
+
+char	*get_env_val(const char *env_key)
+{
+	t_var	*var;
+
+	if (!ft_strcmp(env_key, "?"))
+		return (ft_itoa(get_status()));
+	var = get_env(env_key);
+	if (!var || !var->value)
+		return (NULL);
+	return (ft_strdup(var->value));
+}
 
 /*
  * Get environment variable with key.
  *
  * env_key: key name of environment variable.
  *
- * return: value of environment variable.
- *         That forms "key=value"
+ * return: found t_var
  */
-char	*get_env(const char *env_key)
+t_var	*get_env(const char *env_key)
 {
-	size_t		idx;
-	char		**key_val;
-	extern char	**environ;
+	t_var	*current;
 
-	idx = 0;
-	while (environ[idx])
+	current = g_shell.vars;
+	while (current)
 	{
-		key_val = ft_split(environ[idx], '=');
-		if (!key_val)
-			return (NULL);
-		if (ft_strncmp(key_val[0], env_key, ft_strlen(env_key) + 1) == 0)
-		{
-			free_ptrarr((void **)key_val);
-			break ;
-		}
-		free_ptrarr((void **)key_val);
-		idx++;
+		if (!ft_strcmp(env_key, current->key))
+			return (current);
+		current = current->next;
 	}
-	return (environ[idx]);
+	return (NULL);
 }
 
 /*
@@ -77,7 +80,7 @@ char	**split_first_c(const char *str, char c)
  * str: コロン(':')区切られた文字列
  * def_str: default string.
  */
-char	**get_colon_units(char *str, char *default_str)
+char	**get_colon_units(const char *str, const char *default_str)
 {
 	void	**result;
 	char	*next;
@@ -126,28 +129,4 @@ char	*get_val_from_kvstr(const char *kvstr, char delimiter)
 	free(kvarr[0]);
 	free(kvarr);
 	return (valstr);
-}
-
-/*
- * Get value from environment variable with key ("key=value").
- *
- * env_key: key name of environment variable
- *
- * return: value of environment variable if env_key is found,
- *         or else, return NULL.
- */
-char	*get_env_val(char *env_key)
-{
-	char	*path_env_kv;
-	char	*path_env_val;
-
-	if (ft_strncmp(env_key, "?", 2) == 0)
-		return (ft_itoa(get_status()));
-	path_env_kv = get_env(env_key);
-	if (!path_env_kv)
-		return (NULL);
-	path_env_val = get_val_from_kvstr(path_env_kv, '=');
-	if (!path_env_val)
-		return (NULL);
-	return (path_env_val);
 }

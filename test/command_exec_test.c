@@ -1,7 +1,11 @@
 #include "test.h"
 #include "../execution.h"
+#include "../minishell.h"
+
+t_shell	g_shell;
 
 int main(){
+	init_g_shell();
 
     TEST_SECTION("echo hello");
     {
@@ -318,6 +322,7 @@ int main(){
 		remove("output.txt");
     }
 
+	free_vars(g_shell.vars);
 	int fail_count = print_result();
 	return (fail_count);
 }

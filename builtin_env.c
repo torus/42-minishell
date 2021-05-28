@@ -1,18 +1,21 @@
 #include <unistd.h>
 #include "builtin.h"
 #include "libft/libft.h"
+#include "env.h"
+#include "minishell.h"
 
 int	builtin_env(char **argv)
 {
 	int			i;
-	extern char	**environ;
+	char		**envs;
 
 	(void)argv;
 	i = 0;
-	while (environ[i])
+	envs = vars2environ(g_shell.vars);
+	while (envs[i])
 	{
-		if (ft_strchr(environ[i], '='))
-			ft_putendl_fd(environ[i++], STDOUT_FILENO);
+		if (ft_strchr(envs[i], '='))
+			ft_putendl_fd(envs[i++], STDOUT_FILENO);
 	}
 	return (0);
 }

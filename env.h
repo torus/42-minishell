@@ -1,14 +1,32 @@
 #ifndef ENV_H
 # define ENV_H
 
-char	*get_env(const char *env_key);
+# include <stdbool.h>
+
+// 環境変数とシェル変数をリストとして保持する
+typedef struct s_var {
+	const char			*key;
+	const char			*value;
+	bool				is_shell_var;
+	struct s_var		*next;
+}						t_var;
+
+void	free_vars(t_var *vars);
+t_var	*add_new_var(t_var **vars,
+			const char *key, const char *value, bool is_shell_var);
+t_var	*kvstr2var(char *kvstr, bool is_shell_var);
+t_var	*environ2vars(char **environ);
+char	**vars2environ(t_var *vars);
+
+t_var	*get_env(const char *env_key);
+char	*get_env_val(const char *env_key);
 char	**split_first_c(const char *str, char c);
-char	**get_colon_units(char *str, char *default_str);
+char	**get_colon_units(const char *str, const char *default_str);
 char	*get_val_from_kvstr(const char *kvstr, char delimiter);
-char	*get_env_val(char *env_key);
 char	*expand_env_var(char *str);
-int		ft_setenv(const char *name, const char *value, int rewrite);
-int		ft_unsetenv(const char *name);
+char	*generate_kvstr(const char *key, const char *value);
+int		ft_setenv(const char *key, const char *value, bool is_shell_var);
+int		ft_unsetenv(const char *key);
 
 // コマンドの終了ステータス
 int		get_status(void);

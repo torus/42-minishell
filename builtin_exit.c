@@ -57,6 +57,6 @@ int	builtin_exit(char **argv)
 	else if (argv_len == 2)
 		exit_atol(argv[1]);
 	else
-		exit(get_status());
+		exit(g_shell.status);
 	return (0);
 }

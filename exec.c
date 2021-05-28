@@ -50,13 +50,14 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 static char	*search_and_exec_file_from_dirs(char *filename,
 	char **argv, char **dirs)
 {
-	extern char	**environ;
+	char		**envs;
 	int			i;
 	char		*executable_path;
 	char		*last_executable_path;
 
 	i = 0;
 	last_executable_path = NULL;
+	envs = vars2environ(g_shell.vars);
 	while (dirs[i])
 	{
 		if (dirs[i])
@@ -65,11 +66,12 @@ static char	*search_and_exec_file_from_dirs(char *filename,
 		{
 			free(last_executable_path);
 			last_executable_path = ft_strdup(executable_path);
-			execve(executable_path, argv, environ);
+			execve(executable_path, argv, envs);
 		}
 		free(executable_path);
 		i++;
 	}
+	free_ptrarr((void **)envs);
 	return (last_executable_path);
 }
 
@@ -77,16 +79,14 @@ static char	*search_and_exec_file_from_dirs(char *filename,
  */
 char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 {
-	extern char	**environ;
-	char		*path_env_val;
+	t_var		*path_env_var;
 	char		**dirs;
 	char		*last_executable_path;
 
-	path_env_val = get_env_val("PATH");
-	if (!path_env_val)
+	path_env_var = get_env("PATH");
+	if (!path_env_var || !path_env_var->value)
 		return (NULL);
-	dirs = get_colon_units(path_env_val, "./");
-	free(path_env_val);
+	dirs = get_colon_units(path_env_var->value, "./");
 	last_executable_path = search_and_exec_file_from_dirs(filename, argv, dirs);
 	free_ptrarr((void **)dirs);
 	return (last_executable_path);
@@ -103,13 +103,12 @@ char	*search_and_exec_file_from_path_env(char *filename, char **argv)
  */
 int	cmd_execvp(char *filename, char **argv)
 {
-	extern char	**environ;
 	char		*executable_path;
 
 	errno = 0;
 	executable_path = filename;
 	if (ft_strchr(filename, '/'))
-		execve(filename, argv, environ);
+		execve(filename, argv, vars2environ(g_shell.vars));
 	else
 		executable_path = search_and_exec_file_from_path_env(filename, argv);
 	if (executable_path && is_directory(executable_path))

@@ -6,7 +6,7 @@
 /*
  * keyname, value を元に "key=value" の文字列を作成する
  */
-static char	*generate_kvstr(const char *key, const char *value)
+char	*generate_kvstr(const char *key, const char *value)
 {
 	char	*tmp;
 	char	*kvstr;
@@ -17,132 +17,62 @@ static char	*generate_kvstr(const char *key, const char *value)
 	return (kvstr);
 }
 
-/* 既に環境変数が存在している場合
- *   rewrite=1 なら書き換える.
- *   rewrite=0 なら書き換えない
- *
- * name: 環境変数のキー名
+/* 環境変数(or シェル変数)に値をセットする
+ * key: 環境変数のキー名
  * value: 環境変数の値
- * rewrite: 環境変数が存在していた場合に置き換えるかどうか
- * has_updated: 環境変数の更新が行われたらtrueが入る.
+ * is_shell_var: 環境変数が既に存在している場合に書き換えるかどうか
  *
  * return: 正常なら0. それ以外なら-1.
  */
-static int	update_env(const char *name,
-	const char *value, int rewrite, bool *has_updated)
+int	ft_setenv(const char *key, const char *value, bool is_shell_var)
 {
-	extern char	**environ;
-	int			idx;
-	char		*kvstr;
-	int			name_len;
+	t_var	*var;
 
-	idx = 0;
-	name_len = ft_strlen(name);
-	while (!*has_updated && environ[idx])
+	var = get_env(key);
+	if (var)
 	{
-		if (!ft_strncmp(environ[idx], name, name_len)
-			&& environ[idx][name_len] == '=')
+		if (value)
 		{
-			*has_updated = true;
-			if (!rewrite)
-				return (0);
-			kvstr = generate_kvstr(name, value);
-			if (!kvstr)
-				return (ERROR);
-			if ((void *)environ[idx] < (void *)&idx)
-				free((void *)environ[idx]);
-			environ[idx] = kvstr;
+			free((void *)var->value);
+			var->value = ft_strdup(value);
 		}
-		idx++;
+		var->is_shell_var = is_shell_var;
 	}
+	else
+		add_new_var(&g_shell.vars, key, value, is_shell_var);
 	return (0);
 }
 
 /*
- * environ より+2大きい配列を確保して環境変数を追加する.
- *
- * name: 環境変数のキー名
- * value: 環境変数の値
- *
- * return: 正常なら0. それ以外なら-1.
- */
-static int	expand_and_add_env(const char *name, const char *value)
-{
-	extern char	**environ;
-	char		**new_environ;
-	int			i;
-	char		*kvstr;
-
-	new_environ = ft_calloc(ptrarr_len((void **)environ) + 2, sizeof(char *));
-	kvstr = generate_kvstr(name, value);
-	if (!new_environ || !kvstr)
-		put_minish_err_msg_and_exit(1, "environment", "failed expand environ");
-	i = 0;
-	while (environ[i]
-		&& ft_strncmp(name, environ[i], ft_strlen(name) + 1) >= 0)
-		i++;
-	ft_memcpy(new_environ, environ,
-		sizeof(char *) * i);
-	new_environ[i] = kvstr;
-	ft_memcpy(&new_environ[i + 1], &environ[i],
-		sizeof(char *) * ptrarr_len((void**)&environ[i]));
-	if ((void *)environ < (void *)&new_environ)
-		free(environ);
-	environ = new_environ;
-	return (0);
-}
-
-/*
- * 標準ライブラリの setenv() と同じ動作をする
- *
- * name: 環境変数のキー名
- * value: 環境変数の値
- * rewrite: 環境変数が既に存在している場合に書き換えるかどうか
- *
- * return: 正常なら0. それ以外なら-1.
- */
-int	ft_setenv(const char *name, const char *value, int rewrite)
-{
-	bool	has_updated;
-
-	has_updated = false;
-	if (update_env(name, value, rewrite, &has_updated) == ERROR)
-		return (ERROR);
-	if (!has_updated && expand_and_add_env(name, value) == ERROR)
-		return (ERROR);
-	return (0);
-}
-
-/*
- * name で指定された環境変数が存在する場合, それを削除する.
+ * key で指定された環境変数が存在する場合, それを削除する.
  * 標準ライブラリの unsetenv() と同じ動作をする.
  *
- * name: 環境変数のキー名
+ * key: 環境変数のキー名
  *
  * return: 正常なら0. それ以外なら-1.
  */
-int	ft_unsetenv(const char *name)
+int	ft_unsetenv(const char *key)
 {
-	extern char	**environ;
-	int			idx;
-	int			env_len;
-	int			name_len;
+	t_var	*prev;
+	t_var	*current;
 
-	idx = 0;
-	name_len = ft_strlen(name);
-	env_len = ptrarr_len((void **)environ);
-	while (environ[idx])
+	current = g_shell.vars;
+	prev = NULL;
+	while (current)
 	{
-		if (ft_strncmp(environ[idx], name, name_len) == 0
-			&& environ[idx][name_len] == '=')
+		if (!ft_strcmp(current->key, key))
 		{
-			if ((void *)environ[idx] < (void *)&idx)
-				free(environ[idx]);
-			ft_memmove(environ + idx, environ + idx + 1,
-				sizeof(char *) * (env_len - idx));
-			return (0);
+			if (prev)
+				prev->next = current->next;
+			else
+				g_shell.vars = current->next;
+			free((void *)current->key);
+			free((void *)current->value);
+			free(current);
+			break ;
 		}
-		idx++;
+		prev = current;
+		current = current->next;
 	}
 	return (0);
 }
