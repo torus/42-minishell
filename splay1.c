@@ -10,12 +10,7 @@ t_splay_tree	*splay_create(
 	if (tree)
 	{
 		splay_init(&tree->left, left);
-		/* if (left) */
-		/* 	left->refcount++; */
 		splay_init(&tree->right, right);
-		/* tree->right = right; */
-		/* if (right) */
-		/* 	right->refcount++; */
 		tree->value = value;
 		tree->refcount = 0;
 	}

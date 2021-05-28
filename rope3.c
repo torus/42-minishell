@@ -32,15 +32,12 @@ static void	rope_split_update(
 void	rope_split_iter(
 	t_rope *rope, int index, t_rope **left, t_rope **right)
 {
-	t_rope	*new_left;
-	t_rope	*new_right;
 	t_rope	*parent;
 	t_rope	*cur;
 
-	new_right = NULL;
 	parent = NULL;
 	splay_init(&cur, rope);
-	splay_init(&new_left, cur);
+	splay_init(left, cur);
 	while (1)
 	{
 		if (rope_weight(cur) < index && cur->right)
@@ -51,17 +48,12 @@ void	rope_split_iter(
 		}
 		else if (cur->left)
 		{
-			rope_split_update(cur, parent, &new_left, &new_right);
+			rope_split_update(cur, parent, left, right);
 			splay_assign(&cur, cur->left);
 		}
 		else
 			break ;
 	}
-	splay_assign(left, new_left);
-	splay_assign(right, new_right);
-
-	splay_release(new_left);
-	splay_release(new_right);
 	splay_release(parent);
 	splay_release(cur);
 }
@@ -75,7 +67,6 @@ void	rope_split(t_rope *rope, int index, t_rope **left, t_rope **right)
 	splayed = NULL;
 	path = NULL;
 	rope_index_with_path(rope, index, &path);
-	/* path->refcount++; */
 	cur = path->next;
 	while (cur)
 	{
