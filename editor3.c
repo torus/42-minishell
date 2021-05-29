@@ -61,6 +61,11 @@ void	edit_normal_character(
 	t_command_history *history, t_command_state *st,
 	char *cbuf)
 {
+	if (cbuf[0] == 0x7f)
+	{
+		edit_handle_backspace(history, st);
+		return ;
+	}
 	edit_putc(cbuf[0]);
 	if (!history->ropes[history->current])
 		edit_add_new_rope(history, cbuf);
