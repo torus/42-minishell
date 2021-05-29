@@ -222,6 +222,98 @@ void	test_rope()
 		splay_release(rope);
 	}
 
+	TEST_SECTION("rope_delete 最初の文字");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
+		// quick brown fox jumps
+		// -> uick brown fox jumps
+		//    01234567890123456789
+
+		splay_assign(&rope, rope_delete(rope, 0, 1));
+
+		CHECK(rope);
+		CHECK_EQ(rope_index(rope, 0), 'u');
+		CHECK_EQ(rope_index(rope, 1), 'i');
+		CHECK_EQ(rope_index(rope, 19), 's');
+		CHECK_EQ(rope_length(rope), 20);
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_delete 最初の 3 文字");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
+		// quick brown fox jumps
+		// -> ck brown fox jumps
+		//    012345678901234567
+
+		splay_assign(&rope, rope_delete(rope, 0, 3));
+
+		CHECK(rope);
+		CHECK_EQ(rope_index(rope, 0), 'c');
+		CHECK_EQ(rope_index(rope, 1), 'k');
+		CHECK_EQ(rope_index(rope, 17), 's');
+		CHECK_EQ(rope_length(rope), 18);
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_delete 最後の文字");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
+		// quick brown fox jumps
+		// -> quick brown fox jump
+		//    01234567890123456789
+
+		splay_assign(&rope, rope_delete(rope, 20, 21));
+
+		CHECK(rope);
+		CHECK_EQ(rope_index(rope, 0), 'q');
+		CHECK_EQ(rope_index(rope, 1), 'u');
+		CHECK_EQ(rope_index(rope, 19), 'p');
+		CHECK_EQ(rope_length(rope), 20);
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_delete 最後の 3 文字");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope, brownfox());
+		// quick brown fox jumps
+		// -> quick brown fox ju
+		//    012345678901234567
+
+		splay_assign(&rope, rope_delete(rope, 18, 21));
+
+		CHECK(rope);
+		CHECK_EQ(rope_index(rope, 0), 'q');
+		CHECK_EQ(rope_index(rope, 1), 'u');
+		CHECK_EQ(rope_index(rope, 16), 'j');
+		CHECK_EQ(rope_index(rope, 17), 'u');
+		CHECK_EQ(rope_length(rope), 18);
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_delete 全部消す");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope, rope_create("1", NULL));
+
+		CHECK_EQ(rope_length(rope), 1);
+
+		splay_assign(&rope, rope_delete(rope, 0, 1));
+
+		CHECK(!rope);
+		CHECK_EQ(rope_length(rope), 0);
+		splay_release(rope);
+	}
+
 }
 
 int main()

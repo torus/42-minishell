@@ -58,23 +58,41 @@ void	rope_split_iter(
 	splay_release(cur);
 }
 
+static void	rope_split_aux(
+	t_rope *rope, int index, t_rope **left, t_rope **right)
+{
+	if (index == 0)
+	{
+		splay_assign(left, NULL);
+		splay_assign(right, rope);
+		return ;
+	}
+	splay_assign(left, rope);
+	splay_assign(right, NULL);
+}
+
 void	rope_split(t_rope *rope, int index, t_rope **left, t_rope **right)
 {
 	t_splay_path	*path;
 	t_splay_path	*cur;
 	t_rope			*splayed;
 
-	splayed = NULL;
-	path = NULL;
-	rope_index_with_path(rope, index, &path);
-	cur = path->next;
-	while (cur)
+	if (index > 0 && index < rope_length(rope))
 	{
-		cur->node->value = ROPE_NOWEIGHT;
-		cur = cur->next;
+		splayed = NULL;
+		path = NULL;
+		rope_index_with_path(rope, index, &path);
+		cur = path->next;
+		while (cur)
+		{
+			cur->node->value = ROPE_NOWEIGHT;
+			cur = cur->next;
+		}
+		splay_assign(&splayed, splay(path->next));
+		rope_split_iter(splayed, index, left, right);
+		splay_release(splayed);
+		splay_path_release(path);
 	}
-	splay_assign(&splayed, splay(path->next));
-	rope_split_iter(splayed, index, left, right);
-	splay_release(splayed);
-	splay_path_release(path);
+	else
+		rope_split_aux(rope, index, left, right);
 }
