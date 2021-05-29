@@ -6,7 +6,6 @@
 #include "builtin.h"
 #include "env.h"
 #include "minishell.h"
-#include "utils.h"
 
 static void	put_export_err_msg(char *identifer)
 {
@@ -59,36 +58,6 @@ static int	export_strjoin_env(const char *key, const char *value)
 	return (0);
 }
 
-static char	*escape_string(char *str)
-{
-	char	*result;
-	char	*tmp;
-	int		i;
-
-	i = 0;
-	result = ft_strdup("");
-	while (str[i])
-	{
-		if (str[i] == '"' || str[i] == '$' || str[i] == '`' || str[i] == '\\')
-		{
-			tmp = ft_substr(str, 0, i);
-			result = strjoin_and_free_both(result, tmp);
-			result = strjoin_and_free_first(result, "\\");
-			tmp = ft_substr(str + i, 0, 1);
-			result = strjoin_and_free_both(result, tmp);
-			str += i + 1;
-			i = 0;
-		}
-		i++;
-	}
-	if (i)
-	{
-		tmp = ft_substr(str, 0, i);
-		result = strjoin_and_free_both(result, tmp);
-	}
-	return (result);
-}
-
 /*
  * bashの挙動を見る限り,
  * "key=value"  (valueは空文字列でもOK) の場合のみ
@@ -99,7 +68,6 @@ static char	*escape_string(char *str)
 static int	export_env(char *arg)
 {
 	char	**kvarr;
-	char	*tmp;
 
 	kvarr = split_first_c(arg, '=');
 	if (!is_valid_env_key(kvarr[0])
@@ -111,13 +79,6 @@ static int	export_env(char *arg)
 	}
 	if (ft_strchr(kvarr[0], '+'))
 		export_strjoin_env(kvarr[0], kvarr[1]);
-	else if (kvarr[1])
-	{
-		tmp = kvarr[1];
-		kvarr[1] = escape_string(kvarr[1]);
-		free(tmp);
-		ft_setenv(kvarr[0], kvarr[1], 0);
-	}
 	else
 		ft_setenv(kvarr[0], kvarr[1], 0);
 	free_ptrarr((void **)kvarr);
