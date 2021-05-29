@@ -31,12 +31,13 @@ typedef struct s_command_history
 
 typedef struct s_term_controls
 {
-	char	areabuf[32];
+	char	areabuf[64];
 	char	*c_cursor_left;
 	char	*c_cursor_right;
 	char	*c_clr_bol;
 	char	*c_enter_insert_mode;
 	char	*c_exit_insert_mode;
+	char	*c_delete_character;
 }	t_term_controls;
 
 typedef struct s_command_state
@@ -72,5 +73,9 @@ void	edit_handle_escape_sequence(
 			t_command_history *history, t_command_state *st);
 void	edit_term_controls_init(t_term_controls *t);
 int		edit_setup_terminal(void);
+
+int		edit_handle_delete(
+			t_command_history *history, t_command_state *st, char ch);
+void	edit_handle_backspace(t_command_history *history, t_command_state *st);
 
 #endif
