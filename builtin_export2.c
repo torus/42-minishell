@@ -6,6 +6,25 @@
 #include "builtin.h"
 #include "env.h"
 #include "minishell.h"
+#include "utils.h"
+
+static void	print_escaped_value(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '"' || str[i] == '$' || str[i] == '`' || str[i] == '\\')
+		{
+			ft_putchar_fd('\\', STDOUT_FILENO);
+			ft_putchar_fd(str[i], STDOUT_FILENO);
+		}
+		else
+			ft_putchar_fd(str[i], STDOUT_FILENO);
+		i++;
+	}
+}
 
 int	print_envs_with_declaration(void)
 {
@@ -22,7 +41,7 @@ int	print_envs_with_declaration(void)
 			{
 				write(STDOUT_FILENO, "=", 1);
 				write(STDOUT_FILENO, "\"", 1);
-				ft_putstr_fd((char *)tmp_var->value, STDOUT_FILENO);
+				print_escaped_value((char *)tmp_var->value);
 				write(STDOUT_FILENO, "\"", 1);
 			}
 			write(STDOUT_FILENO, "\n", 1);
