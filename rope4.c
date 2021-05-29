@@ -31,11 +31,15 @@ t_rope	*rope_delete(t_rope *rope, int begin, int end)
 	right = NULL;
 	rope_split(rope, end, &left_middle, &right);
 	rope_split(left_middle, begin, &left, &middle);
-	splay_init(&result, rope_concat(left, right));
+	if (left || right)
+		splay_init(&result, rope_concat(left, right));
+	else
+		result = NULL;
 	splay_release(left);
 	splay_release(right);
 	splay_release(left_middle);
 	splay_release(middle);
-	result->refcount--;
+	if (result)
+		result->refcount--;
 	return (result);
 }

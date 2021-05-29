@@ -21,6 +21,19 @@ static void	init_pwd(void)
 		ft_setenv("PWD", NULL, 0);
 }
 
+static void	put_shlvl_warnmsg(int shlvl)
+{
+	char	*num_str;
+
+	num_str = ft_itoa(shlvl);
+	if (!num_str)
+		put_minish_err_msg_and_exit(1, "initialization", "malloc failed");
+	ft_putstr_fd("minishell: warning: shell level (", STDERR_FILENO);
+	ft_putstr_fd(num_str, STDERR_FILENO);
+	ft_putstr_fd(") too high, resetting to 1\n", STDERR_FILENO);
+	free(num_str);
+}
+
 static void	init_shlvl(void)
 {
 	t_var	*shlvl_var;
@@ -35,6 +48,11 @@ static void	init_shlvl(void)
 			num = 0;
 		else
 			num++;
+		if (num >= 1000)
+		{
+			put_shlvl_warnmsg(num);
+			num = 1;
+		}
 	}
 	else
 		num = 1;

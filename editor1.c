@@ -17,7 +17,7 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 	{
 		if (read(STDIN_FILENO, cbuf, 1) != 1)
 			break ;
-		if (cbuf[0] >= 0x20 && cbuf[0] < 0x7f)
+		if (cbuf[0] >= 0x20)
 			edit_normal_character(history, state, cbuf);
 		else if (cbuf[0] == '\n')
 		{

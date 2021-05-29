@@ -69,7 +69,8 @@ void	edit_handle_escape_sequence(
 	if (i != 1)
 		return ;
 	if (edit_handle_left_right(st, cbuf[0])
-		|| edit_handle_up_down(history, st, cbuf[0]))
+		|| edit_handle_up_down(history, st, cbuf[0])
+		|| edit_handle_delete(history, st, cbuf[0]))
 		;
 	else if (cbuf[0] == '1')
 	{
@@ -95,6 +96,7 @@ void	edit_term_controls_init(t_term_controls *t)
 	t->c_clr_bol = tgetstr("cb", &area);
 	t->c_enter_insert_mode = tgetstr("im", &area);
 	t->c_exit_insert_mode = tgetstr("ei", &area);
+	t->c_delete_character = tgetstr("dc", &area);
 }
 
 int	edit_setup_terminal(void)

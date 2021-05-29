@@ -13,7 +13,8 @@ LIBFT_LIB = -L./libft -lft
 
 LDFLAGS = $(LIBFT_LIB) $(LINK_LIB)
 
-HEADER_FILES = minishell.h
+HEADER_FILES = builtin.h env.h lexer.h parse.h rope.h editor.h	\
+	execution.h minishell.h path.h utils.h
 
 SRCS = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c		\
 	cmd_exec_commands.c cmd_pipe.c cmd_redirection.c convert_ast2cmdinvo.c	\
@@ -35,7 +36,7 @@ SRCS = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c		\
 	rope1.c rope2.c rope3.c rope4.c splay1.c splay2.c splay3.c splay4.c		\
 	splay5.c splay6.c														\
 																			\
-	editor1.c editor2.c editor3.c editor4.c editor5.c
+	editor1.c editor2.c editor3.c editor4.c editor5.c editor6.c
 
 OBJS = $(SRCS:.c=.o)
 

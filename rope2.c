@@ -38,6 +38,8 @@ char	rope_index(t_rope *rope, int index)
 
 int	rope_length(t_rope *rope)
 {
+	if (!rope)
+		return (0);
 	if (rope->right)
 		return (rope_weight(rope) + rope_length(rope->right));
 	return (rope_weight(rope));
