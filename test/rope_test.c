@@ -299,6 +299,21 @@ void	test_rope()
 		splay_release(rope);
 	}
 
+	TEST_SECTION("rope_delete 全部消す");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope, rope_create("1", NULL));
+
+		CHECK_EQ(rope_length(rope), 1);
+
+		splay_assign(&rope, rope_delete(rope, 0, 1));
+
+		CHECK(!rope);
+		CHECK_EQ(rope_length(rope), 0);
+		splay_release(rope);
+	}
+
 }
 
 int main()
