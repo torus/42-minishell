@@ -23,6 +23,7 @@ int	edit_handle_delete(
 	if (st->cursor_x < rope_length(rope))
 	{
 		tputs(st->cnt.c_delete_character, 1, edit_putc);
+		st->length--;
 		splay_assign(
 			&history->ropes[history->current],
 			rope_delete(rope, st->cursor_x, st->cursor_x + 1));
