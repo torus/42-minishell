@@ -27,7 +27,6 @@ int	lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result)
 	return (1);
 }
 
-#include <stdio.h>
 int	lex_escaped(t_parse_buffer *buf, t_token *result)
 {
 	char	ch;
@@ -36,10 +35,9 @@ int	lex_escaped(t_parse_buffer *buf, t_token *result)
 	if (ch == '\\')
 	{
 		ch = lex_getc(buf);
-		// printf("escaped_char: %c\n", ch);
 		if (buf->lex_stat == LEXSTAT_NORMAL
 			|| (buf->lex_stat == LEXSTAT_DOUBLE_QUOTED
-				&& (ch == '$' || ch == '\"' || ch == '\'' || ch == '\\' || ch == '`')))
+				&& ft_strchr("$\"\'\\`", ch)))
 		{
 			result->text[0] = ch;
 			result->length = 1;
