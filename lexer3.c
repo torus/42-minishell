@@ -35,7 +35,17 @@ int	lex_escaped(t_parse_buffer *buf, t_token *result)
 	if (ch == '\\')
 	{
 		ch = lex_getc(buf);
-		result->text[0] = ch;
+		if (buf->lex_stat == LEXSTAT_NORMAL
+			|| (buf->lex_stat == LEXSTAT_DOUBLE_QUOTED
+				&& ft_strchr("$\"\'\\`", ch)))
+		{
+			result->text[0] = ch;
+			result->length = 1;
+			result->type = TOKTYPE_NON_EXPANDABLE;
+			return (1);
+		}
+		lex_ungetc(buf);
+		result->text[0] = '\\';
 		result->length = 1;
 		result->type = TOKTYPE_NON_EXPANDABLE;
 		return (1);
