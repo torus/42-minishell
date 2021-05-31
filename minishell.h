@@ -6,7 +6,8 @@
 # include "parse.h"
 # include "env.h"
 
-# define PROMPT "minish > "
+# define MINISHELL_PROMPT "minish > "
+# define MINISHELL_PROMPT_LEN 9
 
 // グローバル構造体
 typedef struct s_shell {

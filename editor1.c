@@ -67,6 +67,7 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 	t_parse_ast			*seqcmd;
 	t_parse_buffer		buf;
 
+	write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
 	splay_init(&rope, edit_get_line(history, state));
 	if (rope)
 	{
