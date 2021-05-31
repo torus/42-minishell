@@ -4,7 +4,7 @@
 #include "minishell.h"
 
 /*
- * keyname, value を元に "key=value" の文字列を作成する
+ * Generate "key=value" format string from key and value.
  */
 char	*generate_kvstr(const char *key, const char *value)
 {
@@ -17,12 +17,13 @@ char	*generate_kvstr(const char *key, const char *value)
 	return (kvstr);
 }
 
-/* 環境変数(or シェル変数)に値をセットする
- * key: 環境変数のキー名
- * value: 環境変数の値
- * is_shell_var: 環境変数が既に存在している場合に書き換えるかどうか
+/* Set or update variable.
  *
- * return: 正常なら0. それ以外なら-1.
+ * key: Key name of variable. This argument isn't nullable.
+ * value: Value of variable. This argument is nullable.
+ * is_shell_var: Whether the variable is shell variable or environment variable.
+ *
+ * Return: 0 if the process is succeeded, otherwise returns -1.
  */
 int	ft_setenv(const char *key, const char *value, bool is_shell_var)
 {
@@ -38,18 +39,19 @@ int	ft_setenv(const char *key, const char *value, bool is_shell_var)
 		}
 		var->is_shell_var = is_shell_var;
 	}
-	else
-		add_new_var(&g_shell.vars, key, value, is_shell_var);
+	else if (!add_new_var(&g_shell.vars, key, value, is_shell_var))
+		return (-1);
 	return (0);
 }
 
 /*
- * key で指定された環境変数が存在する場合, それを削除する.
- * 標準ライブラリの unsetenv() と同じ動作をする.
+ * Remove variable if the variable specified by key exist.
  *
- * key: 環境変数のキー名
+ * key: Key name of variable.
  *
- * return: 正常なら0. それ以外なら-1.
+ * Return: 0 if the process is succeeded, otherwise returns 1.
+ *
+ * NOTE: Returns 0 even if variable specified by key doesn't exist.
  */
 int	ft_unsetenv(const char *key)
 {

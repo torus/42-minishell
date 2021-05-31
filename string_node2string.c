@@ -1,8 +1,8 @@
 #include "minishell.h"
 #include "utils.h"
 
-/* string_nodeを文字列に戻す
- *うまくいけばASTの時点でこの文字列になるように依頼する
+/*
+ * Convert AST string node to string.
  */
 char	*string_node2string(t_parse_node_string *string_node)
 {

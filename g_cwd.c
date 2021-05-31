@@ -21,10 +21,11 @@ static void	set_oldpwd(char *oldpwd)
 	}
 }
 
-/* shell.cwd に新しいパスをセットする.
- * chdir() などはしない.
+/*
+ * Set g_shell.cwd to the new_path without executing chdir().
  *
- * 環境変数$PWDが削除されていた場合はシェル変数としてセットする
+ * If the $PWD environment variable has been deleted,
+ *   set it as a shell variable.
  */
 int	set_cwd(char *abs_path)
 {
@@ -71,8 +72,9 @@ void	put_cwd_err_msg(char *for_whom)
 		"No such file or directory\n", 106);
 }
 
-/* 絶対パスを構築する
- * "{shell.cwd}/{relative_path}" を返す
+/*
+ * Get absolute path from relative path.
+ *
  * ex:
  *   - relative_path="dir/dir2/symlink2dir"
  *   - relative_path="./../dir/../././/.//////./"

@@ -2,7 +2,7 @@
 #include "minishell.h"
 
 /*
- * コマンドの終了ステータスを取得する
+ * Get command exit status.
  */
 int	get_status(void)
 {
@@ -10,7 +10,7 @@ int	get_status(void)
 }
 
 /*
- * コマンドの終了ステータスを設定する
+ * Set command exit status.
  */
 void	set_status(int status_value)
 {

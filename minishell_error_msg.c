@@ -1,7 +1,7 @@
 #include "minishell.h"
 
 /*
- * 以下の形式のエラーメッセージをstderrに出力する
+ * Output error messages of the following format to stderr.
  * "minishell: {cmd_name}: {msg}\n"
  */
 void	put_minish_err_msg(const char *cmd_name, const char *msg)
@@ -16,7 +16,7 @@ void	put_minish_err_msg(const char *cmd_name, const char *msg)
 }
 
 /*
- * 以下の形式のエラーメッセージをstderrに出力して return(ret_val);
+ * Output error messages of the following format to stderr and return ret_val.
  * "minishell: {cmd_name}: {msg}\n"
  */
 int	put_minish_err_msg_and_ret(int ret_val,
@@ -27,7 +27,7 @@ int	put_minish_err_msg_and_ret(int ret_val,
 }
 
 /*
- * 以下の形式のエラーメッセージをstderrに出力して exit(status);
+ * Output error messages of the following format to stderr and exit(status).
  * "minishell: {cmd_name}: {msg}\n"
  */
 void	put_minish_err_msg_and_exit(int status,
