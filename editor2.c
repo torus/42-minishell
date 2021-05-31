@@ -9,10 +9,11 @@ int	edit_handle_left_right(t_command_state *st, char c)
 {
 	if (c == 'D')
 	{
-		tputs(st->cnt.c_cursor_left, 1, edit_putc);
-		st->cursor_x--;
-		if (st->cursor_x < 0)
-			st->cursor_x = 0;
+		if (st->cursor_x > 0)
+		{
+			tputs(st->cnt.c_cursor_left, 1, edit_putc);
+			st->cursor_x--;
+		}
 		return (1);
 	}
 	else if (c == 'C')
