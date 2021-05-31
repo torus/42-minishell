@@ -3,7 +3,7 @@
 
 # include <stdbool.h>
 
-// 環境変数とシェル変数をリストとして保持する
+// Store environment variables and shell variables as linked list.
 typedef struct s_var {
 	const char			*key;
 	const char			*value;
@@ -28,7 +28,7 @@ char	*generate_kvstr(const char *key, const char *value);
 int		ft_setenv(const char *key, const char *value, bool is_shell_var);
 int		ft_unsetenv(const char *key);
 
-// コマンドの終了ステータス
+// Utilities for command exit code.
 int		get_status(void);
 void	set_status(int status_value);
 int		set_status_and_ret(int status_value, int ret_value);

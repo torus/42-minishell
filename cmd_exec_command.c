@@ -4,7 +4,9 @@
 #include "libft/libft.h"
 
 /*
- * STDIN_FILENO, STDOUT_FILENO をdup2()で置き換える.
+ * Connect pipe to STDIN_FILENO and STDOUT_FILE_NO.
+ *
+ * replace STDIN_FILENO and STDOUT_FILE_NO with pipe by dup2().
  */
 static void	replace_stdio_with_pipe(t_command_invocation *command,
 	int pipe_prev_fd[2], int pipe_fd[2])

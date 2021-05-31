@@ -1,8 +1,5 @@
 #include "minishell.h"
 
-/*
- * from から len文字substrして dst にくっつける
- */
 static char	*substr_and_join(char *dst, char *from, int len)
 {
 	char	*tmp_dst;
@@ -20,21 +17,20 @@ static char	*substr_and_join(char *dst, char *from, int len)
 }
 
 /*
- * get_str_from_expanded_str() 内でのクオートが見つかった場合の
- *   text, str, len の更新処理.
- * Normの行数対策で切り分けた.
+ * This function is called when quote is found
+ *   while processing get_str_from_expanded_str().
+ * This function updates passed text, str and len.
  *
- * quote_char: 文字列ではなく,
- *   呼び出し元でのchar型変数のポインタ.
- *   クオーテーションの文字( ' or " )もしくは\0が入ってる
- * text: 空白で区切られた文字.
- *   str から取り出した部分文字列をくっつけて返す.
- * str: 変数展開された文字列.
- *   この関数内で len+1 ポインタが進む
- * len: strからlen文字strdupする 時に使う
- *   この関数内で 0 が代入される.
+ * quote_char: Variable in get_str_from_expanded_str()
+ *               this variable has quotation character '\'', '\"' or '\0'.
+ * text: String that is delimited by space.
+ *         It will be concatenate with sub string of str.
+ * str: Variable expanded string.
+ *        Advance the str pointer by len+1.
+ * len: It's used for strdup().
+ *        0 will be assigned in len in this function.
  *
- * return: strからlen文字strdupしたものをくっつけたtext
+ * return: text concatenated with len characters substring from str
  */
 static char	*update_text_and_str(char *quote_char,
 	char *text, char **str, int *len)
@@ -50,11 +46,15 @@ static char	*update_text_and_str(char *quote_char,
 }
 
 /*
- * 環境変数展開された文字列から空白区切りされた文字列の1単位をstrdupする
+ * Duplicate one unit of space-delimited string
+ *   from environment variable expanded string.
  *
- * in: |abc def"ghi jkl"| だとしたら
- * out: |abc| を返し, *str を d まで進める
- * 次の呼び出しでは |defghi jkl| を返し, *str を \0 まで進める
+ * str: pointer of string.
+ * Return: one unit of space delimited string.
+ *
+ * ex:
+ *   If str is |abc def"ghi jkl"|, return |abc| and advance *str to 'd'.
+ *     In next call, return |defghi jkl| and advance *str to '\0'.
  */
 static char	*get_str_from_expanded_str(char **str)
 {
@@ -83,7 +83,7 @@ static char	*get_str_from_expanded_str(char **str)
 }
 
 /*
- * 環境変数展開した文字列を分解して返す
+ * Expand environment variables in string and split to array of string.
  *
  * ex:
  *   in($ABC="hoge"):       |'$''$'"ABC"'\'"$ABC""$ABC"|

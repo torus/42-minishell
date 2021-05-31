@@ -55,8 +55,8 @@ static t_var	*add_var(t_var **vars, t_var *new_var)
 	return (new_var);
 }
 
-/* 新しい環境変数(or シェル変数)を追加する
- * 常にkeyでソートされた状態に保たれるように要素が追加される
+/* Add new environment variable or shell variable
+ *   and keep variable's list sorted.
  */
 t_var	*add_new_var(t_var **vars,
 	const char *key, const char *value, bool is_shell_var)

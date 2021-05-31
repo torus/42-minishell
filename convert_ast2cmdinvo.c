@@ -1,15 +1,15 @@
 #include "minishell.h"
 
 /* set values of command->exec_and_args based on string_node
-**
-** string ::=
-**       expandable <no_space> string
-**     | expandable
-**     | not_expandable <no_space> string
-**     | not_expandable
-**     | expandable_quoted <no_space> string
-**     | expandable_quoted
-*/
+ *
+ * string ::=
+ *       expandable <no_space> string
+ *     | expandable
+ *     | not_expandable <no_space> string
+ *     | not_expandable
+ *     | expandable_quoted <no_space> string
+ *     | expandable_quoted
+ */
 int	cmd_process_string_node(t_parse_node_string *string_node,
 	t_command_invocation *command)
 {
@@ -28,15 +28,16 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 }
 
 /* set values of command->input_file_path or output_file_path
-** based on redirection_node
-**
-** bashの挙動に合わせるため環境変数展開はここで行わず, 実行する直前のタイミングで行う
-**
-** redirection ::=
-**       "<" string
-**     | ">" string
-**     | ">>" string
-*/
+ * based on redirection_node
+ *
+ * To follow to bash behavior, environment variable expansion is not done here,
+ *   but is done just before execution.
+ *
+ * redirection ::=
+ *       "<" string
+ *     | ">" string
+ *     | ">>" string
+ */
 int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	t_command_invocation *command)
 {
@@ -59,13 +60,13 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 }
 
 /* parse argument_node and set values of command
-**
-** arguments ::=
-**       redirection
-**     | redirection arguments
-**     | string
-**     | string arguments
-*/
+ *
+ * arguments ::=
+ *       redirection
+ *     | redirection arguments
+ *     | string
+ *     | string arguments
+ */
 int	cmd_process_arguments_node(t_parse_node_arguments *args_node,
 	t_command_invocation *command)
 {
@@ -81,12 +82,12 @@ int	cmd_process_arguments_node(t_parse_node_arguments *args_node,
 }
 
 /* convert ast command_node to command_invocation object
-**
-** command ::=
-**     arguments
-**   | (bonus) "(" sequencial_commands ")"
-**   | (bonus) "(" sequencial_commands delimiter ")"
-*/
+ *
+ * command ::=
+ *     arguments
+ *   | (bonus) "(" sequencial_commands ")"
+ *   | (bonus) "(" sequencial_commands delimiter ")"
+ */
 t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 {
 	t_command_invocation	*cmdinvo;
@@ -108,12 +109,12 @@ t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 }
 
 /* convert ast command_node to command_invocation object
-**
-** pipcmds: piped_commands
-** piped_commands ::=
-**       command "|" piped_commands
-**     | command
-*/
+ *
+ * pipcmds: piped_commands
+ * piped_commands ::=
+ *       command "|" piped_commands
+ *     | command
+ */
 t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 {
 	t_command_invocation	*commands;

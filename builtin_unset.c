@@ -3,8 +3,7 @@
 #include "env.h"
 
 /*
- * unset に渡すキーとして正しいか?
- * 環境変数のキーに設定出来ないやつは駄目という認識で良さそう
+ * Is the key is correct as argument of builtin_unset?
  */
 bool	is_valid_key(char *key)
 {

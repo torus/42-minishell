@@ -5,14 +5,15 @@
 #include "path.h"
 #include "minishell.h"
 
-/* get_cd_dest_from_argv() で取得した移動先パス(絶対or相対) を元に
- * 移動先の絶対パスを返す.
+/* Returns the absolute path to the destination
+ *   based on the destination path (absolute or relative)
+ *   obtained by get_cd_dest_from_argv().
  *
- * dest: get_cd_dest_from_argv() で取得した移動先.
- * is_canon_path: 正規化されたパスかどうかが
- *   ポインタに代入される.
+ * dest: Destination path (absolute or relative)
+ *   obtained by get_cd_dest_from_argv().
+ * is_canon_path: Assign whether path is canonicalized to pointer.
  *
- * Return: 移動先ディレクトリの絶対パス.
+ * Return: Absolute path of destination directory.
  */
 static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
 {
@@ -37,15 +38,14 @@ static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
 	return (physical_path);
 }
 
-/* cd で移動した先のパスとパス情報を元に
- *   g_shell.cwd をセットする.
+/* Set g_shell.cwd based on the path to the location moved by builtin_cd
+ *   and path infomation.
  *
- * path: 実際に chdir() が成功したパス.
- * is_canon_path: 正規化されたパスかどうか.
- * is_abs_path: 絶対パスかどうか.
+ * path: Path where chdir() succeeded.
+ * is_canon_path: Whether the path is canonicalized.
+ * is_abs_path: Whether the path is absolute path.
  *
- * Return: ヒープ領域の確保に失敗したら-1,
- *   成功したら0を返す.
+ * Return: Return 0 if success, otherwise, return -1.
  */
 static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
 {
@@ -72,15 +72,15 @@ static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
 	return (SUCCESS);
 }
 
-/* 実際に chdir() を実行して現在のプロセスのcwdを変更する
+/* Execute chdir() to change cwd of current process.
  *
- * abs_dest: chdir() を実行する絶対パス.
- * arg: chdir(abs_dest) が失敗した時に移動するパス.
- *   これは bash の cd がabs_dest に移動失敗した時に
- *   引数で chdir() を試す挙動に合わせている.
- * is_canon_path: 正規化されたパスかどうか
+ * abs_dest: chdir() try to move to this path first.
+ * arg: chdir() try to move to this path if chdir(abs_dest) is failed.
+ *   This is in line with the behavior of bash's cd,
+ *   which tries chdir() with an argument when it fails to move to abs_dest.
+ * is_canon_path: Whether the path is canonicalized.
  *
- * Return: 移動に成功したかどうか.
+ * Return: true if the chdir() is successful, otherwise, return false.
  */
 static bool	change_dir_process(char *abs_dest,
 	const char *arg, bool is_canon_path)
@@ -105,11 +105,11 @@ static bool	change_dir_process(char *abs_dest,
 	return (false);
 }
 
-/* プロセスのcwdを変更する
+/* Change current working directory of current process
  *
- * dest: get_cd_dest_from_argv() で取得した移動先.
+ * dest: Destination path obtained by get_cd_dest_from_argv().
  *
- * Return: 移動に成功したかどうか.
+ * Return: true if successful, otherwise, return false.
  */
 bool	change_directory(char *dest)
 {

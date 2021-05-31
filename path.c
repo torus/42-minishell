@@ -36,10 +36,11 @@ char	*path_join(char *dirpath, char *filename)
 	return (result);
 }
 
-/* 親ディレクトリのパスを返す
+/*
+ * Return path of parent directory.
  *
- * path: 絶対パス.
- * Return: 親ディレクトリの絶対パス.
+ * path: Path of the target directory.
+ * Return: Path of parent directory.
  */
 char	*get_parent_dir(char *path)
 {
@@ -54,8 +55,8 @@ char	*get_parent_dir(char *path)
 	return (result);
 }
 
-/* ユーザー が path のファイルの実行アクセス許可
- *   を持っているか
+/*
+ * If user has access permission to the path, return True. Otherwise, return false.
  */
 bool	is_executable(char *path)
 {

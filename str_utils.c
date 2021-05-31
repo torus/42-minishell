@@ -2,7 +2,7 @@
 #include "libft/libft.h"
 
 /*
- * first に second を繋げて, firstだけfreeする
+ * Join first and second string and free first string.
  */
 char	*strjoin_and_free_first(char *first, char *second)
 {
@@ -14,7 +14,7 @@ char	*strjoin_and_free_first(char *first, char *second)
 }
 
 /*
- * first に second を繋げて, firstとsecondをfreeする
+ * Join first and second string and free both strings.
  */
 char	*strjoin_and_free_both(char *first, char *second)
 {
@@ -27,10 +27,10 @@ char	*strjoin_and_free_both(char *first, char *second)
 }
 
 /*
- * str_nullable がtruthyだったら, strjoin(str_nullable, second) を返し,
- * そうでない場合 strdup(second) を返す.
+ * If str_nullable is truthy return strjoin(str_nullable, second),
+ *   otherwise, return strdup(second).
  *
- * str_nullable と second は free される.
+ * str_nullable and second will be freed in this function.
  */
 char	*strjoin_nullable_and_free_both(char *str_nullable, char *second)
 {

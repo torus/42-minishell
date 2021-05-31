@@ -2,7 +2,7 @@
 #include "minishell.h"
 #include "env.h"
 
-/* "key=value" 形式の文字列をt_varに変換する */
+/* Convert a string that's format "key=value" to t_var. */
 t_var	*kvstr2var(char *kvstr, bool is_shell_var)
 {
 	char	**kvarr;
@@ -24,7 +24,7 @@ t_var	*kvstr2var(char *kvstr, bool is_shell_var)
 	return (new_var);
 }
 
-/* "key=value" 形式の文字列配列をt_varに変換する */
+/* Convert array of string that's format "key=value" to t_var */
 t_var	*environ2vars(char **environ)
 {
 	int		i;
@@ -50,7 +50,7 @@ t_var	*environ2vars(char **environ)
 	return (first);
 }
 
-/* t_var 内の環境変数を "key=value" 形式の文字列配列に変換する */
+/* Convert t_var to a string that's format "key=value" */
 char	**vars2environ(t_var *vars)
 {
 	t_var	*tmp;

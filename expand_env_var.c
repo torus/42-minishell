@@ -2,7 +2,10 @@
 #include "minishell.h"
 
 /*
- * 環境変数を展開してresultに連結させて引数をfreeする
+ * Get the variables with key substr(str, 0, env_len)
+ *   and concatenate them to result.
+ * Old result will be freed
+ *   so caller doesn't need to free result after calling this function.
  */
 static char	*expand_env_and_join(char *result,
 	char *str, int env_len)
@@ -32,7 +35,9 @@ static char	*expand_env_and_join(char *result,
 }
 
 /*
- * 普通の文字列をresultに連結させて引数をfreeする
+ * Concatenate string which doesn't have variable in it to result.
+ * Old result will be freed
+ *   so caller doesn't need to free result after calling this function.
  */
 static char	*result_join_normal_str(char *result,
 	char *str, int len)
@@ -56,13 +61,13 @@ static char	*result_join_normal_str(char *result,
 }
 
 /*
- * 環境変数が開始, または終了するかどうかを判定する.
+ * Return true if variable starts or ends.
  *
- * 例: 以下のような場合にtrueを返す.
- *   - is_in_env == true で str[len] が環境変数として不正な文字.
- *   - is_in_env == false で str[len] がstr[len]が'$'で,
- *       str[len+1]が環境変数として適切な文字.
- *   - 文字列の終端に達した.
+ * ex: It returns true in the following cases.
+ *   - is_in_env == true and str[len] is invalid character as variable key.
+ *   - is_in_env == false and str[len] is '$' and
+ *       srt[len] is invalid character as variable key.
+ *   - str[len] has reached to the end of string.
  */
 static bool	will_toggle_env(bool is_in_env,
 	bool is_in_noexpand, char *str, int len)
@@ -82,13 +87,13 @@ static bool	will_toggle_env(bool is_in_env,
 }
 
 /*
- * 文字列(or 環境変数)を連結する
+ * string or expanded variable is joined to result
  *
- * is_in_env の値によって処理が変わる.
- *   is_in_env == true: 環境変数展開して連結する.
- *   is_in_env == false: 普通に連結する.
+ * How the function works depends on is_in_env.
+ *   - is_in_env == true: expand variable and join to result.
+ *   - is_in_env == false: join to result with out variable expansion.
  *
- * return: 文字列解析処理を続けるかどうか (is_continue)
+ * return: whether continue string processing.
  */
 static bool	join_str_or_env(char **result,
 	char **str, int *len, bool *is_in_env)
@@ -105,9 +110,8 @@ static bool	join_str_or_env(char **result,
 	return (true);
 }
 
-/* 環境変数を展開する
+/* Expand variables in string.
  *
- * エスケープされたクオートなどはそのままなので, この後別の関数で処理してください
  * ex:
  *   in($ABC=" abc def "):  |"$ABC"'\'$ABC'|
  *   out:                   |" abc def "'\'$ABC'|

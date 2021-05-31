@@ -38,7 +38,8 @@ static void	add_double_slash(char **path)
 	free(tmp);
 }
 
-/* パスを正規化する.
+/* Canonicalize path.
+ *
  * ex:
  *   - "////hoge//fuga//../././//gaga" -> "/hoge/gaga"
  */

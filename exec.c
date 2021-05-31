@@ -45,7 +45,8 @@ char	*find_executable_file_in_dir(char *filename, char *dirpath)
 	return (free_and_rtn_ptr(dir, NULL));
 }
 
-/* dirs の各ディレクトリを検索して実行する.
+/*
+ * This function search file in directories in dirs and try to execute.
  */
 static char	*search_and_exec_file_from_dirs(char *filename,
 	char **argv, char **dirs)
@@ -75,7 +76,8 @@ static char	*search_and_exec_file_from_dirs(char *filename,
 	return (last_executable_path);
 }
 
-/* $PATH のディレクトリを検索して実行する.
+/*
+ * This function search file in directories in $PATH and try to execute.
  */
 char	*search_and_exec_file_from_path_env(char *filename, char **argv)
 {
