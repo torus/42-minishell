@@ -7,6 +7,7 @@ typedef struct s_parse_buffer	t_parse_buffer;
 
 typedef enum e_token_type
 {
+	TOKTYPE_EOF = -1,
 	TOKTYPE_NON_EXPANDABLE = 0xc101,
 	TOKTYPE_EXPANDABLE,
 	TOKTYPE_EXPANDABLE_QUOTED,
@@ -45,5 +46,6 @@ int		lex_get_quoted(t_parse_buffer *buf, t_token *result, int ch);
 int		lex_get_token(t_parse_buffer *buf, t_token *result);
 int		lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result);
 int		lex_escaped(t_parse_buffer *buf, t_token *result);
+int		lex_get_eof(t_token *result, int ch);
 
 #endif

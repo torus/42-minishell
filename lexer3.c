@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "libft/libft.h"
 #include "parse.h"
 
@@ -52,5 +53,15 @@ int	lex_escaped(t_parse_buffer *buf, t_token *result)
 		return (1);
 	}
 	lex_ungetc(buf);
+	return (0);
+}
+
+int	lex_get_eof(t_token *result, int ch)
+{
+	if (ch == EOF)
+	{
+		result->type = TOKTYPE_EOF;
+		return (1);
+	}
 	return (0);
 }

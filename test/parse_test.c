@@ -320,6 +320,15 @@ void test_lexer()
 		lex_get_token(&buf, &tok);
 		CHECK_EQ(tok.type, TOKTYPE_SEMICOLON);
 	}
+
+	TEST_SECTION("lex_get_token EOF");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "");
+		t_token	tok;
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_EOF);
+	}
 }
 
 void check_string(t_parse_ast *node, const char *expected)
@@ -875,6 +884,60 @@ void test_parser(void)
 
 		check_piped_seqence(node->content.command_line->seqcmd_node);
 		CHECK_EQ(node->content.command_line->delimiter_node, NULL);
+	}
+
+	TEST_SECTION("parse_command_line バックスラッシュで終わる");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc\\\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+
+		check_single_argument(
+			node->content.command_line->seqcmd_node
+			->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node,
+			"abc");
+	}
+
+	TEST_SECTION("parse_command_line 閉じてないダブルクォート");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc\"\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+
+		check_single_argument(
+			node->content.command_line->seqcmd_node
+			->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node,
+			"abc");
+	}
+
+	TEST_SECTION("parse_command_line 閉じてないシングルクォート");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc'\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+
+		check_single_argument(
+			node->content.command_line->seqcmd_node
+			->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node,
+			"abc");
 	}
 }
 
