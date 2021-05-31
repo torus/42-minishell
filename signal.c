@@ -26,11 +26,11 @@ void	set_sighandlers(t_sighandler sighandler)
 }
 
 /*
- * シェルでのシグナルハンドラーを設定する
+ * Set signal handlers in shell process.
  *
- * 具体的には以下のようなハンドラーを設定する
- * - SIGQUIT: 無視
- * - SIGINT: 改行してプロンプトを表示
+ * This function set these signal handlers.
+ * - SIGQUIT: Ignore signal. Do nothing.
+ * - SIGINT: Line break and show prompt.
  */
 void	set_shell_sighandlers(void)
 {

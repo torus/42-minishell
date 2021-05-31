@@ -11,11 +11,8 @@ typedef struct s_cmd_redirection
 	int			fd;
 }	t_cmd_redirection;
 
-/* コマンド終了後に一気に解放するためにリストで開けたfdを記録する.
- *
- * プロセスが異なる外部コマンドでは気にしなくてもよいのだが,
- * minishellと同じプロセスで動作するビルトインコマンドでは
- * これが必要
+/* This struct is to remember opened filed descriptors
+ *   to close them after finish builtin command.
  */
 typedef struct s_fd_list {
 	int					fd;

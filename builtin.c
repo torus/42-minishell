@@ -16,8 +16,7 @@ bool	is_builtin_command(char *cmd_name)
 }
 
 /*
- * ビルトインコマンド(関数)のポインタを返す.
- * これが上手くいけば is_builtin_command() はいらないかも
+ * Returns pointer of builtin command
  */
 t_builtin_cmd	*get_builtin_func(char *cmd_name)
 {

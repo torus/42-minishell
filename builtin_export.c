@@ -58,13 +58,6 @@ static int	export_strjoin_env(const char *key, const char *value)
 	return (0);
 }
 
-/*
- * bashの挙動を見る限り,
- * "key=value"  (valueは空文字列でもOK) の場合のみ
- * 環境変数をセットしてるっぽい
- *
- * arg: "HOGE" とか "HOGE=" "HOGE=FUGA" とか
- */
 static int	export_env(char *arg)
 {
 	char	**kvarr;

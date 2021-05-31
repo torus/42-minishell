@@ -51,12 +51,15 @@ void	fd_list_close(t_fd_list **lst)
 	*lst = NULL;
 }
 
-/* ビルトインコマンド用に入力リダイレクションを設定
+/* Configure input redirection for builtin command.
  *
- * command: コマンド
- * fd_list: ビルトインコマンド終了後にfdをcloseする用
- * stdinfd: ビルトインコマンド終了後にSTDINを元に戻す用
- * stdoutfd: ビルトインコマンド終了後にSTDOUTを元に戻す用
+ * command: Command.
+ * fd_list: File descriptor list for closing file descriptors
+ *   after finishing command.
+ * stdinfd: int variable's pointer for remember original fd socket of STDIN
+ *   and recovering original STDIN after finishing command.
+ * stdoutfd: int variable's pointer for remember original fd socket of STDOUT
+ *   and recovering original STDOUT after finishing command.
  */
 static int	builtin_set_in_red(t_command_invocation *command,
 	t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
@@ -86,12 +89,15 @@ static int	builtin_set_in_red(t_command_invocation *command,
 	return (0);
 }
 
-/* ビルトインコマンド用に出力リダイレクションを設定
+/* Configure output redirection for builtin command.
  *
- * command: コマンド
- * fd_list: ビルトインコマンド終了後にfdをcloseする用
- * stdinfd: ビルトインコマンド終了後にSTDINを元に戻す用
- * stdoutfd: ビルトインコマンド終了後にSTDOUTを元に戻す用
+ * command: Command.
+ * fd_list: File descriptor list for closing file descriptors
+ *   after finishing command.
+ * stdinfd: int variable's pointer for remember original fd socket of STDIN
+ *   and recovering original STDIN after finishing command.
+ * stdoutfd: int variable's pointer for remember original fd socket of STDOUT
+ *   and recovering original STDOUT after finishing command.
  */
 static int	builtin_set_out_red(t_command_invocation *command,
 	t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
@@ -123,9 +129,8 @@ static int	builtin_set_out_red(t_command_invocation *command,
 	return (0);
 }
 
-/* ビルトインコマンドを実行する
- * パイプではなく単体(minishellと同じプロセス)
- * で実行されることを想定している
+/*
+ * Execute built in command in the same process as the minishell main process.
  */
 int	cmd_exec_builtin(t_command_invocation *command)
 {
@@ -145,7 +150,7 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	fd_list_close(&fd_lst);
 	if (dup2(stdoutfd, STDOUT_FILENO) == -1
 		|| dup2(stdinfd, STDIN_FILENO) == -1)
-		put_err_msg_and_exit("FDの復元に失敗");
+		put_err_msg_and_exit("failed recovering original fd");
 	close(stdoutfd);
 	close(stdinfd);
 	return (status);

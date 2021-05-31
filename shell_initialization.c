@@ -72,7 +72,6 @@ void	init_g_shell(void)
 	g_shell.status = 0;
 }
 
-/* シェルの環境を初期化する */
 int	initialize_shell(void)
 {
 	init_g_shell();

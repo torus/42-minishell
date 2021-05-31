@@ -21,7 +21,8 @@ static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr,
 	return (true);
 }
 
-/* ast_str_node を cmd_str_node に変換する(環境変数は展開する).
+/*
+ * Convert AST str_node to cmd_str_node with variable expansion.
  */
 static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 {
@@ -46,16 +47,15 @@ static t_cmd_str_node	**ast_str2cmd_str(t_parse_node_string *str_node)
 	return ((t_cmd_str_node **)result);
 }
 
-/* TOKTYPE_EXPANDABLEを処理する
+/* process TOKTYPE_EXPANDABLE
  *
- * 渡された next_str を更新する際はは内部でfreeする.
+ * *next_str will be freed in the function when the function update next_str.
  *
- * result: 文字列配列変数へのポインタ
- *   (Normのためにvoidポインタにしている)
- * next_str: 次resultに追加される文字列を指すポインタ
+ * result: Pointer of array of string.
+ * next_str: Pointer of string which will be added to **result in next call. 
  * text: str_node->text
  *
- * Return: 更新された next_str
+ * Return: Updated next_str
  */
 static char	*expandable_node2strarr(void ***result,
 	char *next_str, char *text)
@@ -87,7 +87,6 @@ static char	*expandable_node2strarr(void ***result,
 	return (next_str);
 }
 
-/* 中間表現構造体を文字列配列にする. */
 static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 {
 	void	**result;
@@ -116,7 +115,7 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	return ((char **)result);
 }
 
-/* t_parse_node_string を文字列配列に変換して返す */
+/* Convert AST string node to array of string with variable expansion. */
 char	**expand_string_node(t_parse_node_string *string_node)
 {
 	t_cmd_str_node	**cmd_str;

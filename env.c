@@ -73,12 +73,18 @@ char	**split_first_c(const char *str, char c)
 	return (result);
 }
 
-/* コロン(:)で区切る.
- * ft_split() と違い, "::/" のような入力に対して
- * ["", "", "/"] を作成して返す.
+/* Split string by colon(':').
  *
- * str: コロン(':')区切られた文字列
- * def_str: default string.
+ * str: Colon delimited string.
+ * def_str: Default string.
+ *
+ * Return: An array of strings created as a result of string delimitation.
+ *
+ * ex:
+ *   - args:
+ *     - str: "::/"
+ *     - default_str: "default"
+ *   - return: ["default", "default", "/"]
  */
 char	**get_colon_units(const char *str, const char *default_str)
 {

@@ -5,12 +5,12 @@
 #include "path.h"
 #include "minishell.h"
 
-/* $CDPATH を検索するかどうかを返す
+/* Returns whether you have to search $CDPATH or not
  *
- * argv: builtin_cd() の引数.
- * dest: get_cd_dest_from_argv() で取得した移動先パス.
+ * argv: argument of builtin_cd().
+ * dest: destination path obtained by get_cd_dest_from_argv().
  *
- * Return: $CDPATH を検索する必要があるかどうか.
+ * Return: whether you have to search $CDPATH or not
  */
 bool	will_search_cdpath(char **argv, char *dest)
 {
@@ -35,11 +35,11 @@ static char	*path_join3(char *path0, char *path1, char *path2)
 	return (result);
 }
 
-/* sources の各パスを起点として dest_path に移動を試みる.
+/* Try to move to dest_path from each path in sources.
  *
- * sources: 起点となるパスの文字列の配列
+ * sources: A string array of paths to start from.
  *
- * Return: 移動が成功したかどうか.
+ * Return: Whether chdir() was successful.
  */
 static bool	cd_from_sources(char *dest_path, char **sources)
 {
@@ -66,11 +66,11 @@ static bool	cd_from_sources(char *dest_path, char **sources)
 	return (false);
 }
 
-/* $CDPATH を元に移動する.
+/* Try to move to directories that are in $CDPATH.
  *
- * dest_path: 移動先相対パス
- * Return: 移動に成功したら true を返す.
- *   そうでない場合は false を返す.
+ * dest_path: relative destination path
+ *
+ * Return: true if moving directory is successful, otherwise, return false.
  */
 int	cd_cdpath_env(char *dest_path)
 {

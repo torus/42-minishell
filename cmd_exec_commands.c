@@ -16,7 +16,8 @@ static int	cmd_connect_pipe(
 	return (0);
 }
 
-/* コマンドが実行完了するまでwaitする.
+/*
+ * Wait until all commands has finished and return exit code of last command.
  */
 int	cmd_wait_commands(t_command_invocation *command)
 {

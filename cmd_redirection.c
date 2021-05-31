@@ -23,15 +23,15 @@ int	put_redirect_fd_err_msg_and_ret(int ret_value, int fd, char *msg)
 }
 
 /*
- * リダイレクション用に渡された文字列の環境変数展開を行う.
+ * Expand variable of the string passed for redirection.
+ * If error is occurred, put error message to stderr.
  *
- * 環境変数展開を行った結果, 文字列が0個や2つ以上の場合はエラーを表すNULLを返す.
- * エラーの場合, エラーメッセージをstderrに出力する.
  *
- * red_target: リダイレクション先の文字列
+ * red_target: The string of redirection node.
  *
- * return: 環境変数展開などが完了した文字列.
- *   展開した結果文字列が2つ以上の場合はエラーなのでNULLを返す.
+ * Return: Filepath if variable expansion is succeeded.
+ *   If the result of the environment variable expansion
+ *     can be decomposed into two strings, an NULL is returned.
  */
 char	*expand_redirect_filepath(char *red_target)
 {

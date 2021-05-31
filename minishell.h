@@ -9,7 +9,6 @@
 # define MINISHELL_PROMPT "minish > "
 # define MINISHELL_PROMPT_LEN 9
 
-// グローバル構造体
 typedef struct s_shell {
 	char		*cwd;
 	t_var		*vars;
@@ -17,13 +16,15 @@ typedef struct s_shell {
 }				t_shell;
 extern t_shell	g_shell;
 
-// AST から exec_and_args に変換する時に使う構造体
+/* This struct is used in process
+ *   that convert AST string node to exec_and_args (array of string).
+ */
 typedef struct s_cmd_str_node {
 	char					*text;
 	t_token_type			type;
 }				t_cmd_str_node;
 
-// MacOSでは signal.h に __sighandler_t がない
+// FreeBSD doesn't have type __sighandler_t.
 typedef void	(*t_sighandler)(int);
 
 // AST to command_invocation
@@ -43,7 +44,7 @@ void					put_minish_err_msg_and_exit(int status,
 							const char *cmd_name, const char *msg);
 int						invoke_sequential_commands(t_parse_ast *seqcmd);
 
-// シェルの初期化
+// Shell initialization
 void					init_g_shell(void);
 int						initialize_shell(void);
 

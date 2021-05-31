@@ -22,11 +22,11 @@ static void	put_cd_errmsg(const char *dest_path)
 	free(errmsg);
 }
 
-/* cd先のディレクトリをcdコマンドのargvを元に作成して返す.
+/* Generate destination path from argv
  *
- * argv: builtin_cd() の引数.
+ * argv: arguments of builtin_cd().
  *
- * Return: cdコマンドの移動先パス(絶対or相対パス).
+ * Return: Destination path of cd command (absolute or relative)
  */
 static char	*get_cd_dest_from_argv(char **argv)
 {
