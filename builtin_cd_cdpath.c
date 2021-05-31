@@ -5,7 +5,7 @@
 #include "path.h"
 #include "minishell.h"
 
-/* Return whether you have to search $CDPATH or not
+/* Returns whether you have to search $CDPATH or not
  *
  * argv: argument of builtin_cd().
  * dest: destination path obtained by get_cd_dest_from_argv().

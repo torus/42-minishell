@@ -23,7 +23,7 @@ char	*generate_kvstr(const char *key, const char *value)
  * value: Value of variable. This argument is nullable.
  * is_shell_var: Whether the variable is shell variable or environment variable.
  *
- * Return: 0 if the process is succeeded, otherwise return 1.
+ * Return: 0 if the process is succeeded, otherwise returns 1.
  */
 int	ft_setenv(const char *key, const char *value, bool is_shell_var)
 {
@@ -49,9 +49,9 @@ int	ft_setenv(const char *key, const char *value, bool is_shell_var)
  *
  * key: Key name of variable.
  *
- * Return: 0 if the process is succeeded, otherwise return 1.
+ * Return: 0 if the process is succeeded, otherwise returns 1.
  *
- * NOTE: Return 0 even if variable specified by key doesn't exist.
+ * NOTE: Returns 0 even if variable specified by key doesn't exist.
  */
 int	ft_unsetenv(const char *key)
 {

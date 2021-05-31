@@ -37,7 +37,7 @@ char	*path_join(char *dirpath, char *filename)
 }
 
 /*
- * Return path of parent directory.
+ * Returns path of parent directory.
  *
  * path: Path of the target directory.
  * Return: Path of parent directory.

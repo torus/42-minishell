@@ -16,7 +16,7 @@ bool	is_builtin_command(char *cmd_name)
 }
 
 /*
- * Return pointer of builtin command
+ * Returns pointer of builtin command
  */
 t_builtin_cmd	*get_builtin_func(char *cmd_name)
 {

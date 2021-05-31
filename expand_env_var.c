@@ -61,7 +61,7 @@ static char	*result_join_normal_str(char *result,
 }
 
 /*
- * Return true if variable starts or ends.
+ * Returns true if variable starts or ends.
  *
  * ex: It returns true in the following cases.
  *   - is_in_env == true and str[len] is invalid character as variable key.

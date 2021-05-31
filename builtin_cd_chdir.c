@@ -45,7 +45,7 @@ static char	*get_cd_abs_dest(char *dest, bool *is_canon_path)
  * is_canon_path: Whether the path is canonicalized.
  * is_abs_path: Whether the path is absolute path.
  *
- * Return: Return 0 if success, otherwise, return -1.
+ * Return: 0 if success, otherwise, return -1.
  */
 static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
 {
@@ -80,7 +80,7 @@ static int	set_new_pwd(char *path, bool is_canon_path, bool is_abs_path)
  *   which tries chdir() with an argument when it fails to move to abs_dest.
  * is_canon_path: Whether the path is canonicalized.
  *
- * Return: true if the chdir() is successful, otherwise, return false.
+ * Return: true if the chdir() is successful, otherwise, returns false.
  */
 static bool	change_dir_process(char *abs_dest,
 	const char *arg, bool is_canon_path)
@@ -109,7 +109,7 @@ static bool	change_dir_process(char *abs_dest,
  *
  * dest: Destination path obtained by get_cd_dest_from_argv().
  *
- * Return: true if successful, otherwise, return false.
+ * Return: true if successful, otherwise, returns false.
  */
 bool	change_directory(char *dest)
 {
