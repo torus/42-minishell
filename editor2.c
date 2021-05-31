@@ -6,48 +6,6 @@
 #include "parse.h"
 #include "minishell.h"
 
-#include <stdio.h>
-int	edit_handle_left_right(t_command_state *st, char c)
-{
-	if (c == 'D')
-	{
-		if (st->cursor_x > 0)
-		{
-			if ((st->cursor_x + MINISHELL_PROMPT_LEN) % tgetnum("co") > 0)
-				tputs(st->cnt.c_cursor_left, 1, edit_putc);
-			else
-			{
-				int	col;
-				tputs(st->cnt.c_cursor_up, 1, edit_putc);
-				col = tgetnum("co");
-				while (col-- > 1)
-					tputs(st->cnt.c_cursor_right, 1, edit_putc);
-			}
-			st->cursor_x--;
-		}
-		return (1);
-	}
-	else if (c == 'C')
-	{
-		if (st->cursor_x < st->length)
-		{
-			int	col;
-			col = tgetnum("co");
-			if ((st->cursor_x + MINISHELL_PROMPT_LEN) % tgetnum("co") < col - 1)
-				tputs(st->cnt.c_cursor_right, 1, edit_putc);
-			else
-			{
-				tputs(st->cnt.c_cursor_down, 1, edit_putc);
-				while (col-- > 1)
-					tputs(st->cnt.c_cursor_left, 1, edit_putc);
-			}
-			st->cursor_x++;
-		}
-		return (1);
-	}
-	return (0);
-}
-
 int	edit_handle_up_down(t_command_history *history, t_command_state *st, char c)
 {
 	if (c != 'A' && c != 'B')
@@ -87,7 +45,8 @@ void	edit_handle_escape_sequence(
 	i = read(STDIN_FILENO, cbuf, 1);
 	if (i != 1)
 		return ;
-	if (edit_handle_left_right(st, cbuf[0])
+	if (edit_handle_left(st, cbuf[0])
+		|| edit_handle_right(st, cbuf[0])
 		|| edit_handle_up_down(history, st, cbuf[0])
 		|| edit_handle_delete(history, st, cbuf[0]))
 		;

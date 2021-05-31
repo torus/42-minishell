@@ -71,7 +71,8 @@ void	edit_normal_character(
 			char *cbuf);
 void	edit_enter(t_command_history *history, t_command_state *st);
 void	edit_sig_catch(int signo);
-int		edit_handle_left_right(t_command_state *st, char c);
+int		edit_handle_left(t_command_state *st, char c);
+int		edit_handle_right(t_command_state *st, char c);
 int		edit_handle_up_down(
 			t_command_history *history, t_command_state *st, char c);
 void	edit_handle_escape_sequence(
