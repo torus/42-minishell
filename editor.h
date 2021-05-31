@@ -34,10 +34,13 @@ typedef struct s_term_controls
 	char	areabuf[64];
 	char	*c_cursor_left;
 	char	*c_cursor_right;
+	char	*c_cursor_up;
+	char	*c_cursor_down;
 	char	*c_clr_bol;
 	char	*c_enter_insert_mode;
 	char	*c_exit_insert_mode;
 	char	*c_delete_character;
+	char	*c_cursor_address;
 }	t_term_controls;
 
 typedef struct s_command_state

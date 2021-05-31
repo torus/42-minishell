@@ -4,14 +4,25 @@
 #include "rope.h"
 #include "editor.h"
 #include "parse.h"
+#include "minishell.h"
 
+#include <stdio.h>
 int	edit_handle_left_right(t_command_state *st, char c)
 {
 	if (c == 'D')
 	{
 		if (st->cursor_x > 0)
 		{
-			tputs(st->cnt.c_cursor_left, 1, edit_putc);
+			if ((st->cursor_x + MINISHELL_PROMPT_LEN) % tgetnum("co") > 0)
+				tputs(st->cnt.c_cursor_left, 1, edit_putc);
+			else
+			{
+				int	col;
+				tputs(st->cnt.c_cursor_up, 1, edit_putc);
+				col = tgetnum("co");
+				while (col-- > 1)
+					tputs(st->cnt.c_cursor_right, 1, edit_putc);
+			}
 			st->cursor_x--;
 		}
 		return (1);
@@ -20,7 +31,16 @@ int	edit_handle_left_right(t_command_state *st, char c)
 	{
 		if (st->cursor_x < st->length)
 		{
-			tputs(st->cnt.c_cursor_right, 1, edit_putc);
+			int	col;
+			col = tgetnum("co");
+			if ((st->cursor_x + MINISHELL_PROMPT_LEN) % tgetnum("co") < col - 1)
+				tputs(st->cnt.c_cursor_right, 1, edit_putc);
+			else
+			{
+				tputs(st->cnt.c_cursor_down, 1, edit_putc);
+				while (col-- > 1)
+					tputs(st->cnt.c_cursor_left, 1, edit_putc);
+			}
 			st->cursor_x++;
 		}
 		return (1);
@@ -94,6 +114,8 @@ void	edit_term_controls_init(t_term_controls *t)
 	area = t->areabuf;
 	t->c_cursor_left = tgetstr("le", &area);
 	t->c_cursor_right = tgetstr("nd", &area);
+	t->c_cursor_up = tgetstr("up", &area);
+	t->c_cursor_down = tgetstr("do", &area);
 	t->c_clr_bol = tgetstr("cb", &area);
 	t->c_enter_insert_mode = tgetstr("im", &area);
 	t->c_exit_insert_mode = tgetstr("ei", &area);
