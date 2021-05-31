@@ -52,24 +52,22 @@ int	edit_handle_up_down(t_command_history *history, t_command_state *st, char c)
 {
 	if (c != 'A' && c != 'B')
 		return (0);
-	if (c == 'B')
+	if (c == 'B' && history->current != history->end)
 	{
-		if (history->current != history->end)
-		{
-			history->current = (history->current + 1) % LINE_BUFFER_SIZE;
-			tputs(st->cnt.c_clr_bol, 1, edit_putc);
-			edit_putc('\r');
-			st->cursor_x = edit_print_history(history, history->current);
-			st->length = st->cursor_x;
-		}
-		return (1);
+		history->current = (history->current + 1) % LINE_BUFFER_SIZE;
+		tputs(st->cnt.c_clr_bol, 1, edit_putc);
+		edit_putc('\r');
+		write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
+		st->cursor_x = edit_print_history(history, history->current);
+		st->length = st->cursor_x;
 	}
-	if (history->current != history->begin)
+	else if (c == 'A' && history->current != history->begin)
 	{
 		history->current = (LINE_BUFFER_SIZE + history->current - 1)
 			% LINE_BUFFER_SIZE;
 		tputs(st->cnt.c_clr_bol, 1, edit_putc);
 		edit_putc('\r');
+		write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
 		st->cursor_x = edit_print_history(history, history->current);
 		st->length = st->cursor_x;
 	}
