@@ -56,7 +56,8 @@ char	*get_parent_dir(char *path)
 }
 
 /*
- * If user has access permission to the path, return True. Otherwise, return false.
+ * If user has access permission to the path,
+ *   return True. Otherwise, return false.
  */
 bool	is_executable(char *path)
 {
