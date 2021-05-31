@@ -8,6 +8,7 @@ typedef struct s_parse_buffer	t_parse_buffer;
 typedef enum e_token_type
 {
 	TOKTYPE_EOF = -1,
+	TOKTYPE_PARSE_ERROR = 0,
 	TOKTYPE_NON_EXPANDABLE = 0xc101,
 	TOKTYPE_EXPANDABLE,
 	TOKTYPE_EXPANDABLE_QUOTED,

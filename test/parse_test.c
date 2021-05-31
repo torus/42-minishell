@@ -912,14 +912,7 @@ void test_parser(void)
 
 		lex_get_token(&buf, &tok);
 		t_parse_ast *node = parse_command_line(&buf, &tok);
-
-		check_single_argument(
-			node->content.command_line->seqcmd_node
-			->content.sequential_commands
-			->pipcmd_node->content.piped_commands
-			->command_node->content.command
-			->arguments_node,
-			"abc");
+		CHECK(!node);
 	}
 
 	TEST_SECTION("parse_command_line 閉じてないシングルクォート");
@@ -930,14 +923,7 @@ void test_parser(void)
 
 		lex_get_token(&buf, &tok);
 		t_parse_ast *node = parse_command_line(&buf, &tok);
-
-		check_single_argument(
-			node->content.command_line->seqcmd_node
-			->content.sequential_commands
-			->pipcmd_node->content.piped_commands
-			->command_node->content.command
-			->arguments_node,
-			"abc");
+		CHECK(!node);
 	}
 }
 
