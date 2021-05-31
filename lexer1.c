@@ -9,12 +9,7 @@ int	lex_getc(t_parse_buffer *buf)
 	if (buf->getc)
 		return (buf->getc(buf));
 	if (buf->cur_pos == buf->size)
-	{
-		buf->size = read(STDIN_FILENO, buf->buffer, sizeof(buf->buffer));
-		if (buf->size == 0)
-			return (EOF);
-		buf->cur_pos = 0;
-	}
+		return (EOF);
 	return (buf->buffer[buf->cur_pos++]);
 }
 
@@ -83,11 +78,10 @@ int	lex_get_token(t_parse_buffer *buf, t_token *result)
 	if (buf->lex_stat == LEXSTAT_NORMAL)
 	{
 		ch = lex_getc(buf);
-		if (ch == EOF)
-			return (0);
 		if (lex_get_spaces(buf, result, ch)
 			|| lex_get_symbols(buf, result, ch)
-			|| lex_get_quoted(buf, result, ch))
+			|| lex_get_quoted(buf, result, ch)
+			|| lex_get_eof(result, ch))
 			return (1);
 		result->type = TOKTYPE_EXPANDABLE;
 		lex_ungetc(buf);

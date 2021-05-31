@@ -32,8 +32,6 @@ run: parse_test env_test path_test exec_test command_exec_test ast2cmdinvo_test 
 	${VALGRIND} ./splay_test
 	${VALGRIND} ./rope_test
 
-# TODO: valgrind チェックする。
-
 SRCS_PARSE = $(wildcard ../lexer*.c ../parse*.c) ../libft/ft_memcpy.c
 SRCS_SPLAY = $(wildcard ../splay*.c)
 SRCS_ROPE = $(SRCS_SPLAY) $(wildcard ../rope*.c)	\

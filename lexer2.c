@@ -44,9 +44,11 @@ int	lex_read_double_quoted(t_parse_buffer *buf, t_token *result)
 	while (1)
 	{
 		ch = lex_getc(buf);
-		if (ch == '"')
+		if (ch == '"' || ch == '\n' || ch == EOF)
 			buf->lex_stat = LEXSTAT_NORMAL;
-		if (ch == '\\')
+		if (ch == '\n' || ch == EOF)
+			result->type = TOKTYPE_PARSE_ERROR;
+		if (ch == '\\' || ch == '\n' || ch == EOF)
 			lex_ungetc(buf);
 		if (ch == '\\' || ch == '"' || ch == '\n' || ch == EOF)
 			break ;
@@ -65,8 +67,13 @@ int	lex_read_single_quoted(t_parse_buffer *buf, t_token *result)
 	while (1)
 	{
 		ch = lex_getc(buf);
-		if (ch == '\'')
+		if (ch == '\'' || ch == '\n' || ch == EOF)
 			buf->lex_stat = LEXSTAT_NORMAL;
+		if (ch == '\n' || ch == EOF)
+		{
+			result->type = TOKTYPE_PARSE_ERROR;
+			lex_ungetc(buf);
+		}
 		if (ch == '\'' || ch == '\n' || ch == EOF)
 			break ;
 		result->text[pos++] = ch;
