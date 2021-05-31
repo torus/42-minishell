@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "libft/libft.h"
 #include "parse.h"
 
@@ -35,11 +36,32 @@ int	lex_escaped(t_parse_buffer *buf, t_token *result)
 	if (ch == '\\')
 	{
 		ch = lex_getc(buf);
-		result->text[0] = ch;
+		if (ch != '\n'
+			&& (buf->lex_stat == LEXSTAT_NORMAL
+				|| (buf->lex_stat == LEXSTAT_DOUBLE_QUOTED
+					&& ft_strchr("$\"\'\\`", ch))))
+		{
+			result->text[0] = ch;
+			result->length = 1;
+			result->type = TOKTYPE_NON_EXPANDABLE;
+			return (1);
+		}
+		lex_ungetc(buf);
+		result->text[0] = '\\';
 		result->length = 1;
 		result->type = TOKTYPE_NON_EXPANDABLE;
 		return (1);
 	}
 	lex_ungetc(buf);
+	return (0);
+}
+
+int	lex_get_eof(t_token *result, int ch)
+{
+	if (ch == EOF)
+	{
+		result->type = TOKTYPE_EOF;
+		return (1);
+	}
 	return (0);
 }
