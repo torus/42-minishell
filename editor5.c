@@ -18,18 +18,11 @@ int	edit_putc(int ch)
 
 int	tty_reset(int fd)
 {
-	char	areabuf[32];
-	char	*area;
-	char	*c_exit_insert_mode;
-
-	area = areabuf;
-	c_exit_insert_mode = tgetstr("ei", &area);
 	if (g_term_stat.ttystate == TTY_RESET)
 		return (0);
 	if (tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios) < 0)
 		return (-1);
 	g_term_stat.ttystate = TTY_RESET;
-	tputs(c_exit_insert_mode, 1, edit_putc);
 	return (0);
 }
 

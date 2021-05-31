@@ -98,7 +98,6 @@ int	edit_main(void)
 	state.cursor_x = 0;
 	state.length = 0;
 	edit_term_controls_init(&state.cnt);
-	tputs(state.cnt.c_enter_insert_mode, 1, edit_putc);
 	running = 1;
 	while (running)
 		running = edit_read_execute(&history, &state);

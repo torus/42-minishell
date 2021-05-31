@@ -58,7 +58,7 @@ int	edit_handle_up_down(t_command_history *history, t_command_state *st, char c)
 		tputs(st->cnt.c_clr_bol, 1, edit_putc);
 		edit_putc('\r');
 		write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
-		st->cursor_x = edit_print_history(history, history->current);
+		st->cursor_x = edit_print_history(history, history->current, 0);
 		st->length = st->cursor_x;
 	}
 	else if (c == 'A' && history->current != history->begin)
@@ -68,7 +68,7 @@ int	edit_handle_up_down(t_command_history *history, t_command_state *st, char c)
 		tputs(st->cnt.c_clr_bol, 1, edit_putc);
 		edit_putc('\r');
 		write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
-		st->cursor_x = edit_print_history(history, history->current);
+		st->cursor_x = edit_print_history(history, history->current, 0);
 		st->length = st->cursor_x;
 	}
 	return (1);
@@ -118,6 +118,8 @@ void	edit_term_controls_init(t_term_controls *t)
 	t->c_enter_insert_mode = tgetstr("im", &area);
 	t->c_exit_insert_mode = tgetstr("ei", &area);
 	t->c_delete_character = tgetstr("dc", &area);
+	t->c_save_cursor = tgetstr("sc", &area);
+	t->c_restore_cursor = tgetstr("rc", &area);
 }
 
 int	edit_setup_terminal(void)

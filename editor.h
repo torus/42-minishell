@@ -31,7 +31,7 @@ typedef struct s_command_history
 
 typedef struct s_term_controls
 {
-	char	areabuf[64];
+	char	areabuf[128];
 	char	*c_cursor_left;
 	char	*c_cursor_right;
 	char	*c_cursor_up;
@@ -41,6 +41,8 @@ typedef struct s_term_controls
 	char	*c_exit_insert_mode;
 	char	*c_delete_character;
 	char	*c_cursor_address;
+	char	*c_save_cursor;
+	char	*c_restore_cursor;
 }	t_term_controls;
 
 typedef struct s_command_state
@@ -58,7 +60,7 @@ void	edit_error_exit(const char *message);
 int		tty_set_attributes(int fd, struct termios *buf);
 int		tty_cbreak(int fd);
 void	edit_init_history(t_command_history *his);
-int		edit_print_history(t_command_history *his, int index);
+int		edit_print_history(t_command_history *his, int his_index, int index);
 void	edit_dump_history(t_command_history *his);
 void	edit_add_new_rope(t_command_history *history, char *cbuf);
 void	edit_insert_character(

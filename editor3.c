@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "minishell.h"
 #include "editor.h"
 
 void	edit_dump_history(t_command_history *his)
@@ -11,7 +12,7 @@ void	edit_dump_history(t_command_history *his)
 	while (index != his->end)
 	{
 		printf("| '");
-		edit_print_history(his, index);
+		edit_print_history(his, index, 0);
 		printf("'\n");
 		index = (index + 1) % LINE_BUFFER_SIZE;
 	}
@@ -61,6 +62,9 @@ void	edit_normal_character(
 	t_command_history *history, t_command_state *st,
 	char *cbuf)
 {
+	int	col;
+
+	col = tgetnum("co");
 	if (cbuf[0] == 0x7f)
 	{
 		edit_handle_backspace(history, st);
@@ -73,6 +77,14 @@ void	edit_normal_character(
 		edit_insert_character(history, cbuf, st->cursor_x, st->length);
 	st->cursor_x++;
 	st->length++;
+	if ((st->cursor_x + MINISHELL_PROMPT_LEN) % col == 0)
+	{
+		tputs(st->cnt.c_cursor_down, 1, edit_putc);
+		write(1, "\r", 1);
+	}
+	tputs(st->cnt.c_save_cursor, 1, edit_putc);
+	edit_print_history(history, history->current, st->cursor_x);
+	tputs(st->cnt.c_restore_cursor, 1, edit_putc);
 }
 
 void	edit_enter(t_command_history *history, t_command_state *st)

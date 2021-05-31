@@ -78,19 +78,19 @@ void	edit_init_history(t_command_history *his)
 		his->ropes[i++] = NULL;
 }
 
-int	edit_print_history(t_command_history *his, int index)
+int	edit_print_history(t_command_history *his, int his_index, int index)
 {
 	t_rope	*rope;
 	int		len;
 	int		i;
 	char	ch;
 
-	rope = his->ropes[index];
+	rope = his->ropes[his_index];
 	len = 0;
 	if (rope)
 	{
 		len = rope_length(rope);
-		i = 0;
+		i = index;
 		while (i < len)
 		{
 			ch = rope_index(rope, i);
