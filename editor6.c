@@ -43,11 +43,13 @@ void	edit_handle_backspace(t_command_history *history, t_command_state *st)
 {
 	if (st->cursor_x == 0)
 		return ;
-	tputs(st->cnt.c_cursor_left, 1, edit_putc);
-	st->cursor_x--;
+	edit_handle_left(st, 'D');
 	delete_char(history, st);
 }
 
+/*
+ * (The escape sequence for the left key is '^[[D'.)
+ */
 int	edit_handle_left(t_command_state *st, char c)
 {
 	int	col;
