@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "minishell.h"
 #include "editor.h"
 
 void	edit_dump_history(t_command_history *his)
@@ -10,9 +11,9 @@ void	edit_dump_history(t_command_history *his)
 	index = his->begin;
 	while (index != his->end)
 	{
-		printf("| '");
-		edit_print_history(his, index);
-		printf("'\n");
+		write(1, "| '", 3);
+		edit_print_history(his, index, 0);
+		write(1, "'\n", 2);
 		index = (index + 1) % LINE_BUFFER_SIZE;
 	}
 }
@@ -61,6 +62,9 @@ void	edit_normal_character(
 	t_command_history *history, t_command_state *st,
 	char *cbuf)
 {
+	int	col;
+
+	col = tgetnum("co");
 	if (cbuf[0] == 0x7f)
 	{
 		edit_handle_backspace(history, st);
@@ -73,10 +77,23 @@ void	edit_normal_character(
 		edit_insert_character(history, cbuf, st->cursor_x, st->length);
 	st->cursor_x++;
 	st->length++;
+	if ((st->cursor_x + MINISHELL_PROMPT_LEN) % col == 0)
+	{
+		tputs(st->cnt.c_cursor_down, 1, edit_putc);
+		write(1, "\r", 1);
+	}
+	edit_redraw(history, st);
 }
 
+/*
+ * This function is called when the Enter key is pressed to execute
+ * the given command.  Calling edit_print_history() to make sure the
+ * cursor is on the end of the line before the execution otherwise the
+ * output from the command may overwrite the current command line.
+ */
 void	edit_enter(t_command_history *history, t_command_state *st)
 {
+	edit_print_history(history, history->current, st->cursor_x);
 	history->current = history->end;
 	splay_release(history->ropes[history->current]);
 	history->ropes[history->current] = NULL;

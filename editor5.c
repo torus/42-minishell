@@ -18,18 +18,11 @@ int	edit_putc(int ch)
 
 int	tty_reset(int fd)
 {
-	char	areabuf[32];
-	char	*area;
-	char	*c_exit_insert_mode;
-
-	area = areabuf;
-	c_exit_insert_mode = tgetstr("ei", &area);
 	if (g_term_stat.ttystate == TTY_RESET)
 		return (0);
 	if (tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios) < 0)
 		return (-1);
 	g_term_stat.ttystate = TTY_RESET;
-	tputs(c_exit_insert_mode, 1, edit_putc);
 	return (0);
 }
 
@@ -38,4 +31,12 @@ void	edit_sig_catch(int signo)
 	printf("signal caught %d\n", signo);
 	tty_reset(STDIN_FILENO);
 	exit(0);
+}
+
+void	edit_redraw(t_command_history *history, t_command_state *st)
+{
+	tputs(st->cnt.c_save_cursor, 1, edit_putc);
+	edit_print_history(history, history->current, st->cursor_x);
+	tputs(st->cnt.c_clr_eol, 1, edit_putc);
+	tputs(st->cnt.c_restore_cursor, 1, edit_putc);
 }

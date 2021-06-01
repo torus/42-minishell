@@ -4,52 +4,29 @@
 #include "rope.h"
 #include "editor.h"
 #include "parse.h"
-
-int	edit_handle_left_right(t_command_state *st, char c)
-{
-	if (c == 'D')
-	{
-		tputs(st->cnt.c_cursor_left, 1, edit_putc);
-		st->cursor_x--;
-		if (st->cursor_x < 0)
-			st->cursor_x = 0;
-		return (1);
-	}
-	else if (c == 'C')
-	{
-		if (st->cursor_x < st->length)
-		{
-			tputs(st->cnt.c_cursor_right, 1, edit_putc);
-			st->cursor_x++;
-		}
-		return (1);
-	}
-	return (0);
-}
+#include "minishell.h"
 
 int	edit_handle_up_down(t_command_history *history, t_command_state *st, char c)
 {
 	if (c != 'A' && c != 'B')
 		return (0);
-	if (c == 'B')
+	if (c == 'B' && history->current != history->end)
 	{
-		if (history->current != history->end)
-		{
-			history->current = (history->current + 1) % LINE_BUFFER_SIZE;
-			tputs(st->cnt.c_clr_bol, 1, edit_putc);
-			edit_putc('\r');
-			st->cursor_x = edit_print_history(history, history->current);
-			st->length = st->cursor_x;
-		}
-		return (1);
+		history->current = (history->current + 1) % LINE_BUFFER_SIZE;
+		tputs(st->cnt.c_clr_bol, 1, edit_putc);
+		edit_putc('\r');
+		write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
+		st->cursor_x = edit_print_history(history, history->current, 0);
+		st->length = st->cursor_x;
 	}
-	if (history->current != history->begin)
+	else if (c == 'A' && history->current != history->begin)
 	{
 		history->current = (LINE_BUFFER_SIZE + history->current - 1)
 			% LINE_BUFFER_SIZE;
 		tputs(st->cnt.c_clr_bol, 1, edit_putc);
 		edit_putc('\r');
-		st->cursor_x = edit_print_history(history, history->current);
+		write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
+		st->cursor_x = edit_print_history(history, history->current, 0);
 		st->length = st->cursor_x;
 	}
 	return (1);
@@ -68,7 +45,8 @@ void	edit_handle_escape_sequence(
 	i = read(STDIN_FILENO, cbuf, 1);
 	if (i != 1)
 		return ;
-	if (edit_handle_left_right(st, cbuf[0])
+	if (edit_handle_left(st, cbuf[0])
+		|| edit_handle_right(st, cbuf[0])
 		|| edit_handle_up_down(history, st, cbuf[0])
 		|| edit_handle_delete(history, st, cbuf[0]))
 		;
@@ -93,10 +71,15 @@ void	edit_term_controls_init(t_term_controls *t)
 	area = t->areabuf;
 	t->c_cursor_left = tgetstr("le", &area);
 	t->c_cursor_right = tgetstr("nd", &area);
+	t->c_cursor_up = tgetstr("up", &area);
+	t->c_cursor_down = tgetstr("do", &area);
 	t->c_clr_bol = tgetstr("cb", &area);
+	t->c_clr_eol = tgetstr("ce", &area);
 	t->c_enter_insert_mode = tgetstr("im", &area);
 	t->c_exit_insert_mode = tgetstr("ei", &area);
 	t->c_delete_character = tgetstr("dc", &area);
+	t->c_save_cursor = tgetstr("sc", &area);
+	t->c_restore_cursor = tgetstr("rc", &area);
 }
 
 int	edit_setup_terminal(void)

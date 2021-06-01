@@ -42,6 +42,8 @@ OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
+$(OBJS): $(HEADER_FILES)
+
 $(NAME): ${HEADER_FILES} ${OBJS}
 	$(LIBFT_MAKE)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LDFLAGS)
