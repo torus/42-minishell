@@ -69,20 +69,22 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 
 	write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
 	splay_init(&rope, edit_get_line(history, state));
-	if (rope)
-	{
-		splay_assign(&rope, rope_concat(rope, rope_create("\n", NULL)));
-		edit_init_parse_buffer_with_rope(&buf, rope);
-		lex_get_token(&buf, &tok);
-		cmdline = parse_command_line(&buf, &tok);
-		if (cmdline)
-		{
-			seqcmd = cmdline->content.command_line->seqcmd_node;
-			invoke_sequential_commands(seqcmd);
-			parse_free_all_ast();
-		}
-	}
+	if (!rope)
+		return (0);
+	splay_assign(&rope, rope_concat(rope, rope_create("\n", NULL)));
+	edit_init_parse_buffer_with_rope(&buf, rope);
+	lex_get_token(&buf, &tok);
+	cmdline = parse_command_line(&buf, &tok);
 	splay_release(rope);
+	if (!cmdline)
+	{
+		put_err_msg("Parse error.");
+		set_status(1);
+		return (1);
+	}
+	seqcmd = cmdline->content.command_line->seqcmd_node;
+	invoke_sequential_commands(seqcmd);
+	parse_free_all_ast();
 	return (1);
 }
 
