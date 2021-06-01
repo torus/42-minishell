@@ -37,5 +37,6 @@ void	edit_redraw(t_command_history *history, t_command_state *st)
 {
 	tputs(st->cnt.c_save_cursor, 1, edit_putc);
 	edit_print_history(history, history->current, st->cursor_x);
+	tputs(st->cnt.c_clr_eol, 1, edit_putc);
 	tputs(st->cnt.c_restore_cursor, 1, edit_putc);
 }

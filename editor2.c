@@ -74,6 +74,7 @@ void	edit_term_controls_init(t_term_controls *t)
 	t->c_cursor_up = tgetstr("up", &area);
 	t->c_cursor_down = tgetstr("do", &area);
 	t->c_clr_bol = tgetstr("cb", &area);
+	t->c_clr_eol = tgetstr("ce", &area);
 	t->c_enter_insert_mode = tgetstr("im", &area);
 	t->c_exit_insert_mode = tgetstr("ei", &area);
 	t->c_delete_character = tgetstr("dc", &area);

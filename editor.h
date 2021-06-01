@@ -37,6 +37,7 @@ typedef struct s_term_controls
 	char	*c_cursor_up;
 	char	*c_cursor_down;
 	char	*c_clr_bol;
+	char	*c_clr_eol;
 	char	*c_enter_insert_mode;
 	char	*c_exit_insert_mode;
 	char	*c_delete_character;
