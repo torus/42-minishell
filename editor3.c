@@ -11,9 +11,9 @@ void	edit_dump_history(t_command_history *his)
 	index = his->begin;
 	while (index != his->end)
 	{
-		printf("| '");
+		write(1, "| '", 3);
 		edit_print_history(his, index, 0);
-		printf("'\n");
+		write(1, "'\n", 2);
 		index = (index + 1) % LINE_BUFFER_SIZE;
 	}
 }
@@ -82,13 +82,18 @@ void	edit_normal_character(
 		tputs(st->cnt.c_cursor_down, 1, edit_putc);
 		write(1, "\r", 1);
 	}
-	tputs(st->cnt.c_save_cursor, 1, edit_putc);
-	edit_print_history(history, history->current, st->cursor_x);
-	tputs(st->cnt.c_restore_cursor, 1, edit_putc);
+	edit_redraw(history, st);
 }
 
+/*
+ * This function is called when the Enter key is pressed to execute
+ * the given command.  Calling edit_print_history() to make sure the
+ * cursor is on the end of the line before the execution otherwise the
+ * output from the command may overwrite the current command line.
+ */
 void	edit_enter(t_command_history *history, t_command_state *st)
 {
+	edit_print_history(history, history->current, st->cursor_x);
 	history->current = history->end;
 	splay_release(history->ropes[history->current]);
 	history->ropes[history->current] = NULL;

@@ -83,5 +83,6 @@ int		edit_setup_terminal(void);
 int		edit_handle_delete(
 			t_command_history *history, t_command_state *st, char ch);
 void	edit_handle_backspace(t_command_history *history, t_command_state *st);
+void	edit_redraw(t_command_history *history, t_command_state *st);
 
 #endif

@@ -13,6 +13,7 @@ static void	delete_char(t_command_history *history, t_command_state *st)
 		&history->ropes[history->current],
 		rope_delete(rope, st->cursor_x, st->cursor_x + 1));
 	splay_release(rope);
+	edit_redraw(history, st);
 }
 
 int	edit_handle_delete(
