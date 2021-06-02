@@ -19,7 +19,7 @@ typedef struct s_terminal_state
 	t_tty_state		ttystate;
 }	t_terminal_state;
 
-extern t_terminal_state	g_term_stat;
+/* extern t_terminal_state	g_term_stat; */
 
 typedef struct s_command_history
 {
@@ -85,5 +85,6 @@ int		edit_handle_delete(
 			t_command_history *history, t_command_state *st, char ch);
 void	edit_handle_backspace(t_command_history *history, t_command_state *st);
 void	edit_redraw(t_command_history *history, t_command_state *st);
+int	handle_ctrl_d(t_command_history *history, t_command_state *st);
 
 #endif

@@ -89,12 +89,12 @@ int	edit_setup_terminal(void)
 	if (!term)
 		edit_error_exit("getenv(TERM) error");
 	tgetent(NULL, term);
-	if (signal(SIGINT, edit_sig_catch) == SIG_ERR)
-		edit_error_exit("signal(SIGINT) error");
-	if (signal(SIGQUIT, edit_sig_catch) == SIG_ERR)
-		edit_error_exit("signal(SIGQUIT) error");
-	if (signal(SIGTERM, edit_sig_catch) == SIG_ERR)
-		edit_error_exit("signal(SIGTERM) error");
+	/* if (signal(SIGINT, edit_sig_catch) == SIG_ERR) */
+	/* 	edit_error_exit("signal(SIGINT) error"); */
+	/* if (signal(SIGQUIT, edit_sig_catch) == SIG_ERR) */
+	/* 	edit_error_exit("signal(SIGQUIT) error"); */
+	/* if (signal(SIGTERM, edit_sig_catch) == SIG_ERR) */
+	/* 	edit_error_exit("signal(SIGTERM) error"); */
 	if (tty_cbreak(STDIN_FILENO) < 0)
 		edit_error_exit("tty_cbreak error");
 	return (1);

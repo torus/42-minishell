@@ -5,14 +5,18 @@
 # include "execution.h"
 # include "parse.h"
 # include "env.h"
+# include "editor.h"
 
 # define MINISHELL_PROMPT "minish > "
 # define MINISHELL_PROMPT_LEN 9
 
 typedef struct s_shell {
-	char		*cwd;
-	t_var		*vars;
-	int			status;
+	char				*cwd;
+	t_var				*vars;
+	int					status;
+	int					interrupted;
+	t_terminal_state	term_stat;
+	int					running;
 }				t_shell;
 extern t_shell	g_shell;
 

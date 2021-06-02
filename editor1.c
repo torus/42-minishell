@@ -10,13 +10,29 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 {
 	char	cbuf[2];
 	t_rope	*rope;
+	int		input_count;
 
 	rope = NULL;
 	cbuf[1] = '\0';
 	while (1)
 	{
-		if (read(STDIN_FILENO, cbuf, 1) != 1)
+		/* printf("%s: %d\n", __FUNCTION__, __LINE__); */
+		input_count = 0;
+		while (input_count == 0)
+		{
+			input_count = read(STDIN_FILENO, cbuf, 1);
+			if (g_shell.interrupted)
+			{
+				g_shell.interrupted = 0;
+				splay_assign(&history->ropes[history->current], NULL);
+	splay_release(rope);
+	edit_putc('\n');
+	return (NULL);
+			}
+		}
+		if (input_count != 1)
 			break ;
+		/* printf("%s: %d\n", __FUNCTION__, __LINE__); */
 		if (cbuf[0] >= 0x20)
 			edit_normal_character(history, state, cbuf);
 		else if (cbuf[0] == '\n')
@@ -27,6 +43,8 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 				rope->refcount--;
 			return (rope);
 		}
+		else if (cbuf[0] == 0x04 && !handle_ctrl_d(history, state))
+			break ;
 		else if (cbuf[0] == 0x1b)
 			if (read(STDIN_FILENO, cbuf, 1) == 1 && cbuf[0] == '[')
 				edit_handle_escape_sequence (history, state);
@@ -70,7 +88,7 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 	write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
 	splay_init(&rope, edit_get_line(history, state));
 	if (!rope)
-		return (0);
+		return (1);
 	splay_assign(&rope, rope_concat(rope, rope_create("\n", NULL)));
 	edit_init_parse_buffer_with_rope(&buf, rope);
 	lex_get_token(&buf, &tok);
@@ -83,7 +101,10 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 		return (1);
 	}
 	seqcmd = cmdline->content.command_line->seqcmd_node;
+	tty_reset(STDIN_FILENO);
 	invoke_sequential_commands(seqcmd);
+	if (tty_cbreak(STDIN_FILENO) < 0)
+		edit_error_exit("tty_cbreak error");
 	parse_free_all_ast();
 	return (1);
 }
@@ -92,17 +113,16 @@ int	edit_main(void)
 {
 	t_command_history	history;
 	t_command_state		state;
-	int					running;
 
-	edit_terminal_state_init(&g_term_stat);
+	/* edit_terminal_state_init(&g_term_stat); */
 	edit_init_history(&history);
 	edit_setup_terminal();
 	state.cursor_x = 0;
 	state.length = 0;
 	edit_term_controls_init(&state.cnt);
-	running = 1;
-	while (running)
-		running = edit_read_execute(&history, &state);
+	g_shell.running = 1;
+	while (g_shell.running)
+		edit_read_execute(&history, &state);
 	if (tty_reset(STDIN_FILENO) < 0)
 		edit_error_exit("tty_reset error");
 	return (0);
