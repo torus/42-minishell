@@ -26,7 +26,6 @@ int	put_redirect_fd_err_msg_and_ret(int ret_value, int fd, char *msg)
  * Expand variable of the string passed for redirection.
  * If error is occurred, put error message to stderr.
  *
- *
  * red_target: The string of redirection node.
  *
  * Return: Filepath if variable expansion is succeeded.
