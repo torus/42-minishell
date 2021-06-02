@@ -37,7 +37,6 @@ char	*expand_redirect_filepath(char *red_target)
 {
 	char	*expanded_str;
 	char	**splitted_expanded_str;
-	char	*errmsg;
 	char	*filepath;
 
 	expanded_str = expand_env_var(red_target);
@@ -46,11 +45,8 @@ char	*expand_redirect_filepath(char *red_target)
 	if (!splitted_expanded_str
 		|| ptrarr_len((void **)splitted_expanded_str) != 1)
 	{
-		errmsg = ft_strjoin(red_target, ": ambiguous redirect\n");
-		if (errmsg)
-			put_err_msg(errmsg);
+		put_minish_err_msg(red_target, "ambiguous redirect");
 		free_ptrarr((void **)splitted_expanded_str);
-		free(errmsg);
 		return (NULL);
 	}
 	filepath = ft_strdup(splitted_expanded_str[0]);
