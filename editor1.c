@@ -25,9 +25,9 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 			{
 				g_shell.interrupted = 0;
 				splay_assign(&history->ropes[history->current], NULL);
-	splay_release(rope);
-	edit_putc('\n');
-	return (NULL);
+				splay_release(rope);
+				edit_putc('\n');
+				return (NULL);
 			}
 		}
 		if (input_count != 1)
@@ -43,7 +43,7 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 				rope->refcount--;
 			return (rope);
 		}
-		else if (cbuf[0] == 0x04 && !handle_ctrl_d(history, state))
+		else if (cbuf[0] == 0x04 && !edit_handle_ctrl_d(history, state))
 			break ;
 		else if (cbuf[0] == 0x1b)
 			if (read(STDIN_FILENO, cbuf, 1) == 1 && cbuf[0] == '[')
@@ -123,6 +123,7 @@ int	edit_main(void)
 	g_shell.running = 1;
 	while (g_shell.running)
 		edit_read_execute(&history, &state);
+	edit_cleanup_history(&history);
 	if (tty_reset(STDIN_FILENO) < 0)
 		edit_error_exit("tty_reset error");
 	return (0);

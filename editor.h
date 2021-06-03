@@ -85,6 +85,8 @@ int		edit_handle_delete(
 			t_command_history *history, t_command_state *st, char ch);
 void	edit_handle_backspace(t_command_history *history, t_command_state *st);
 void	edit_redraw(t_command_history *history, t_command_state *st);
-int	handle_ctrl_d(t_command_history *history, t_command_state *st);
+int		edit_handle_ctrl_d(t_command_history *history, t_command_state *st);
+void	edit_cleanup_history(t_command_history *history);
+void	edit_delete_char(t_command_history *history, t_command_state *st);
 
 #endif
