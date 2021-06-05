@@ -85,6 +85,7 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 	t_parse_ast			*seqcmd;
 	t_parse_buffer		buf;
 
+	set_shell_sighandlers();
 	write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
 	splay_init(&rope, edit_get_line(history, state));
 	if (!rope)
@@ -102,7 +103,16 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 	}
 	seqcmd = cmdline->content.command_line->seqcmd_node;
 	tty_reset(STDIN_FILENO);
+	set_sighandlers_during_execution();
 	invoke_sequential_commands(seqcmd);
+	if (g_shell.signal_child_received)
+	{
+		if (g_shell.signal_child_received == SIGQUIT)
+			write(STDOUT_FILENO, "Quit (core dumped)", 18);
+		write(STDOUT_FILENO, "\n", 1);
+		set_status(128 + g_shell.signal_child_received);
+	}
+	set_shell_sighandlers();
 	if (tty_cbreak(STDIN_FILENO) < 0)
 		edit_error_exit("tty_cbreak error");
 	parse_free_all_ast();

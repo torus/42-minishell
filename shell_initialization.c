@@ -78,7 +78,6 @@ void	init_g_shell(void)
 int	initialize_shell(void)
 {
 	init_g_shell();
-	set_shell_sighandlers();
 	init_pwd();
 	init_shlvl();
 	return (0);
