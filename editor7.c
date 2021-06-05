@@ -54,14 +54,16 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 int	edit_handle_ctrl_d(t_command_history *history, t_command_state *st)
 {
 	t_rope	*rope;
+	int		len;
 
 	splay_init(&rope, history->ropes[history->current]);
-	if (rope_length(rope) == 0)
+	len = rope_length(rope);
+	if (len == 0)
 	{
 		g_shell.running = 0;
 		write(1, "exit\n", 5);
 	}
-	else
+	else if (st->cursor_x < len)
 		edit_delete_char(history, st);
 	splay_release(rope);
 	return (g_shell.running);
