@@ -16,7 +16,6 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 	cbuf[1] = '\0';
 	while (1)
 	{
-		/* printf("%s: %d\n", __FUNCTION__, __LINE__); */
 		input_count = 0;
 		while (input_count == 0)
 		{
@@ -32,7 +31,6 @@ t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
 		}
 		if (input_count != 1)
 			break ;
-		/* printf("%s: %d\n", __FUNCTION__, __LINE__); */
 		if (cbuf[0] >= 0x20)
 			edit_normal_character(history, state, cbuf);
 		else if (cbuf[0] == '\n')
@@ -124,7 +122,6 @@ int	edit_main(void)
 	t_command_history	history;
 	t_command_state		state;
 
-	/* edit_terminal_state_init(&g_term_stat); */
 	edit_init_history(&history);
 	edit_setup_terminal();
 	state.cursor_x = 0;

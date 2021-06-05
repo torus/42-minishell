@@ -20,7 +20,7 @@ void	edit_error_exit(const char *message)
 	}
 	exit (1);
 }
-/* #include <stdio.h> */
+
 int	tty_set_attributes(int fd, struct termios *buf)
 {
 	int	err;
@@ -28,10 +28,8 @@ int	tty_set_attributes(int fd, struct termios *buf)
 	buf->c_lflag &= ~(ECHO | ICANON);
 	buf->c_cc[VMIN] = 0;
 	buf->c_cc[VTIME] = 1;
-	/* printf("%s: %d\n", __FUNCTION__, __LINE__); */
 	if (tcsetattr(fd, TCSAFLUSH, buf) < 0)
 		return (-1);
-	/* printf("%s: %d\n", __FUNCTION__, __LINE__); */
 	if (tcgetattr(fd, buf) < 0)
 	{
 		err = errno;
@@ -39,7 +37,6 @@ int	tty_set_attributes(int fd, struct termios *buf)
 		errno = err;
 		return (-1);
 	}
-	/* printf("%s: %d\n", __FUNCTION__, __LINE__); */
 	if ((buf->c_lflag & (ECHO | ICANON)) || buf->c_cc[VMIN] != 0
 		|| buf->c_cc[VTIME] != 1)
 	{
@@ -47,7 +44,6 @@ int	tty_set_attributes(int fd, struct termios *buf)
 		errno = EINVAL;
 		return (-1);
 	}
-	/* printf("%s: %d\n", __FUNCTION__, __LINE__); */
 	return (0);
 }
 
@@ -61,19 +57,13 @@ int	tty_cbreak(int fd)
 		errno = EINVAL;
 		return (-1);
 	}
-	/* printf("%s, %d\n", __FUNCTION__, __LINE__); */
 	if (tcgetattr(fd, &buf) < 0)
 		return (-1);
-	/* printf("%s, %d\n", __FUNCTION__, __LINE__); */
 	g_shell.term_stat.save_termios = buf;
-	/* printf("%s, %d\n", __FUNCTION__, __LINE__); */
 	err = tty_set_attributes(fd, &buf);
-	/* printf("%s, %d\n", __FUNCTION__, __LINE__); */
 	if (err)
 		return (err);
-	/* printf("%s, %d\n", __FUNCTION__, __LINE__); */
 	g_shell.term_stat.ttystate = TTY_CBREAK;
-	/* printf("%s, %d\n", __FUNCTION__, __LINE__); */
 	return (0);
 }
 

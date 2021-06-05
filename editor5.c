@@ -25,13 +25,6 @@ int	tty_reset(int fd)
 	return (0);
 }
 
-/* void	edit_sig_catch(int signo) */
-/* { */
-/* 	printf("signal caught %d\n", signo); */
-/* 	tty_reset(STDIN_FILENO); */
-/* 	exit(0); */
-/* } */
-
 void	edit_redraw(t_command_history *history, t_command_state *st)
 {
 	tputs(st->cnt.c_save_cursor, 1, edit_putc);

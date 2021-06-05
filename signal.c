@@ -6,18 +6,10 @@
 
 static void	sigint_sighandler(int sig)
 {
-	/* ft_putstr_fd("\n\r" MINISHELL_PROMPT, STDOUT_FILENO); */
-	/* printf("INTERRUPTED\n"); */
 	write(STDOUT_FILENO, "^C", 2);
 	g_shell.interrupted = 1;
 	set_status(128 + sig);
 }
-
-/* static void	sigquit_sighandler(int sig) */
-/* { */
-/* 	(void)sig; */
-/* 	/\* ft_putstr_fd("\b\b  \b\b", STDOUT_FILENO); *\/ */
-/* } */
 
 void	set_sighandlers(t_sighandler sighandler)
 {
@@ -35,7 +27,7 @@ void	set_sighandlers(t_sighandler sighandler)
  *
  * This function set these signal handlers.
  * - SIGQUIT: Ignore signal. Do nothing.
- * - SIGINT: Show "^C"
+ * - SIGINT: Show "^C" since echo is disabled on the terminal.
  */
 void	set_shell_sighandlers(void)
 {
