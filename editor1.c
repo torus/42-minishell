@@ -6,60 +6,6 @@
 #include "parse.h"
 #include "minishell.h"
 
-int	edit_read_char(
-		t_command_history *history, t_command_state *state, char *cbuf)
-{
-	int	input_count;
-
-	input_count = 0;
-	while (input_count == 0)
-	{
-		input_count = read(STDIN_FILENO, cbuf, 1);
-		if (g_shell.interrupted)
-		{
-			g_shell.interrupted = 0;
-			splay_assign(&history->ropes[history->current], NULL);
-			state->length = 0;
-			state->cursor_x = 0;
-			edit_putc('\n');
-			input_count = -1;
-		}
-	}
-	return (input_count);
-}
-
-t_rope	*edit_get_line(t_command_history *history, t_command_state *state)
-{
-	char	cbuf[2];
-	t_rope	*rope;
-	int		input_count;
-
-	rope = NULL;
-	cbuf[1] = '\0';
-	while (1)
-	{
-		input_count = edit_read_char(history, state, cbuf);
-		if (input_count != 1
-			|| (cbuf[0] == 0x04 && !edit_handle_ctrl_d(history, state)))
-			break ;
-		if (cbuf[0] == '\n')
-		{
-			splay_assign(&rope, history->ropes[history->current]);
-			edit_enter(history, state);
-			if (rope)
-				rope->refcount--;
-			return (rope);
-		}
-		if (cbuf[0] >= 0x20)
-			edit_normal_character(history, state, cbuf);
-		else if (cbuf[0] == 0x1b)
-			if (read(STDIN_FILENO, cbuf, 1) == 1 && cbuf[0] == '[')
-				edit_handle_escape_sequence (history, state);
-	}
-	splay_release(rope);
-	return (NULL);
-}
-
 int	rope_getc(t_parse_buffer *buf)
 {
 	t_rope			*rope;
@@ -84,12 +30,31 @@ void	edit_init_parse_buffer_with_rope(t_parse_buffer *buf, t_rope *rope)
 	buf->data = rope;
 }
 
-int	edit_read_execute(t_command_history *history, t_command_state *state)
+static void	edit_execute(t_parse_ast *cmdline)
+{
+	t_parse_ast			*seqcmd;
+
+	seqcmd = cmdline->content.command_line->seqcmd_node;
+	tty_reset(STDIN_FILENO);
+	set_sighandlers_during_execution();
+	invoke_sequential_commands(seqcmd);
+	if (g_shell.signal_child_received)
+	{
+		if (g_shell.signal_child_received == SIGQUIT)
+			write(STDOUT_FILENO, "Quit (core dumped)", 18);
+		write(STDOUT_FILENO, "\n", 1);
+		set_status(128 + g_shell.signal_child_received);
+	}
+	set_shell_sighandlers();
+	if (tty_cbreak(STDIN_FILENO) < 0)
+		edit_error_exit("tty_cbreak error");
+}
+
+int	edit_read_and_execute(t_command_history *history, t_command_state *state)
 {
 	t_rope				*rope;
 	t_token				tok;
 	t_parse_ast			*cmdline;
-	t_parse_ast			*seqcmd;
 	t_parse_buffer		buf;
 
 	set_shell_sighandlers();
@@ -108,20 +73,7 @@ int	edit_read_execute(t_command_history *history, t_command_state *state)
 		set_status(1);
 		return (1);
 	}
-	seqcmd = cmdline->content.command_line->seqcmd_node;
-	tty_reset(STDIN_FILENO);
-	set_sighandlers_during_execution();
-	invoke_sequential_commands(seqcmd);
-	if (g_shell.signal_child_received)
-	{
-		if (g_shell.signal_child_received == SIGQUIT)
-			write(STDOUT_FILENO, "Quit (core dumped)", 18);
-		write(STDOUT_FILENO, "\n", 1);
-		set_status(128 + g_shell.signal_child_received);
-	}
-	set_shell_sighandlers();
-	if (tty_cbreak(STDIN_FILENO) < 0)
-		edit_error_exit("tty_cbreak error");
+	edit_execute(cmdline);
 	parse_free_all_ast();
 	return (1);
 }
@@ -138,7 +90,7 @@ int	edit_main(void)
 	edit_term_controls_init(&state.cnt);
 	g_shell.running = 1;
 	while (g_shell.running)
-		edit_read_execute(&history, &state);
+		edit_read_and_execute(&history, &state);
 	edit_cleanup_history(&history);
 	if (tty_reset(STDIN_FILENO) < 0)
 		edit_error_exit("tty_reset error");
