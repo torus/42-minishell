@@ -2,7 +2,7 @@
 #include "minishell.h"
 #include "editor.h"
 
-static void	delete_char(t_command_history *history, t_command_state *st)
+void	edit_delete_char(t_command_history *history, t_command_state *st)
 {
 	t_rope	*rope;
 
@@ -34,7 +34,7 @@ int	edit_handle_delete(
 	if (!rope)
 		return (1);
 	if (st->cursor_x < rope_length(rope))
-		delete_char(history, st);
+		edit_delete_char(history, st);
 	splay_release(rope);
 	return (1);
 }
@@ -44,7 +44,7 @@ void	edit_handle_backspace(t_command_history *history, t_command_state *st)
 	if (st->cursor_x == 0)
 		return ;
 	edit_handle_left(st, 'D');
-	delete_char(history, st);
+	edit_delete_char(history, st);
 }
 
 /*

@@ -5,14 +5,19 @@
 # include "execution.h"
 # include "parse.h"
 # include "env.h"
+# include "editor.h"
 
 # define MINISHELL_PROMPT "minish > "
 # define MINISHELL_PROMPT_LEN 9
 
 typedef struct s_shell {
-	char		*cwd;
-	t_var		*vars;
-	int			status;
+	char				*cwd;
+	t_var				*vars;
+	int					status;
+	int					interrupted;
+	t_terminal_state	term_stat;
+	int					running;
+	int					signal_child_received;
 }				t_shell;
 extern t_shell	g_shell;
 
@@ -35,6 +40,7 @@ char					**expand_string_node(t_parse_node_string *string_node);
 char					**split_expanded_str(char *str);
 char					**expand_string_node(t_parse_node_string *string_node);
 void					set_shell_sighandlers(void);
+void					set_sighandlers_during_execution(void);
 void					set_sighandlers(t_sighandler sighandler);
 void					put_minish_err_msg(const char *cmd_name,
 							const char *msg);

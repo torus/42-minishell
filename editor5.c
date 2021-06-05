@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "editor.h"
-
-t_terminal_state	g_term_stat;
+#include "minishell.h"
 
 void	edit_terminal_state_init(t_terminal_state *st)
 {
@@ -18,19 +17,12 @@ int	edit_putc(int ch)
 
 int	tty_reset(int fd)
 {
-	if (g_term_stat.ttystate == TTY_RESET)
+	if (g_shell.term_stat.ttystate == TTY_RESET)
 		return (0);
-	if (tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios) < 0)
+	if (tcsetattr(fd, TCSAFLUSH, &g_shell.term_stat.save_termios) < 0)
 		return (-1);
-	g_term_stat.ttystate = TTY_RESET;
+	g_shell.term_stat.ttystate = TTY_RESET;
 	return (0);
-}
-
-void	edit_sig_catch(int signo)
-{
-	printf("signal caught %d\n", signo);
-	tty_reset(STDIN_FILENO);
-	exit(0);
 }
 
 void	edit_redraw(t_command_history *history, t_command_state *st)

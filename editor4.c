@@ -4,6 +4,7 @@
 #include <string.h>
 #include "libft/libft.h"
 #include "editor.h"
+#include "minishell.h"
 
 void	edit_error_exit(const char *message)
 {
@@ -25,21 +26,21 @@ int	tty_set_attributes(int fd, struct termios *buf)
 	int	err;
 
 	buf->c_lflag &= ~(ECHO | ICANON);
-	buf->c_cc[VMIN] = 1;
-	buf->c_cc[VTIME] = 0;
+	buf->c_cc[VMIN] = 0;
+	buf->c_cc[VTIME] = 1;
 	if (tcsetattr(fd, TCSAFLUSH, buf) < 0)
 		return (-1);
 	if (tcgetattr(fd, buf) < 0)
 	{
 		err = errno;
-		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
+		tcsetattr(fd, TCSAFLUSH, &g_shell.term_stat.save_termios);
 		errno = err;
 		return (-1);
 	}
-	if ((buf->c_lflag & (ECHO | ICANON)) || buf->c_cc[VMIN] != 1
-		|| buf->c_cc[VTIME] != 0)
+	if ((buf->c_lflag & (ECHO | ICANON)) || buf->c_cc[VMIN] != 0
+		|| buf->c_cc[VTIME] != 1)
 	{
-		tcsetattr(fd, TCSAFLUSH, &g_term_stat.save_termios);
+		tcsetattr(fd, TCSAFLUSH, &g_shell.term_stat.save_termios);
 		errno = EINVAL;
 		return (-1);
 	}
@@ -51,18 +52,18 @@ int	tty_cbreak(int fd)
 	int				err;
 	struct termios	buf;
 
-	if (g_term_stat.ttystate != TTY_RESET)
+	if (g_shell.term_stat.ttystate != TTY_RESET)
 	{
 		errno = EINVAL;
 		return (-1);
 	}
 	if (tcgetattr(fd, &buf) < 0)
 		return (-1);
-	g_term_stat.save_termios = buf;
+	g_shell.term_stat.save_termios = buf;
 	err = tty_set_attributes(fd, &buf);
 	if (err)
 		return (err);
-	g_term_stat.ttystate = TTY_CBREAK;
+	g_shell.term_stat.ttystate = TTY_CBREAK;
 	return (0);
 }
 
