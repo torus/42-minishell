@@ -16,7 +16,6 @@ void	set_sighandlers(t_sighandler sighandler)
 	if (signal(SIGQUIT, sighandler) == SIG_ERR
 		|| signal(SIGINT, sighandler) == SIG_ERR)
 	{
-		tty_reset(STDIN_FILENO);
 		printf("signal() failed\n");
 		exit(1);
 	}

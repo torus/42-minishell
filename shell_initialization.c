@@ -72,7 +72,6 @@ void	init_g_shell(void)
 	g_shell.vars = environ2vars(environ);
 	g_shell.status = 0;
 	g_shell.interrupted = 0;
-	edit_terminal_state_init(&g_shell.term_stat);
 }
 
 int	initialize_shell(void)

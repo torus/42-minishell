@@ -83,6 +83,7 @@ int	edit_main(void)
 	t_command_history	history;
 	t_command_state		state;
 
+	edit_terminal_state_init(&g_shell.term_stat);
 	edit_init_history(&history);
 	edit_setup_terminal();
 	state.cursor_x = 0;
