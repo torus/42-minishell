@@ -10,7 +10,7 @@ int	edit_handle_up_down(t_command_history *history, t_command_state *st, char c)
 {
 	if (c != 'A' && c != 'B')
 		return (0);
-	if (c == 'B' && history->current != history->end)
+	if (c == 'B' && history->current != st->current_history_index)
 	{
 		history->current = (history->current + 1) % LINE_BUFFER_SIZE;
 		tputs(st->cnt.c_clr_bol, 1, edit_putc);
