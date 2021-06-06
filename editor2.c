@@ -93,3 +93,13 @@ int	edit_setup_terminal(void)
 		edit_error_exit("tty_cbreak error");
 	return (1);
 }
+
+void	edit_adjust_history_index(t_command_history *history)
+{
+	if (history->current == history->end)
+	{
+		history->end = (history->end + 1) % LINE_BUFFER_SIZE;
+		if (history->end == history->begin)
+			history->begin = (history->end + 1) % LINE_BUFFER_SIZE;
+	}
+}
