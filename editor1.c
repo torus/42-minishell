@@ -57,6 +57,7 @@ int	edit_read_and_execute(t_command_history *history, t_command_state *state)
 	t_parse_ast			*cmdline;
 	t_parse_buffer		buf;
 
+	state->current_history_index = history->current;
 	set_shell_sighandlers();
 	write(STDOUT_FILENO, MINISHELL_PROMPT, MINISHELL_PROMPT_LEN);
 	splay_init(&rope, edit_get_line(history, state));

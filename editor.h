@@ -51,6 +51,7 @@ typedef struct s_command_state
 	int				cursor_x;
 	int				length;
 	t_term_controls	cnt;
+	int				current_history_index;
 }	t_command_state;
 
 int		edit_main(void);
@@ -80,6 +81,7 @@ void	edit_handle_escape_sequence(
 			t_command_history *history, t_command_state *st);
 void	edit_term_controls_init(t_term_controls *t);
 int		edit_setup_terminal(void);
+void	edit_adjust_history_index(t_command_history *history);
 
 int		edit_handle_delete(
 			t_command_history *history, t_command_state *st, char ch);
@@ -89,5 +91,7 @@ int		edit_handle_ctrl_d(t_command_history *history, t_command_state *st);
 void	edit_cleanup_history(t_command_history *history);
 void	edit_delete_char(t_command_history *history, t_command_state *st);
 t_rope	*edit_get_line(t_command_history *history, t_command_state *state);
+void	edit_copy_history_if_needed(
+			t_command_history *history, t_command_state *state);
 
 #endif

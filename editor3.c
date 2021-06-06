@@ -20,12 +20,7 @@ void	edit_dump_history(t_command_history *his)
 
 void	edit_add_new_rope(t_command_history *history, char *cbuf)
 {
-	if (history->current == history->end)
-	{
-		history->end = (history->end + 1) % LINE_BUFFER_SIZE;
-		if (history->end == history->begin)
-			history->begin = (history->end + 1) % LINE_BUFFER_SIZE;
-	}
+	edit_adjust_history_index(history);
 	splay_assign(
 		&history->ropes[history->current], rope_create(cbuf, NULL));
 }
@@ -64,6 +59,7 @@ void	edit_normal_character(
 {
 	int	col;
 
+	edit_copy_history_if_needed(history, st);
 	col = tgetnum("co");
 	if (cbuf[0] == 0x7f)
 	{

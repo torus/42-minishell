@@ -10,7 +10,7 @@ int	edit_handle_up_down(t_command_history *history, t_command_state *st, char c)
 {
 	if (c != 'A' && c != 'B')
 		return (0);
-	if (c == 'B' && history->current != history->end)
+	if (c == 'B' && history->current != st->current_history_index)
 	{
 		history->current = (history->current + 1) % LINE_BUFFER_SIZE;
 		tputs(st->cnt.c_clr_bol, 1, edit_putc);
@@ -92,4 +92,14 @@ int	edit_setup_terminal(void)
 	if (tty_cbreak(STDIN_FILENO) < 0)
 		edit_error_exit("tty_cbreak error");
 	return (1);
+}
+
+void	edit_adjust_history_index(t_command_history *history)
+{
+	if (history->current == history->end)
+	{
+		history->end = (history->end + 1) % LINE_BUFFER_SIZE;
+		if (history->end == history->begin)
+			history->begin = (history->end + 1) % LINE_BUFFER_SIZE;
+	}
 }
