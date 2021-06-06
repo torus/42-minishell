@@ -44,7 +44,7 @@ void	cmd_exec_command(t_command_invocation *command,
 	replace_stdio_with_pipe(command, pipe_prev_fd, pipe_fd);
 	if (cmd_set_input_file(command) == ERROR
 		|| cmd_set_output_file(command) == ERROR)
-		put_err_msg_and_exit("error child input/output file");
+		exit(EXIT_FAILURE);
 	if (!command->exec_and_args)
 		exit(0);
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
