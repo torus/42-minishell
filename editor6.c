@@ -8,7 +8,7 @@ void	edit_delete_char(t_command_history *history, t_command_state *st)
 
 	edit_copy_history_if_needed(history, st);
 	splay_init(&rope, history->ropes[history->current]);
-	tputs(st->cnt.c_delete_character, 1, edit_putc);
+	/* tputs(st->cnt.c_delete_character, 1, edit_putc); */
 	st->length--;
 	splay_assign(
 		&history->ropes[history->current],
