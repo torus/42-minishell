@@ -314,6 +314,179 @@ void	test_rope()
 		splay_release(rope);
 	}
 
+	TEST_SECTION("rope_split 右に偏った木");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope,
+				   rope_concat(
+					   rope_create("0", NULL),
+					   rope_concat(
+						   rope_create("1", NULL),
+						   rope_concat(
+							   rope_create("2", NULL),
+							   rope_concat(
+								   rope_create("3", NULL),
+								   NULL)))));
+
+		CHECK_EQ(rope_length(rope), 4);
+
+		t_rope	*left = NULL, *right = NULL;
+		rope_split(rope, 2, &left, &right);
+		CHECK_EQ(rope_length(left), 2);
+		CHECK_EQ(rope_length(right), 2);
+
+		splay_release(left);
+		splay_release(right);
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_split 右に偏った 3 要素の木の最後の要素");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope,
+				   rope_concat(
+					   rope_create("0", NULL),
+					   rope_concat(
+						   rope_create("1", NULL),
+						   rope_concat(
+							   rope_create("2", NULL),
+							   NULL))));
+
+		CHECK_EQ(rope_length(rope), 3);
+
+		t_splay_path	*path = NULL;
+		rope_index_with_path(rope, 2, &path);
+
+		CHECK_EQ_STR((char*)&path->node->value, "2");
+		CHECK_EQ(path->dir, SPLAY_RIGHT);
+		CHECK_EQ(path->next->dir, SPLAY_RIGHT);
+		CHECK_EQ(path->next->next->dir, SPLAY_ROOT);
+		CHECK_EQ_STR((char*)&path->next->node->left->value, "1");
+		splay_path_release(path);
+
+		t_rope	*left = NULL, *right = NULL;
+		rope_split(rope, 2, &left, &right);
+		CHECK_EQ(rope_length(left), 2);
+		CHECK_EQ(rope_length(right), 1);
+
+		splay_release(left);
+		splay_release(right);
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_split 右に偏った木の最後の要素");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope,
+				   rope_concat(
+					   rope_create("0", NULL),
+					   rope_concat(
+						   rope_create("1", NULL),
+						   rope_concat(
+							   rope_create("2", NULL),
+							   rope_concat(
+								   rope_create("3", NULL),
+								   NULL)))));
+
+		CHECK_EQ(rope_length(rope), 4);
+
+		t_rope	*left = NULL, *right = NULL;
+		rope_split(rope, 3, &left, &right);
+		CHECK_EQ(rope_length(left), 3);
+		CHECK_EQ(rope_length(right), 1);
+
+		splay_release(left);
+		splay_release(right);
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_delete 右に偏った木");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope,
+				   rope_concat(
+					   rope_create("0", NULL),
+					   rope_concat(
+						   rope_create("1", NULL),
+						   rope_concat(
+							   rope_create("2", NULL),
+							   rope_concat(
+								   rope_create("3", NULL),
+								   NULL)))));
+
+		CHECK_EQ(rope_length(rope), 4);
+
+		splay_assign(&rope, rope_delete(rope, 2, 3));
+		CHECK_EQ(rope_length(rope), 3);
+
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_split 左に偏った木");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope,
+				   rope_concat(
+					   rope_concat(
+						   rope_concat(
+							   NULL,
+							   rope_create("0", NULL)),
+						   rope_create("1", NULL)),
+					   rope_create("2", NULL)));
+
+		CHECK_EQ(rope_length(rope), 3);
+
+		t_rope	*left = NULL, *right = NULL;
+		rope_split(rope, 2, &left, &right);
+		CHECK_EQ(rope_length(left), 2);
+		CHECK_EQ_STR((char*)&left->left->value, "0");
+		CHECK_EQ_STR((char*)&left->right->value, "1");
+		CHECK_EQ(rope_length(right), 1);
+		CHECK_EQ_STR((char*)&right->value, "2");
+
+		t_rope	*lleft = NULL, *lright = NULL;
+		rope_split(left, 1, &lleft, &lright);
+		CHECK_EQ(rope_length(lleft), 1);
+		CHECK_EQ_STR((char*)&lleft->value, "0");
+		CHECK_EQ(rope_length(lright), 1);
+		CHECK_EQ_STR((char*)&lright->value, "1");
+		splay_release(lleft);
+		splay_release(lright);
+
+		splay_release(left);
+		splay_release(right);
+
+		splay_release(rope);
+	}
+
+	TEST_SECTION("rope_delete 左に偏った木");
+	{
+		t_rope	*rope;
+
+		splay_init(&rope,
+				   rope_concat(
+					   rope_concat(
+						   rope_concat(
+							   NULL,
+							   rope_create("0", NULL)),
+						   rope_create("1", NULL)),
+					   rope_create("2", NULL)));
+
+		CHECK_EQ(rope_length(rope), 3);
+
+		splay_assign(&rope, rope_delete(rope, 1, 2));
+		CHECK_EQ(rope_length(rope), 2);
+		CHECK_EQ_STR((char*)&rope->left->value, "0");
+		CHECK_EQ_STR((char*)&rope->right->value, "2");
+
+		splay_release(rope);
+	}
+
 }
 
 int main()

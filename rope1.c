@@ -27,7 +27,27 @@ t_rope	*rope_create(char *left, char *right)
 
 t_rope	*rope_concat(t_rope *left, t_rope *right)
 {
-	return (splay_create(left, ROPE_NOWEIGHT, right));
+	t_rope	*l;
+	t_rope	*r;
+	t_rope	*result;
+
+	if (!left && !right)
+		return (NULL);
+	splay_init(&l, left);
+	splay_init(&r, right);
+	if (l && !l->right && l->left)
+		splay_assign(&l, l->left);
+	else if (l && l->right && !l->left)
+		splay_assign(&l, l->right);
+	if (r && !r->right && r->left)
+		splay_assign(&r, r->left);
+	else if (r && r->right && !r->left)
+		splay_assign(&r, r->right);
+	splay_init(&result, splay_create(l, ROPE_NOWEIGHT, r));
+	splay_release(l);
+	splay_release(r);
+	result->refcount--;
+	return (result);
 }
 
 int	rope_weight(t_rope *rope)
