@@ -22,12 +22,14 @@ int	lex_read_word(t_parse_buffer *buf, t_token *result)
 		ch = lex_getc(buf);
 		if (ch == EOF)
 			break ;
-		if (ch == '\\' || lex_is_special_char(ch))
+		if (ch == '\\' || lex_is_special_char(ch) || (ch == '$' && pos > 0))
 		{
 			lex_ungetc(buf);
 			break ;
 		}
 		result->text[pos++] = ch;
+		if (pos == PARSE_BUFFER_SIZE)
+			break;
 	}
 	result->length = pos;
 	return (1);
