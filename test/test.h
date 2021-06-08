@@ -11,8 +11,11 @@
 		if (!test_check(										\
 				actual == expected,								\
 				#actual " == " #expected))						\
-			printf("      actual: %lld\n    expected: %lld\n",	\
-				   (long long)actual, (long long)expected);		\
+			printf(												\
+				"      actual: %lld\t%llx\n"					\
+				"    expected: %lld\t%llx\n",					\
+				   (long long)actual, (long long)actual,		\
+				   (long long)expected, (long long)expected);	\
 	} while(0)
 
 #define CHECK_EQ_STR(actual, expected)						\
