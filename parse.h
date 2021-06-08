@@ -83,7 +83,6 @@ typedef struct s_parse_node_seqcmds
 typedef struct s_parse_node_cmdline
 {
 	t_parse_ast	*seqcmd_node;
-	t_parse_ast	*delimiter_node;
 }	t_parse_node_cmdline;
 
 typedef struct s_parse_ast
