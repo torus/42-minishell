@@ -261,7 +261,9 @@ int main()
 		args_node = args_node->rest_node->content.arguments;
 		t_parse_node_string *string_node = args_node->string_node->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(string_node->text, "hoge$ABC");
+		CHECK_EQ_STR(string_node->text, "hoge");
+		string_node = string_node->next->content.string;
+		CHECK_EQ_STR(string_node->text, "$ABC");
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
 		CHECK_EQ_STR(string_node->text, "hoge hoge");
@@ -295,7 +297,9 @@ int main()
 
 		t_parse_node_string *string_node = args_node->string_node->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(string_node->text, "hoge$ABC");
+		CHECK_EQ_STR(string_node->text, "hoge");
+		string_node = string_node->next->content.string;
+		CHECK_EQ_STR(string_node->text, "$ABC");
 
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_EXPANDABLE_QUOTED);
@@ -907,7 +911,10 @@ int main()
 		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
 		args_node = args_node->rest_node->content.arguments;
 		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "hoge$ABC");
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+		CHECK_EQ_STR(string_node->text, "hoge");
+		string_node = string_node->next->content.string;
+		CHECK_EQ_STR(string_node->text, "$ABC");
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
@@ -978,7 +985,12 @@ int main()
 		CHECK_EQ_STR(args_node->string_node->content.string->text, "echo");
 		args_node = args_node->rest_node->content.arguments;
 		CHECK_EQ(args_node->string_node->content.string->type, TOKTYPE_EXPANDABLE);
-		CHECK_EQ_STR(args_node->string_node->content.string->text, "$ABC$DEF");
+
+		t_parse_node_string *string_node = args_node->string_node->content.string;
+
+		CHECK_EQ_STR(string_node->text, "$ABC");
+		string_node = string_node->next->content.string;
+		CHECK_EQ_STR(string_node->text, "$DEF");
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
@@ -1048,7 +1060,13 @@ int main()
 		CHECK_EQ_STR(args_node->string_node->content.string->text, "hello");
 		args_node = args_node->rest_node->content.arguments;
 		CHECK_EQ(args_node->redirection_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
-		CHECK_EQ_STR(args_node->redirection_node->content.redirection->string_node->content.string->text, "hoge$ABC");
+
+		t_parse_node_string *string_node =
+			args_node->redirection_node->content.redirection
+			->string_node->content.string;
+		CHECK_EQ_STR(string_node->text, "hoge");
+		string_node = string_node->next->content.string;
+		CHECK_EQ_STR(string_node->text, "$ABC");
 
 		/* テスト */
 		t_command_invocation *actual = cmd_ast_cmd2cmdinvo(node->content.command);
