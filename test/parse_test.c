@@ -844,6 +844,36 @@ void test_parser(void)
 			"xyz");
 	}
 
+	TEST_SECTION("parse_sequential_commands セミコロンで終わる");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, " abc ; xyz ;\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_sequential_commands(&buf, &tok);
+		check_single_argument(
+			node->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node,
+			"abc");
+		check_delimiter(
+			node->content.sequential_commands
+			->delimiter_node);
+		check_single_argument(
+			node->content.sequential_commands
+			->rest_node->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node,
+			"xyz");
+		check_delimiter(
+			node->content.sequential_commands
+			->rest_node->content.sequential_commands
+			->delimiter_node);
+	}
+
 	TEST_SECTION("parse_sequential_commands パイプあり");
 	{
 		t_parse_buffer	buf;
@@ -883,7 +913,7 @@ void test_parser(void)
 		t_parse_ast *node = parse_command_line(&buf, &tok);
 
 		check_piped_seqence(node->content.command_line->seqcmd_node);
-		CHECK_EQ(node->content.command_line->delimiter_node, NULL);
+		/* CHECK_EQ(node->content.command_line->delimiter_node, NULL); */
 	}
 
 	TEST_SECTION("parse_command_line バックスラッシュで終わる");
@@ -919,6 +949,51 @@ void test_parser(void)
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc'\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK(!node);
+	}
+
+	TEST_SECTION("parse_command_line セミコロンで終わる");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, " abc ; xyz ;\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK_EQ(node->type, ASTNODE_COMMAND_LINE);
+		node = node->content.command_line->seqcmd_node;
+		CHECK(node);
+
+		check_single_argument(
+			node->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node,
+			"abc");
+		check_delimiter(
+			node->content.sequential_commands
+			->delimiter_node);
+		check_single_argument(
+			node->content.sequential_commands
+			->rest_node->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node,
+			"xyz");
+		check_delimiter(
+			node->content.sequential_commands
+			->rest_node->content.sequential_commands
+			->delimiter_node);
+	}
+
+	TEST_SECTION("parse_command_line セミコロンだけのときはエラー");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, " ;\n");
 		t_token	tok;
 
 		lex_get_token(&buf, &tok);
