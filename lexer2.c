@@ -29,7 +29,7 @@ int	lex_read_word(t_parse_buffer *buf, t_token *result)
 		}
 		result->text[pos++] = ch;
 		if (pos == PARSE_BUFFER_SIZE)
-			break;
+			break ;
 	}
 	result->length = pos;
 	return (1);
@@ -50,11 +50,14 @@ int	lex_read_double_quoted(t_parse_buffer *buf, t_token *result)
 			buf->lex_stat = LEXSTAT_NORMAL;
 		if (ch == '\n' || ch == EOF)
 			result->type = TOKTYPE_PARSE_ERROR;
-		if (ch == '\\' || ch == '\n' || ch == EOF)
+		if (ch == '\\' || ch == '\n' || ch == EOF || (ch == '$' && pos > 0))
 			lex_ungetc(buf);
-		if (ch == '\\' || ch == '"' || ch == '\n' || ch == EOF)
+		if (ch == '\\' || ch == '"' || ch == '\n' || ch == EOF
+			|| (ch == '$' && pos > 0))
 			break ;
 		result->text[pos++] = ch;
+		if (pos == PARSE_BUFFER_SIZE)
+			break ;
 	}
 	result->length = pos;
 	return (1);
@@ -79,6 +82,8 @@ int	lex_read_single_quoted(t_parse_buffer *buf, t_token *result)
 		if (ch == '\'' || ch == '\n' || ch == EOF)
 			break ;
 		result->text[pos++] = ch;
+		if (pos == PARSE_BUFFER_SIZE)
+			break ;
 	}
 	result->length = pos;
 	return (1);

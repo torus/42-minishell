@@ -1010,7 +1010,7 @@ void test_parser(void)
 #define T1024 T896 T128
 #define T1280 T1024 T128 T128
 
-	TEST_SECTION("parse_command_line 長い行");
+	TEST_SECTION("parse_command_line 長い行は 1024 文字ごとに分ける");
 	{
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, T1280 "\n");
@@ -1019,13 +1019,24 @@ void test_parser(void)
 		lex_get_token(&buf, &tok);
 		t_parse_ast *node = parse_command_line(&buf, &tok);
 		CHECK(node);
-		node = node->content.command_line->seqcmd_node;
-		check_single_argument(
-			node->content.sequential_commands
+
+		node = node->content.command_line->seqcmd_node
+			->content.sequential_commands
 			->pipcmd_node->content.piped_commands
 			->command_node->content.command
-			->arguments_node,
-			T1024);
+			->arguments_node;
+		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
+		check_single_argument(node, T1024);
+
+		node = node->content.arguments->string_node;
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE);
+
+		// のこり
+		node = node->content.string->next;
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE);
+		check_string(node, T128 T128); /* 256 */
 	}
 
 	TEST_SECTION("parse_command_line 長い行の最後に変数");
@@ -1047,15 +1058,99 @@ void test_parser(void)
 			->arguments_node;
 		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
 		check_single_argument(node, T1016);
-		CHECK_EQ(
-			node->content.arguments
-			->string_node->content.string
-			->next->type, ASTNODE_STRING);
-		check_string(
-			node->content.arguments
-			->string_node->content.string
-			->next,
-			"$deadbeef");
+
+		node = node->content.arguments->string_node;
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE);
+		node = node->content.string->next;
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE);
+		check_string(node, "$deadbeef");
+	}
+
+	TEST_SECTION("parse_command_line ダブルクォートされた長い行");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "\"" T1280 "\"\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK(node);
+
+		node = node->content.command_line->seqcmd_node
+			->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node;
+		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
+		check_single_argument(node, T1024);
+
+		node = node->content.arguments->string_node;
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE_QUOTED);
+
+		// のこり
+		node = node->content.string->next;
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE_QUOTED);
+		check_string(node, T128 T128); /* 256 */
+	}
+
+	TEST_SECTION("parse_command_line ダブルクォートされた長い行の最後に変数");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "\"" T1016 "$deadbeef\"\n");
+		t_token	tok;
+
+		CHECK_EQ(strlen(T1016 "$deadbeef"), 1025);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.length, 1016);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK(node);
+		node = node->content.command_line->seqcmd_node
+			->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node;
+		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
+		check_single_argument(node, T1016);
+
+		node = node->content.arguments->string_node;
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE_QUOTED);
+		node = node->content.string->next;
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_EXPANDABLE_QUOTED);
+		check_string(node, "$deadbeef");
+	}
+
+	TEST_SECTION("parse_command_line シングルクォートされた長い行");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "'" T1280 "'\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK(node);
+
+		node = node->content.command_line->seqcmd_node
+			->content.sequential_commands
+			->pipcmd_node->content.piped_commands
+			->command_node->content.command
+			->arguments_node;
+		CHECK_EQ(node->type, ASTNODE_ARGUMENTS);
+		check_single_argument(node, T1024);
+
+		node = node->content.arguments->string_node;
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_NON_EXPANDABLE);
+
+		// のこり
+		node = node->content.string->next;
+		CHECK_EQ(node->type, ASTNODE_STRING);
+		CHECK_EQ(node->content.string->type, TOKTYPE_NON_EXPANDABLE);
+		check_string(node, T128 T128); /* 256 */
 	}
 }
 
