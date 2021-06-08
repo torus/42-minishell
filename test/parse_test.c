@@ -913,7 +913,6 @@ void test_parser(void)
 		t_parse_ast *node = parse_command_line(&buf, &tok);
 
 		check_piped_seqence(node->content.command_line->seqcmd_node);
-		/* CHECK_EQ(node->content.command_line->delimiter_node, NULL); */
 	}
 
 	TEST_SECTION("parse_command_line バックスラッシュで終わる");
