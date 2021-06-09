@@ -68,7 +68,7 @@ int	lex_get_eof(t_token *result, int ch)
 
 int	lex_init_token(t_token *result)
 {
-	result->max_length = 8;
+	result->max_length = 1024;
 	result->text = malloc(result->max_length);
 	if (!result->text)
 	{
