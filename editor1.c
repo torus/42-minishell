@@ -73,11 +73,9 @@ int	edit_read_and_execute(t_command_history *history, t_command_state *state)
 	if (!cmdline)
 	{
 		put_err_msg("Parse error.");
-		set_status(1);
-		return (1);
+		return (set_status_and_ret(1, 1));
 	}
 	edit_execute(cmdline);
-	parse_free_all_ast();
 	return (1);
 }
 
@@ -94,7 +92,10 @@ int	edit_main(void)
 	edit_term_controls_init(&state.cnt);
 	g_shell.running = 1;
 	while (g_shell.running)
+	{
 		edit_read_and_execute(&history, &state);
+		parse_free_all_ast();
+	}
 	edit_cleanup_history(&history);
 	if (tty_reset(STDIN_FILENO) < 0)
 		edit_error_exit("tty_reset error");
