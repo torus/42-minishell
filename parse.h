@@ -88,6 +88,7 @@ typedef struct s_parse_node_cmdline
 typedef struct s_parse_ast
 {
 	t_parse_ast_type	type;
+	int					error;
 	union u_parse_ast_node_content
 	{
 		void						*void_ptr;
