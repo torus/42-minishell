@@ -11,7 +11,7 @@ typedef void				t_lexer_ungetc(struct s_parse_buffer *buf);
 
 typedef struct s_parse_buffer
 {
-	char			buffer[PARSE_BUFFER_SIZE * 100];
+	char			buffer[PARSE_BUFFER_SIZE *100];
 	int				size;
 	int				cur_pos;
 	t_lexer_state	lex_stat;
