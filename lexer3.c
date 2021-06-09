@@ -84,15 +84,15 @@ int	lex_expand_text_buf(t_token *result)
 {
 	char	*old_text;
 
-	result->max_length *= 2;
 	old_text = result->text;
-	result->text = malloc(result->max_length);
+	result->text = malloc(result->max_length * 2);
 	if (!result->text)
 	{
 		printf("expand token buffer failed\n");
 		exit(1);
 	}
-	ft_memcpy(result->text, old_text, result->length);
+	ft_memcpy(result->text, old_text, result->max_length);
+	result->max_length = result->max_length * 2;
 	free(old_text);
 	return (0);
 }
