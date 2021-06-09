@@ -65,6 +65,7 @@ int	edit_read_and_execute(t_command_history *history, t_command_state *state)
 		return (1);
 	splay_assign(&rope, rope_concat(rope, rope_create("\n", NULL)));
 	edit_init_parse_buffer_with_rope(&buf, rope);
+	lex_init_token(&tok);
 	lex_get_token(&buf, &tok);
 	cmdline = parse_command_line(&buf, &tok);
 	splay_release(rope);
@@ -76,6 +77,7 @@ int	edit_read_and_execute(t_command_history *history, t_command_state *state)
 	}
 	edit_execute(cmdline);
 	parse_free_all_ast();
+	free(tok.text);
 	return (1);
 }
 

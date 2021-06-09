@@ -1,8 +1,6 @@
 #ifndef LEXER_H
 # define LEXER_H
 
-# define TOKEN_BUFFER_SIZE 1024
-
 typedef struct s_parse_buffer	t_parse_buffer;
 
 typedef enum e_token_type
