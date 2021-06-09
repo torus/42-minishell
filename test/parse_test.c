@@ -1152,6 +1152,52 @@ void test_parser(void)
 		CHECK_EQ(node->content.string->type, TOKTYPE_NON_EXPANDABLE);
 		check_string(node, T128 T128); /* 256 */
 	}
+
+	TEST_SECTION("parse_command_line > のあとにファイル名が続かないときはエラー");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "aho >\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK(!node);
+	}
+
+	TEST_SECTION("parse_command_line > のあとに ; はエラー");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "aho >; boke\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK(!node);
+	}
+
+	TEST_SECTION("parse_command_line | のあとにコマンドが続かないときはエラー");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "aho |\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK(!node);
+	}
+
+	TEST_SECTION("parse_command_line | のあとに ; はエラー");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "aho |; boke\n");
+		t_token	tok;
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *node = parse_command_line(&buf, &tok);
+		CHECK(!node);
+	}
+
+
 }
 
 int main()
