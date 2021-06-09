@@ -65,3 +65,33 @@ int	lex_get_eof(t_token *result, int ch)
 	}
 	return (0);
 }
+
+int	lex_init_token(t_token *result)
+{
+	result->max_length = 1024;
+	result->text = malloc(result->max_length);
+	if (!result->text)
+	{
+		printf("malloc token buffer failed\n");
+		exit(1);
+	}
+	result->length = 0;
+	return (0);
+}
+
+int	lex_expand_text_buf(t_token *result)
+{
+	char	*old_text;
+
+	result->max_length *= 2;
+	old_text = result->text;
+	result->text = malloc(result->max_length);
+	if (!result->text)
+	{
+		printf("expand token buffer failed\n");
+		exit(1);
+	}
+	ft_memcpy(result->text, old_text, result->length);
+	free(old_text);
+	return (0);
+}
