@@ -7,7 +7,7 @@
 **		command "|" piped_commands
 **	  | command
 */
-#include <stdio.h>
+
 t_parse_ast	*parse_piped_commands(t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast				*pip_node;
@@ -29,14 +29,11 @@ t_parse_ast	*parse_piped_commands(t_parse_buffer *buf, t_token *tok)
 		parse_skip_spaces(buf, tok);
 		rest_node = parse_piped_commands(buf, tok);
 		pip_node->error = pip_node->error || !!!rest_node;
-		/* if (!rest_node) */
-		/* 	return (NULL); */
 	}
 	content_node->next = rest_node;
 	pip_node->error = pip_node->error || cmd_node->error;
 	if (rest_node)
 		pip_node->error = pip_node->error || rest_node->error;
-	printf("%s: error: %d\n", __FUNCTION__, pip_node->error);
 	return (pip_node);
 }
 
@@ -60,7 +57,6 @@ t_parse_ast	*parse_command(t_parse_buffer *buf, t_token *tok)
 	cmd_node = parse_new_ast_node(ASTNODE_COMMAND, content_node);
 	content_node->arguments_node = args_node;
 	cmd_node->error = cmd_node->error || args_node->error;
-	printf("%s: error: %d\n", __FUNCTION__, cmd_node->error);
 	return (cmd_node);
 }
 
@@ -98,7 +94,6 @@ t_parse_ast	*parse_arguments(t_parse_buffer *buf, t_token *tok)
 		args_node->error = args_node->error || string_node->error;
 	if (rest_node)
 		args_node->error = args_node->error || rest_node->error;
-	printf("%s: error: %d\n", __FUNCTION__, args_node->error);
 	return (args_node);
 }
 
@@ -161,16 +156,11 @@ t_parse_ast	*parse_redirection(
 	lex_get_token(buf, tok);
 	parse_skip_spaces(buf, tok);
 	str_node = parse_string(buf, tok);
-	/* if (str_node) */
-	/* { */
-		redirection = malloc(sizeof(t_parse_node_redirection));
-		redirection->type = type;
-		redirection->fd = fd;
-		redirection->string_node = str_node;
-		new_node = parse_new_ast_node(ASTNODE_REDIRECTION, redirection);
-		new_node->error = (!!!str_node) || str_node->error;
-		printf("%s: error: %d\n", __FUNCTION__, new_node->error);
-		return (new_node);
-	/* } */
-	/* return (NULL); */
+	redirection = malloc(sizeof(t_parse_node_redirection));
+	redirection->type = type;
+	redirection->fd = fd;
+	redirection->string_node = str_node;
+	new_node = parse_new_ast_node(ASTNODE_REDIRECTION, redirection);
+	new_node->error = (!!!str_node) || str_node->error;
+	return (new_node);
 }

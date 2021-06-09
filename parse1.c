@@ -6,7 +6,7 @@
 **		"\n"
 **	  | sequential_commands "\n"
 */
-#include <stdio.h>
+
 t_parse_ast	*parse_command_line(
 	t_parse_buffer *buf, t_token *tok)
 {
@@ -24,7 +24,6 @@ t_parse_ast	*parse_command_line(
 	cmdline_node = parse_new_ast_node(ASTNODE_COMMAND_LINE, content_node);
 	content_node->seqcmd_node = seqcmd_node;
 	cmdline_node->error = cmdline_node->error || seqcmd_node->error;
-	printf("%s: error: %d\n", __FUNCTION__, cmdline_node->error);
 	if (cmdline_node->error)
 		return (NULL);
 	return (cmdline_node);
@@ -85,6 +84,5 @@ t_parse_ast	*parse_sequential_commands(
 	seq_node->error = seq_node->error || pipcmd_node->error;
 	if (content->rest_node)
 		seq_node->error = seq_node->error || content->rest_node->error;
-	printf("%s: error: %d\n", __FUNCTION__, seq_node->error);
 	return (seq_node);
 }
