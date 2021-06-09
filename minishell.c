@@ -60,8 +60,10 @@ int	do_command(char *cmdstr)
 	init_buffer_with_string(&buf, cmdstr);
 	buf.size++;
 	buf.buffer[len] = '\n';
+	lex_init_token(&tok);
 	lex_get_token(&buf, &tok);
 	cmdline = parse_command_line(&buf, &tok);
+	free(tok.text);
 	if (cmdline)
 	{
 		seqcmd = cmdline->content.command_line->seqcmd_node;

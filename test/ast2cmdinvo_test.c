@@ -249,6 +249,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hoge\"'$ABC' \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -274,6 +275,7 @@ int main()
 		printf("expanded: %s\n", expanded_str);
 		CHECK_EQ_STR(expanded_str, "hoge$ABC\"hoge hoge\"'$ABC'");
 		free(expanded_str);
+		free(tok.text);
 	}
 
 	TEST_SECTION("expand_string_node() 環境変数とクオーテーションマーク");
@@ -283,6 +285,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC\"hoge hoge\"'$ABC' \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -321,6 +324,7 @@ int main()
 		check_strarr((const char **)actual, (const char **)expected);
 		free_ptrarr((void **)actual);
 		free_ptrarr((void **)expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("expand_string_node() エスケープされた環境変数");
@@ -331,6 +335,7 @@ int main()
 		// echo "\$\$ABC\\$ABC""$ABC"
 		init_buf_with_string(&buf, "echo \"\\$\\$ABC\\\\$ABC\"\"$ABC\" \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -376,6 +381,7 @@ int main()
 		check_strarr((const char **)actual, (const char **)expected);
 		free_ptrarr((void **)actual);
 		free_ptrarr((void **)expected);
+		free(tok.text);
 	}
 
 	TEST_CHAPTER("AST to command_invocation");
@@ -386,6 +392,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -403,6 +410,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo arguments 2個");
@@ -411,6 +419,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc def\n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -425,6 +434,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo() 空文字列を含む");
@@ -434,6 +444,7 @@ int main()
 		// echo a "" b "" c
 		init_buf_with_string(&buf, "echo a \"\" b \"\" c\n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -499,6 +510,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクト付き");
@@ -507,6 +519,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file < abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -522,6 +535,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 入力リダイレクト, ディスクリプタ");
@@ -530,6 +544,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file 123< abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -545,6 +560,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 出力リダイレクト付き");
@@ -553,6 +569,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file > abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -568,6 +585,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 出力リダイレクト, ディスクリプタ");
@@ -576,6 +594,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file 123> abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -591,6 +610,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 入出力リダイレクト付き");
@@ -599,6 +619,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file < input > output \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -615,6 +636,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 追記リダイレクト付き");
@@ -623,6 +645,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file >> abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -638,6 +661,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 追記リダイレクト, ディスクリプタ");
@@ -646,6 +670,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file 456>> abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -661,6 +686,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 
@@ -670,6 +696,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file < a < b < c < d \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -688,6 +715,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 複数書き込みリダイレクト");
@@ -696,6 +724,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file > a > b > c > d \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -714,6 +743,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 複数追記リダイレクト");
@@ -722,6 +752,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file >> a >> b >> c >> d \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -740,6 +771,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 複数入力リダイレクト");
@@ -748,6 +780,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "file < a < b > c > d \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -766,6 +799,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 環境変数");
@@ -775,6 +809,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -797,6 +832,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo ダブルクオーテーションで囲まれた環境変数");
@@ -806,6 +842,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo \"$ABC\" \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -828,6 +865,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo シングルクオーテーションで囲まれた環境変数");
@@ -837,6 +875,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo \'$ABC\' \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -859,6 +898,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
+		free(tok.text);
 	}
 
 
@@ -869,6 +909,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -891,6 +932,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 文字列と環境変数");
@@ -900,6 +942,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hoge$ABC \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -925,6 +968,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
+		free(tok.text);
 	}
 
 
@@ -935,6 +979,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC\"ghi jkl\" \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -964,6 +1009,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 環境変数が複数");
@@ -974,6 +1020,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $ABC$DEF \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -1002,6 +1049,7 @@ int main()
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
 		unsetenv("DEF");
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数");
@@ -1011,6 +1059,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hello > $ABC \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -1037,6 +1086,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo リダイレクション 環境変数と文字列");
@@ -1046,6 +1096,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo hello > hoge$ABC \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -1078,6 +1129,7 @@ int main()
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
 		unsetenv("ABC");
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_cmd2cmdinvo 存在しない環境変数");
@@ -1086,6 +1138,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "echo $DONTEXISTS \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -1107,6 +1160,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_pipcmds2cmdinvo 文字列1つ");
@@ -1115,6 +1169,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -1132,6 +1187,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_pipcmds2cmdinvo arguments 2個");
@@ -1140,6 +1196,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc def\n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -1154,6 +1211,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_pipcmds2cmdinvo パイプ & リダイレクション");
@@ -1162,6 +1220,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc | file < abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -1179,6 +1238,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected_first);
+		free(tok.text);
 	}
 
 	TEST_SECTION("cmd_ast_pipcmds2cmdinvo パイプ & 出力リダイレクション");
@@ -1187,6 +1247,7 @@ int main()
 		t_parse_buffer	buf;
 		init_buf_with_string(&buf, "abc | file > abc \n");
 		t_token	tok;
+		lex_init_token(&tok);
 
 		lex_get_token(&buf, &tok);
 
@@ -1204,6 +1265,7 @@ int main()
 
 		cmd_free_cmdinvo(actual);
 		cmd_free_cmdinvo(expected_first);
+		free(tok.text);
 	}
 
 	free_vars(g_shell.vars);

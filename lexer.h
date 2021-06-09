@@ -1,8 +1,6 @@
 #ifndef LEXER_H
 # define LEXER_H
 
-# define TOKEN_BUFFER_SIZE 1024
-
 typedef struct s_parse_buffer	t_parse_buffer;
 
 typedef enum e_token_type
@@ -30,11 +28,14 @@ typedef enum e_lexer_state
 
 typedef struct s_token
 {
-	char			text[TOKEN_BUFFER_SIZE];
+	char			*text;
 	int				length;
+	int				max_length;
 	t_token_type	type;
 }	t_token;
 
+int		lex_init_token(t_token *result);
+int		lex_expand_text_buf(t_token *result);
 int		lex_getc(t_parse_buffer *buf);
 void	lex_ungetc(t_parse_buffer *buf);
 int		lex_is_special_char(char ch);
