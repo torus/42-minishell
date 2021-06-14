@@ -124,6 +124,7 @@ int	readline_and_execute(void)
 		parse_free_all_ast();
 		free(input_str);
 	}
+	write(1, "exit\n", 5);
 	return (0);
 }
 
