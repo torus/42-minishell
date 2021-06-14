@@ -1,11 +1,16 @@
 NAME = minishell
 CC = gcc
-CFLAGS = -Werror -Wall -Wextra -g
+CFLAGS := -Werror -Wall -Wextra -g
 CFLAGS += -fsanitize=address
 LINK_LIB := -lcurses
 LINK_LIB += -lreadline
 ifeq ($(shell uname), Linux)
 	LINK_LIB += -lbsd
+endif
+ifeq ($(shell uname), Darwin)
+	# User have to run brew install readline before run make to build minishell
+	CFLAGS += -I $(shell brew --prefix readline)/include
+	LINK_LIB += -L$(shell brew --prefix readline)/lib
 endif
 
 LIBFT_PATH = libft
