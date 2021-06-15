@@ -29,24 +29,8 @@ int	lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch)
 		result->type = TOKTYPE_SEMICOLON;
 	else if (ch == '|')
 		result->type = TOKTYPE_PIPE;
-	else if (ch == '<')
-	{
-		result->type = TOKTYPE_INPUT_REDIRECTION;
-		result->length = 0;
-	}
-	else if (ch == '>')
-	{
-		ch = lex_getc(buf);
-		if (ch == '>')
-			result->type = TOKTYPE_OUTPUT_APPENDING;
-		else
-		{
-			result->type = TOKTYPE_OUTPUT_REDIRECTION;
-			if (ch != EOF)
-				lex_ungetc(buf);
-		}
-		result->length = 1;
-	}
+	else if (ch == '<' || ch == '>')
+		lex_get_lt_gt(buf, result, ch);
 	else
 		return (0);
 	return (1);

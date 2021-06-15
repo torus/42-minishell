@@ -12,6 +12,7 @@ typedef enum e_token_type
 	TOKTYPE_EXPANDABLE_QUOTED,
 	TOKTYPE_PIPE,
 	TOKTYPE_INPUT_REDIRECTION,
+	TOKTYPE_HEREDOCUMENT,
 	TOKTYPE_OUTPUT_REDIRECTION,
 	TOKTYPE_OUTPUT_APPENDING,
 	TOKTYPE_SEMICOLON,
@@ -49,5 +50,6 @@ int		lex_get_token(t_parse_buffer *buf, t_token *result);
 int		lex_check_redirection_with_fd(t_parse_buffer *buf, t_token *result);
 int		lex_escaped(t_parse_buffer *buf, t_token *result);
 int		lex_get_eof(t_token *result, int ch);
+void	lex_get_lt_gt(t_parse_buffer *buf, t_token *result, int ch);
 
 #endif
