@@ -20,25 +20,34 @@ void	execute_sqcmd(t_parse_ast *cmdline)
 	set_shell_sighandlers();
 }
 
+static t_parse_ast	*get_cmdline_from_input_str(char *input_str)
+{
+	t_token				tok;
+	t_parse_buffer		buf;
+	t_parse_ast			*cmdline;
+
+	init_buffer_with_string(&buf, input_str);
+	buf.size++;
+	buf.buffer[ft_strlen(input_str)] = '\n';
+	lex_init_token(&tok);
+	lex_get_token(&buf, &tok);
+	cmdline = parse_command_line(&buf, &tok);
+	free(tok.text);
+	return (cmdline);
+}
+
 int	interactive_shell(void)
 {
 	char				*input_str;
-	t_token				tok;
 	t_parse_ast			*cmdline;
-	t_parse_buffer		buf;
 
 	set_shell_sighandlers();
-	while ((input_str = readline(MINISHELL_PROMPT)))
+	input_str = readline(MINISHELL_PROMPT);
+	while (input_str)
 	{
 		if (*input_str)
 			add_history(input_str);
-		init_buffer_with_string(&buf, input_str);
-		buf.size++;
-		buf.buffer[ft_strlen(input_str)] = '\n';
-		lex_init_token(&tok);
-		lex_get_token(&buf, &tok);
-		cmdline = parse_command_line(&buf, &tok);
-		free(tok.text);
+		cmdline = get_cmdline_from_input_str(input_str);
 		if (!cmdline)
 		{
 			put_err_msg("Parse error.");
@@ -48,6 +57,7 @@ int	interactive_shell(void)
 			execute_sqcmd(cmdline);
 		parse_free_all_ast();
 		free(input_str);
+		input_str = readline(MINISHELL_PROMPT);
 	}
 	write(1, "exit\n", 5);
 	return (0);
