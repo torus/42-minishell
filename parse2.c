@@ -28,12 +28,13 @@ t_parse_ast	*parse_piped_commands(t_parse_buffer *buf, t_token *tok)
 		lex_get_token(buf, tok);
 		parse_skip_spaces(buf, tok);
 		rest_node = parse_piped_commands(buf, tok);
-		pip_node->error = pip_node->error || !!!rest_node;
+		pip_node->error = pip_node->error || !rest_node;
 	}
 	content_node->next = rest_node;
 	pip_node->error = pip_node->error || cmd_node->error;
 	if (rest_node)
 		pip_node->error = pip_node->error || rest_node->error;
+	pip_node->heredocs = parse_concat_heredocs(cmd_node, rest_node);
 	return (pip_node);
 }
 
@@ -57,6 +58,7 @@ t_parse_ast	*parse_command(t_parse_buffer *buf, t_token *tok)
 	cmd_node = parse_new_ast_node(ASTNODE_COMMAND, content_node);
 	content_node->arguments_node = args_node;
 	cmd_node->error = cmd_node->error || args_node->error;
+	cmd_node->heredocs = args_node->heredocs;
 	return (cmd_node);
 }
 
@@ -71,29 +73,27 @@ t_parse_ast	*parse_command(t_parse_buffer *buf, t_token *tok)
 t_parse_ast	*parse_arguments(t_parse_buffer *buf, t_token *tok)
 {
 	t_parse_ast				*string_node;
-	t_parse_ast				*redirection_node;
+	t_parse_ast				*redir_node;
 	t_parse_ast				*rest_node;
 	t_parse_node_arguments	*content_node;
 	t_parse_ast				*args_node;
 
 	rest_node = NULL;
 	parse_skip_spaces(buf, tok);
-	redirection_node = parse_redirection(buf, tok);
+	redir_node = parse_redirection(buf, tok);
 	string_node = parse_string(buf, tok);
-	if (!redirection_node && !string_node)
+	if (!redir_node && !string_node)
 		return (NULL);
 	rest_node = parse_arguments(buf, tok);
 	content_node = malloc(sizeof(t_parse_node_arguments));
 	args_node = parse_new_ast_node(ASTNODE_ARGUMENTS, content_node);
 	content_node->string_node = string_node;
-	content_node->redirection_node = redirection_node;
+	content_node->redirection_node = redir_node;
 	content_node->rest_node = rest_node;
-	if (redirection_node)
-		args_node->error = args_node->error || redirection_node->error;
-	if (string_node)
-		args_node->error = args_node->error || string_node->error;
-	if (rest_node)
-		args_node->error = args_node->error || rest_node->error;
+	args_node->error = args_node->error || (redir_node && redir_node->error);
+	args_node->error = args_node->error || (string_node && string_node->error);
+	args_node->error = args_node->error || (rest_node && rest_node->error);
+	args_node->heredocs = parse_concat_heredocs(redir_node, rest_node);
 	return (args_node);
 }
 
@@ -137,6 +137,7 @@ t_parse_ast	*parse_string(t_parse_buffer *buf, t_token *tok)
 **		"<" string
 **	  | ">" string
 **	  | ">>" string
+**	  | "<<" string
 */
 t_parse_ast	*parse_redirection(
 	t_parse_buffer *buf, t_token *tok)
@@ -162,6 +163,8 @@ t_parse_ast	*parse_redirection(
 	redirection->fd = fd;
 	redirection->string_node = str_node;
 	new_node = parse_new_ast_node(ASTNODE_REDIRECTION, redirection);
-	new_node->error = (!!!str_node) || str_node->error;
+	new_node->error = !str_node || str_node->error;
+	if (type == TOKTYPE_HEREDOCUMENT)
+		new_node->heredocs = parse_new_heredocs(redirection);
 	return (new_node);
 }

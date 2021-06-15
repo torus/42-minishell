@@ -48,6 +48,7 @@ t_parse_ast	*parse_new_ast_node(t_parse_ast_type type, void *content)
 		parse_fatal_error();
 	list = create_ast_on_list();
 	list->ast.error = 0;
+	list->ast.heredocs = NULL;
 	list->ast.type = type;
 	list->ast.content.void_ptr = content;
 	return (&list->ast);
