@@ -19,9 +19,6 @@ void	parse_skip_spaces(t_parse_buffer *buf, t_token *tok)
 	}
 }
 
-/*
- * TODO: replace with proper error handling
- */
 void	parse_fatal_error(void)
 {
 	exit(1);

@@ -26,6 +26,7 @@ t_parse_ast	*parse_command_line(
 	cmdline_node->error = cmdline_node->error || seqcmd_node->error;
 	if (cmdline_node->error)
 		return (NULL);
+	cmdline_node->heredocs = seqcmd_node->heredocs;
 	return (cmdline_node);
 }
 
@@ -64,6 +65,7 @@ t_parse_ast	*parse_sequential_commands(
 {
 	t_parse_ast				*seq_node;
 	t_parse_ast				*pipcmd_node;
+	t_parse_ast				*rest_node;
 	t_parse_node_seqcmds	*content;
 
 	parse_skip_spaces(buf, tok);
@@ -74,15 +76,16 @@ t_parse_ast	*parse_sequential_commands(
 	seq_node = parse_new_ast_node(ASTNODE_SEQ_COMMANDS, content);
 	content->pipcmd_node = pipcmd_node;
 	content->delimiter_node = parse_delimiter(buf, tok);
-	content->rest_node = NULL;
+	rest_node = NULL;
 	if (content->delimiter_node)
 	{
 		lex_get_token(buf, tok);
 		parse_skip_spaces(buf, tok);
-		content->rest_node = parse_sequential_commands(buf, tok);
+		rest_node = parse_sequential_commands(buf, tok);
 	}
+	content->rest_node = rest_node;
 	seq_node->error = seq_node->error || pipcmd_node->error;
-	if (content->rest_node)
-		seq_node->error = seq_node->error || content->rest_node->error;
+	seq_node->error = seq_node->error || (rest_node && rest_node->error);
+	seq_node->heredocs = parse_concat_heredocs(pipcmd_node, rest_node);
 	return (seq_node);
 }

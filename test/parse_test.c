@@ -351,6 +351,34 @@ void test_lexer()
 		CHECK_EQ(tok.type, TOKTYPE_EOF);
 		free(tok.text);
 	}
+
+	TEST_SECTION("lex_get_token ヒアドキュメント");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "<< ");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_HEREDOCUMENT);
+		CHECK_EQ(tok.length, 0);
+
+		free(tok.text);
+	}
+
+	TEST_SECTION("lex_get_token ヒアドキュメント fd あり");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "123<< ");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_HEREDOCUMENT);
+		CHECK_EQ(tok.length, 123);
+
+		free(tok.text);
+	}
 }
 
 void check_string(t_parse_ast *node, const char *expected)
@@ -371,6 +399,14 @@ void check_output_redirection(t_parse_ast	*red_node, const char *name)
 	CHECK(red_node);
 	CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
 	CHECK_EQ(red_node->content.redirection->type, TOKTYPE_OUTPUT_REDIRECTION);
+	check_string(red_node->content.redirection->string_node, name);
+}
+
+void check_heredocument(t_parse_ast	*red_node, const char *name)
+{
+	CHECK(red_node);
+	CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
+	CHECK_EQ(red_node->content.redirection->type, TOKTYPE_HEREDOCUMENT);
 	check_string(red_node->content.redirection->string_node, name);
 }
 
@@ -427,6 +463,26 @@ void check_piped_seqence(t_parse_ast *node)
 		->command_node->content.command
 		->arguments_node,
 		"xyz");
+}
+
+void check_pip_heredocument(
+	t_parse_ast *node, const char *cmd, const char *eod, int fd)
+{
+	CHECK_EQ(node->type, ASTNODE_PIPED_COMMANDS);
+	node = node->content.piped_commands
+		->command_node->content.command
+		->arguments_node;
+	CHECK(node);
+	check_single_argument(node, cmd);
+
+	t_parse_ast *red_node = node->content.arguments->rest_node
+		->content.arguments->redirection_node;
+	CHECK(red_node);
+	CHECK_EQ(red_node->type, ASTNODE_REDIRECTION);
+	CHECK_EQ(red_node->content.redirection->type, TOKTYPE_HEREDOCUMENT);
+	CHECK_EQ(red_node->content.redirection->fd, fd);
+
+	check_heredocument(red_node, eod);
 }
 
 void test_parser(void)
@@ -667,11 +723,62 @@ void test_parser(void)
 		t_parse_ast *node = parse_redirection(&buf, &tok);
 		CHECK(node);
 		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK(!node->heredocs);
 		CHECK_EQ(node->content.redirection->fd, 456);
 		CHECK_EQ(node->content.redirection->type, TOKTYPE_OUTPUT_APPENDING);
 		CHECK_EQ_STR(node->content.redirection->string_node
 					->content.string->text, "file");
 		free(tok.text);
+	}
+
+	TEST_SECTION("parse_redirection　<<");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "<< EOD\n");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+
+		CHECK(node->heredocs);
+		CHECK(!node->heredocs->next);
+		check_string(node->heredocs->redirection->string_node, "EOD");
+
+		CHECK_EQ(node->content.redirection->fd, 0);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_HEREDOCUMENT);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					->content.string->text, "EOD");
+		free(tok.text);
+		parse_free_heredocs(node->heredocs);
+	}
+
+	TEST_SECTION("parse_redirection デスクリプタ付き <<");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "456<< EOD\n");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+
+		CHECK(node->heredocs);
+		CHECK(!node->heredocs->next);
+		check_string(node->heredocs->redirection->string_node, "EOD");
+
+		CHECK_EQ(node->content.redirection->fd, 456);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_HEREDOCUMENT);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					->content.string->text, "EOD");
+		free(tok.text);
+		parse_free_heredocs(node->heredocs);
 	}
 
 	TEST_SECTION("parse_arguments 1 個");
@@ -1138,6 +1245,74 @@ void test_parser(void)
 		t_parse_ast *node = parse_command_line(&buf, &tok);
 		CHECK(!node);
 		free(tok.text);
+	}
+
+	TEST_SECTION("parse_command_line ヒアドキュメント");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc << def\n");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *cmdline_node = parse_command_line(&buf, &tok);
+		CHECK(cmdline_node);
+		CHECK(cmdline_node->heredocs);
+
+		CHECK(!cmdline_node->heredocs->next);
+		check_string(cmdline_node->heredocs->redirection->string_node, "def");
+
+		t_parse_ast *node = cmdline_node->content.command_line
+			->seqcmd_node->content.sequential_commands
+			->pipcmd_node;
+		CHECK(node);
+		check_pip_heredocument(node, "abc", "def", 0);
+
+		free(tok.text);
+		parse_free_heredocs(node->heredocs);
+	}
+
+	TEST_SECTION("parse_command_line ヒアドキュメント 2 個");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "abc << def ; g ; hij 123<< klm\n");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+		t_parse_ast *cmdline_node = parse_command_line(&buf, &tok);
+		CHECK(cmdline_node);
+
+		CHECK(cmdline_node->heredocs);
+		check_string(cmdline_node->heredocs->redirection->string_node, "def");
+		CHECK(cmdline_node->heredocs->next);
+		check_string(cmdline_node->heredocs
+					 ->next->redirection->string_node, "klm");
+		CHECK(!cmdline_node->heredocs->next->next);
+
+		t_parse_ast *node = cmdline_node->content.command_line
+			->seqcmd_node;
+		CHECK(node);
+
+		t_parse_ast *here_node = node->content.sequential_commands
+			->pipcmd_node;
+		CHECK(here_node);
+		check_pip_heredocument(here_node, "abc", "def", 0);
+
+		node = node->content.sequential_commands->rest_node;
+		CHECK_EQ(node->type, ASTNODE_SEQ_COMMANDS);
+		check_single_argument(
+			node->content.sequential_commands->pipcmd_node
+			->content.piped_commands->command_node
+			->content.command->arguments_node, "g");
+
+		here_node = node->content.sequential_commands->rest_node
+			->content.sequential_commands->pipcmd_node;
+		CHECK(here_node);
+		check_pip_heredocument(here_node, "hij", "klm", 123);
+
+		free(tok.text);
+		parse_free_heredocs(cmdline_node->heredocs);
 	}
 
 }
