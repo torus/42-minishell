@@ -32,8 +32,7 @@ t_parse_ast	*parse_piped_commands(t_parse_buffer *buf, t_token *tok)
 	}
 	content_node->next = rest_node;
 	pip_node->error = pip_node->error || cmd_node->error;
-	if (rest_node)
-		pip_node->error = pip_node->error || rest_node->error;
+	pip_node->error = pip_node->error || (rest_node && rest_node->error);
 	pip_node->heredocs = parse_concat_heredocs(cmd_node, rest_node);
 	return (pip_node);
 }
