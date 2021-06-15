@@ -31,7 +31,14 @@ int	lex_get_symbols(t_parse_buffer *buf, t_token *result, int ch)
 		result->type = TOKTYPE_PIPE;
 	else if (ch == '<')
 	{
-		result->type = TOKTYPE_INPUT_REDIRECTION;
+		ch = lex_getc(buf);
+		if (ch == '<')
+			result->type = TOKTYPE_HEREDOCUMENT;
+		else
+		{
+			lex_ungetc(buf);
+			result->type = TOKTYPE_INPUT_REDIRECTION;
+		}
 		result->length = 0;
 	}
 	else if (ch == '>')

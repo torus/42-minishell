@@ -351,6 +351,34 @@ void test_lexer()
 		CHECK_EQ(tok.type, TOKTYPE_EOF);
 		free(tok.text);
 	}
+
+	TEST_SECTION("lex_get_token ヒアドキュメント");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "<< ");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_HEREDOCUMENT);
+		CHECK_EQ(tok.length, 0);
+
+		free(tok.text);
+	}
+
+	TEST_SECTION("lex_get_token ヒアドキュメント fd あり");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "123<< ");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+		CHECK_EQ(tok.type, TOKTYPE_HEREDOCUMENT);
+		CHECK_EQ(tok.length, 123);
+
+		free(tok.text);
+	}
 }
 
 void check_string(t_parse_ast *node, const char *expected)
