@@ -702,6 +702,44 @@ void test_parser(void)
 		free(tok.text);
 	}
 
+	TEST_SECTION("parse_redirection　<<");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "<< EOD\n");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 0);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_HEREDOCUMENT);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					->content.string->text, "EOD");
+		free(tok.text);
+	}
+
+	TEST_SECTION("parse_redirection デスクリプタ付き <<");
+	{
+		t_parse_buffer	buf;
+		init_buf_with_string(&buf, "456<< EOD\n");
+		t_token	tok;
+		lex_init_token(&tok);
+
+		lex_get_token(&buf, &tok);
+
+		t_parse_ast *node = parse_redirection(&buf, &tok);
+		CHECK(node);
+		CHECK_EQ(node->type, ASTNODE_REDIRECTION);
+		CHECK_EQ(node->content.redirection->fd, 456);
+		CHECK_EQ(node->content.redirection->type, TOKTYPE_HEREDOCUMENT);
+		CHECK_EQ_STR(node->content.redirection->string_node
+					->content.string->text, "EOD");
+		free(tok.text);
+	}
+
 	TEST_SECTION("parse_arguments 1 個");
 	{
 		t_parse_buffer	buf;

@@ -149,6 +149,7 @@ t_parse_ast	*parse_redirection(
 
 	type = tok->type;
 	if (type != TOKTYPE_INPUT_REDIRECTION
+		&& type != TOKTYPE_HEREDOCUMENT
 		&& type != TOKTYPE_OUTPUT_REDIRECTION
 		&& type != TOKTYPE_OUTPUT_APPENDING)
 		return (NULL);
