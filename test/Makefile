@@ -1,6 +1,7 @@
 LIBFT_PATH = ../libft
 LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
 LIBFT_LIB = ../libft/libft.a
+LDFLAGS = $(LIBFT_LIB) -lreadline
 SRCFILES = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c	\
 	cmd_exec_commands.c cmd_pipe.c cmd_redirection.c convert_ast2cmdinvo.c	\
 	cmd_status.c signal.c env_setter.c minishell_error_msg.c env.c exec.c	\
@@ -49,33 +50,33 @@ SRCS_ROPE = $(SRCS_SPLAY) $(wildcard ../rope*.c)	\
 
 parse_test: Makefile parse_test.c test.c test.h $(SRCS_PARSE) ../parse.h
 	$(LIBFT_MAKE)
-	gcc -Werror -Wall -Wextra -g -o $@ parse_test.c test.c $(SRCS_PARSE) ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ parse_test.c test.c $(SRCS_PARSE) ${LIBFT_LIB} $(LDFLAGS)
 
 splay_test: Makefile splay_test.c test.c test.h $(SRCS_SPLAY) ../rope.h
-	gcc -Werror -Wall -Wextra -g -o $@ splay_test.c test.c $(SRCS_SPLAY)
+	gcc -Werror -Wall -Wextra -g -o $@ splay_test.c test.c $(SRCS_SPLAY) $(LDFLAGS)
 
 rope_test: Makefile rope_test.c test.c test.h $(SRCS_ROPE) ../rope.h
-	gcc -Werror -Wall -Wextra -g -o $@ rope_test.c test.c $(SRCS_ROPE)
+	gcc -Werror -Wall -Wextra -g -o $@ rope_test.c test.c $(SRCS_ROPE) $(LDFLAGS)
 
 env_test: env_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB} $(LDFLAGS)
 
 path_test: path_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB} $(LDFLAGS)
 
 exec_test: exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB} $(LDFLAGS)
 
 command_exec_test: command_exec_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB} $(LDFLAGS)
 
 ast2cmdinvo_test: ast2cmdinvo_test.c ${TEST_UTILS} ${SRCS} ${HEADERS}
 	$(LIBFT_MAKE)
-	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB}
+	gcc -Werror -Wall -Wextra -g -o $@ $^ ${LIBFT_LIB} $(LDFLAGS)
 
 norm:
 	docker-compose run --rm norm norminette ../*.[ch]
