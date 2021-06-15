@@ -4,7 +4,6 @@
 #include <readline/history.h>
 #include "minishell.h"
 #include "env.h"
-#include "editor.h"
 
 static void	sigint_sighandler(int sig)
 {
@@ -12,7 +11,6 @@ static void	sigint_sighandler(int sig)
 	write(STDOUT_FILENO, "\n", 1);
 	rl_replace_line("", 0);
 	rl_redisplay();
-	g_shell.interrupted = 1;
 	set_status(128 + sig);
 }
 

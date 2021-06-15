@@ -4,7 +4,6 @@
 #include "libft/libft.h"
 #include "minishell.h"
 #include "parse.h"
-#include "editor.h"
 
 t_shell	g_shell;
 
