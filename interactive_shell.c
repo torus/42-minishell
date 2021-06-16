@@ -3,7 +3,7 @@
 #include <readline/history.h>
 #include "minishell.h"
 
-void	execute_sqcmd(t_parse_ast *cmdline)
+static void	execute_seqcmd(t_parse_ast *cmdline)
 {
 	t_parse_ast			*seqcmd;
 
@@ -54,7 +54,7 @@ int	interactive_shell(void)
 			set_status(1);
 		}
 		else
-			execute_sqcmd(cmdline);
+			execute_seqcmd(cmdline);
 		parse_free_all_ast();
 		free(input_str);
 		input_str = readline(MINISHELL_PROMPT);
