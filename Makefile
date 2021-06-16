@@ -18,7 +18,7 @@ LIBFT_LIB = -L./libft -lft
 
 LDFLAGS = $(LIBFT_LIB) $(LINK_LIB)
 
-HEADER_FILES = builtin.h env.h lexer.h parse.h rope.h	\
+HEADER_FILES = builtin.h env.h lexer.h parse.h	\
 	execution.h minishell.h path.h utils.h
 
 SRCS = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c		\
@@ -36,10 +36,7 @@ SRCS = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c		\
 	builtin_cd_path.c builtin_cd_chdir.c builtin_cd_cdpath.c				\
 	builtin_export.c builtin_export2.c builtin_pwd.c builtin_unset.c		\
 																			\
-	str_utils.c shell_initialization.c minishell.c	interactive_shell.c		\
-																			\
-	rope1.c rope2.c rope3.c rope4.c splay1.c splay2.c splay3.c splay4.c		\
-	splay5.c splay6.c
+	str_utils.c shell_initialization.c minishell.c	interactive_shell.c
 
 OBJS = $(SRCS:.c=.o)
 
