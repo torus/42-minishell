@@ -5,7 +5,6 @@
 # include "execution.h"
 # include "parse.h"
 # include "env.h"
-# include "editor.h"
 
 # define MINISHELL_PROMPT "minish > "
 # define MINISHELL_PROMPT_LEN 9
@@ -14,9 +13,6 @@ typedef struct s_shell {
 	char				*cwd;
 	t_var				*vars;
 	int					status;
-	int					interrupted;
-	t_terminal_state	term_stat;
-	int					running;
 	int					signal_child_received;
 }				t_shell;
 extern t_shell	g_shell;
@@ -32,7 +28,6 @@ typedef struct s_cmd_str_node {
 // FreeBSD doesn't have type __sighandler_t.
 typedef void	(*t_sighandler)(int);
 
-// AST to command_invocation
 t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds);
 t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node);
 char					*string_node2string(t_parse_node_string *string_node);
@@ -49,6 +44,7 @@ int						put_minish_err_msg_and_ret(int ret_val,
 void					put_minish_err_msg_and_exit(int status,
 							const char *cmd_name, const char *msg);
 int						invoke_sequential_commands(t_parse_ast *seqcmd);
+int						interactive_shell(void);
 
 // Shell initialization
 void					init_g_shell(void);

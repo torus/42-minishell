@@ -1,8 +1,6 @@
-#include <stdio.h>
 #include "libft/libft.h"
 #include "minishell.h"
 #include "parse.h"
-#include "editor.h"
 
 t_shell	g_shell;
 
@@ -81,5 +79,5 @@ int	main(int argc, char **argv)
 	initialize_shell();
 	if (argc == 3 && ft_strncmp(argv[1], "-c", 3) == 0)
 		return (do_command(argv[2]));
-	edit_main();
+	interactive_shell();
 }

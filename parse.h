@@ -20,6 +20,8 @@ typedef struct s_parse_buffer
 	void			*data;
 }	t_parse_buffer;
 
+void				init_buffer_with_string(t_parse_buffer *buf, char *str);
+
 typedef enum e_parse_ast_type
 {
 	ASTNODE_NONE = 0xc201,

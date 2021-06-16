@@ -1,13 +1,16 @@
 #include <signal.h>
 #include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "minishell.h"
 #include "env.h"
-#include "editor.h"
 
 static void	sigint_sighandler(int sig)
 {
-	write(STDOUT_FILENO, "^C", 2);
-	g_shell.interrupted = 1;
+	rl_on_new_line();
+	write(STDOUT_FILENO, "\n", 1);
+	rl_replace_line("", 0);
+	rl_redisplay();
 	set_status(128 + sig);
 }
 
