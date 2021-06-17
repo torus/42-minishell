@@ -56,6 +56,8 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 		cmd_add_outredirect(command, text, fd, false);
 	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
 		cmd_add_outredirect(command, text, fd, true);
+	else if (redirection_type == TOKTYPE_HEREDOCUMENT)
+		cmd_add_heredoc(command, text, fd);
 	return (0);
 }
 

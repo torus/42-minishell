@@ -1,4 +1,5 @@
 #include "execution.h"
+#include "minishell.h"
 
 /*
 ** Malloc and initialize t_command_invocation
@@ -35,6 +36,21 @@ int	cmd_add_inredirect(t_command_invocation *command,
 	return (0);
 }
 
+int	cmd_add_heredoc(t_command_invocation *command,
+	const char *limit_str, int fd)
+{
+	t_cmd_redirection	*redirection;
+
+	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
+	redirection->fd = fd;
+	redirection->is_heredoc = true;
+	// TODO: 標準入力からデータ読み込み
+	if (!redirection || !ft_lstadd_back_new(
+			&command->input_redirections, (void *)redirection))
+		put_minish_err_msg_and_exit(1, "redirection", "malloc failed");
+	return (0);
+}
+
 int	cmd_add_outredirect(t_command_invocation *command,
 	const char *filepath, int fd, bool is_append)
 {
@@ -47,6 +63,7 @@ int	cmd_add_outredirect(t_command_invocation *command,
 	if (!redirection || !ft_lstadd_back_new(
 			&command->output_redirections, (void *)redirection))
 	{
+		// TODO: malloc() 失敗時にはexit()する
 		free(redirection);
 		return (ERROR);
 	}
