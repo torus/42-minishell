@@ -49,7 +49,6 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
 	redirection->fd = fd;
 	redirection->is_heredoc = true;
-	// TODO: 標準入力からデータ読み込み
 	while (1)
 	{
 		input_str = readline("> ");
@@ -60,6 +59,8 @@ int	cmd_add_heredoc(t_command_invocation *command,
 			break ;
 		redirection->filepath = strjoin_nullable_and_free_both(
 			(char *)redirection->filepath, input_str);
+		redirection->filepath = strjoin_and_free_first(
+			(char *)redirection->filepath, "\n");
 	}
 	if (!redirection || !ft_lstadd_back_new(
 			&command->input_redirections, (void *)redirection))
