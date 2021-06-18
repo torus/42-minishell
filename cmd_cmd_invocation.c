@@ -54,9 +54,7 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	while (1)
 	{
 		input_str = readline("> ");
-		if (!input_str)
-			return (put_minish_err_msg_and_ret(ERROR, "heredoc", "delimited by EOF"));
-		if (!ft_strcmp(input_str, limit_str))
+		if (!input_str || !ft_strcmp(input_str, limit_str))
 			break ;
 		redirection->filepath = strjoin_nullable_and_free_both(
 			(char *)redirection->filepath, input_str);
@@ -67,6 +65,8 @@ int	cmd_add_heredoc(t_command_invocation *command,
 		if (!redirection->filepath)
 			return (ERROR);
 	}
+	if (!input_str)
+		write(1, "\n", 1);
 	if (!ft_lstadd_back_new(
 			&command->input_redirections, (void *)redirection))
 		put_minish_err_msg_and_exit(1, "redirection", "lstadd_back failed");
