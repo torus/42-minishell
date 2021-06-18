@@ -29,9 +29,13 @@ int	cmd_add_inredirect(t_command_invocation *command,
 	t_cmd_redirection	*redirection;
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
-	redirection->filepath = filepath;
+	if (!redirection)
+		put_minish_err_msg_and_exit(1, "add_inredirect", "malloc() failed");
+	redirection->filepath = ft_strdup(filepath);
+	if (!redirection->filepath)
+		put_minish_err_msg_and_exit(1, "add_inredirect", "malloc() failed");
 	redirection->fd = fd;
-	if (!redirection || !ft_lstadd_back_new(
+	if (!ft_lstadd_back_new(
 			&command->input_redirections, (void *)redirection))
 	{
 		free(redirection);
@@ -48,7 +52,7 @@ int	cmd_add_heredoc(t_command_invocation *command,
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
 	if (!redirection)
-		put_minish_err_msg_and_exit(1, "redirection", "malloc failed");
+		put_minish_err_msg_and_exit(1, "heredoc", "malloc failed");
 	redirection->fd = fd;
 	redirection->is_heredoc = true;
 	while (1)
@@ -67,9 +71,10 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	}
 	if (!input_str)
 		write(1, "\n", 1);
+	free(input_str);
 	if (!ft_lstadd_back_new(
 			&command->input_redirections, (void *)redirection))
-		put_minish_err_msg_and_exit(1, "redirection", "lstadd_back failed");
+		put_minish_err_msg_and_exit(1, "heredoc", "lstadd_back failed");
 	return (0);
 }
 
@@ -79,10 +84,14 @@ int	cmd_add_outredirect(t_command_invocation *command,
 	t_cmd_redirection	*redirection;
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
-	redirection->filepath = filepath;
+	if (!redirection)
+		put_minish_err_msg_and_exit(1, "add_outredirect", "malloc() failed");
+	redirection->filepath = ft_strdup(filepath);
+	if (!redirection->filepath)
+		put_minish_err_msg_and_exit(1, "add_outredirect", "malloc() failed");
 	redirection->fd = fd;
 	redirection->is_append = is_append;
-	if (!redirection || !ft_lstadd_back_new(
+	if (ft_lstadd_back_new(
 			&command->output_redirections, (void *)redirection))
 	{
 		free(redirection);

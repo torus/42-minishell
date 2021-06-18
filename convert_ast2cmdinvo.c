@@ -44,21 +44,24 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	int			redirection_type;
 	const char	*text;
 	int			fd;
+	int			status;
 
 	redirection_type = redirection_node->type;
 	text = string_node2string(redirection_node->string_node->content.string);
 	fd = redirection_node->fd;
+	status = 0;
 	if (!text)
 		return (ERROR);
 	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
-		return (cmd_add_inredirect(command, text, fd));
+		status = cmd_add_inredirect(command, text, fd);
 	else if (redirection_type == TOKTYPE_OUTPUT_REDIRECTION)
-		return (cmd_add_outredirect(command, text, fd, false));
+		status = cmd_add_outredirect(command, text, fd, false);
 	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
-		return (cmd_add_outredirect(command, text, fd, true));
+		status = cmd_add_outredirect(command, text, fd, true);
 	else if (redirection_type == TOKTYPE_HEREDOCUMENT)
-		return (cmd_add_heredoc(command, text, fd));
-	return (0);
+		status = cmd_add_heredoc(command, text, fd);
+	free((void *)text);
+	return (status);
 }
 
 /* parse argument_node and set values of command
