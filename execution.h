@@ -40,10 +40,10 @@ int						open_file_for_redirect(t_cmd_redirection *red,
 							int open_flags, mode_t open_mode);
 int						put_redirect_fd_err_msg_and_ret(int ret_value,
 							int fd, char *msg);
-int						cmd_set_input_file(t_command_invocation *command);
+int						cmd_set_input_file(t_command_invocation *command, int heredoc_pipe[2]);
 int						cmd_set_output_file(t_command_invocation *command);
 void					cmd_exec_command(t_command_invocation *command,
-							int pipe_prev_fd[2], int pipe_fd[2]);
+							int pipe_prev_fd[2], int pipe_fd[2], int heredoc_pipe[2]);
 int						cmd_exec_builtin(t_command_invocation *command);
 void					cmd_close_pipe(int pipe_fd[2]);
 void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
