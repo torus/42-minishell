@@ -52,7 +52,6 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	while (1)
 	{
 		input_str = readline("> ");
-		printf("input_str: |%s|\n", input_str);
 		if (!input_str)
 			return (put_minish_err_msg_and_ret(ERROR, "heredoc", "delimited by EOF"));
 		if (!ft_strcmp(input_str, limit_str))

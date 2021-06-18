@@ -83,17 +83,33 @@ int	cmd_set_input_file(t_command_invocation *command)
 	t_cmd_redirection	*red;
 
 	current = command->input_redirections;
+	// ファイルのfdで上書きする前のINPUT_REDIRECTIONを持っとく
+	int	stdinfd;
+	stdinfd = dup(STDIN_FILENO);
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
-		fd = open_file_for_redirect(red, O_RDONLY, 0);
-		if (fd == ERROR)
-			return (ERROR);
-		if (dup2(fd, red->fd) == -1)
-			return (put_redirect_fd_err_msg_and_ret(ERROR,
-					red->fd, strerror(errno)));
+		if (!red->is_heredoc)
+		{
+			fd = open_file_for_redirect(red, O_RDONLY, 0);
+			if (fd == ERROR)
+				return (ERROR);
+			if (red->fd == stdinfd)
+				fd = dup(stdinfd);
+			if (dup2(fd, red->fd) == -1)
+				return (put_redirect_fd_err_msg_and_ret(ERROR,
+						red->fd, strerror(errno)));
+		}
+		else
+		{
+			// heredoc(パイプfd)で標準入力を上書き
+			if (dup2(stdinfd, STDIN_FILENO) == -1)
+				return (put_redirect_fd_err_msg_and_ret(ERROR,
+						red->fd, strerror(errno)));
+		}
 		current = current->next;
 	}
+	close(stdinfd);
 	return (0);
 }
 
