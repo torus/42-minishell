@@ -33,12 +33,11 @@ int	cmd_wait_commands(t_command_invocation *command)
 	return (status);
 }
 
-#include <stdio.h>
 /*
  * input_redirectionsの最後がheredocの場合, pipe_prev_fd(pipe_fd[1]) に書き込みを行う
  * pipe_fd: commandプロセスに対するpipe_fd
  */
-int	write_heredoc(t_command_invocation *command, int pipe_prev_fd[2])
+int	write_heredoc(t_command_invocation *command, int pipe_heredoc_fd[2])
 {
 	t_list				*current;
 	t_cmd_redirection	*red;
@@ -51,9 +50,8 @@ int	write_heredoc(t_command_invocation *command, int pipe_prev_fd[2])
 	red = (t_cmd_redirection *)current->content;
 	if (!red->is_heredoc)
 		return (0);
-	printf("----- write(%d) -----\n", pipe_prev_fd[1]);
-	printf("file_path: \n|%s|\n", red->filepath);
-	write(pipe_prev_fd[1], red->filepath, ft_strlen(red->filepath));
+	close(pipe_heredoc_fd[0]);
+	write(pipe_heredoc_fd[1], red->filepath, ft_strlen(red->filepath));
 	return (0);
 }
 
