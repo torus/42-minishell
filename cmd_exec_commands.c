@@ -51,7 +51,6 @@ int	write_heredoc(t_command_invocation *command, int pipe_prev_fd[2])
 	red = (t_cmd_redirection *)current->content;
 	if (!red->is_heredoc)
 		return (0);
-	close(pipe_prev_fd[0]);
 	printf("----- write(%d) -----\n", pipe_prev_fd[1]);
 	printf("file_path: \n|%s|\n", red->filepath);
 	write(pipe_prev_fd[1], red->filepath, ft_strlen(red->filepath));
@@ -76,7 +75,7 @@ int	cmd_exec_commands(t_command_invocation *command)
 	if (!command->piped_command && command->exec_and_args
 		&& is_builtin_command((char *)command->exec_and_args[0]))
 		return (cmd_exec_builtin(current_cmd));
-	cmd_init_pipe_fd(pipe_prev_fd, STDIN_FILENO, -1);
+	cmd_init_pipe_fd(command, pipe_prev_fd);
 	while (current_cmd)
 	{
 		if (pipe(pipe_fd) == -1)
@@ -86,6 +85,7 @@ int	cmd_exec_commands(t_command_invocation *command)
 			return (put_err_msg_and_ret("error fork()"));
 		else if (pid == 0)
 			cmd_exec_command(current_cmd, pipe_prev_fd, pipe_fd);
+		write_heredoc(current_cmd, pipe_prev_fd);
 		current_cmd->pid = pid;
 		if (cmd_connect_pipe(pipe_prev_fd, pipe_fd) != 0)
 			return (put_err_msg_and_ret("error cmd_connect_pipe()"));
