@@ -47,6 +47,8 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	t_cmd_redirection	*redirection;
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
+	if (!redirection)
+		put_minish_err_msg_and_exit(1, "redirection", "malloc failed");
 	redirection->fd = fd;
 	redirection->is_heredoc = true;
 	while (1)
@@ -58,12 +60,16 @@ int	cmd_add_heredoc(t_command_invocation *command,
 			break ;
 		redirection->filepath = strjoin_nullable_and_free_both(
 			(char *)redirection->filepath, input_str);
+		if (!redirection->filepath)
+			return (ERROR);
 		redirection->filepath = strjoin_and_free_first(
 			(char *)redirection->filepath, "\n");
+		if (!redirection->filepath)
+			return (ERROR);
 	}
-	if (!redirection || !ft_lstadd_back_new(
+	if (!ft_lstadd_back_new(
 			&command->input_redirections, (void *)redirection))
-		put_minish_err_msg_and_exit(1, "redirection", "malloc failed");
+		put_minish_err_msg_and_exit(1, "redirection", "lstadd_back failed");
 	return (0);
 }
 
