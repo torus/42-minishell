@@ -51,7 +51,8 @@ int	write_heredoc(t_command_invocation *command, int pipe_heredoc_fd[2])
 	if (!red->is_heredoc)
 		return (0);
 	close(pipe_heredoc_fd[0]);
-	write(pipe_heredoc_fd[1], red->filepath, ft_strlen(red->filepath));
+	if (red->filepath)
+		write(pipe_heredoc_fd[1], red->filepath, ft_strlen(red->filepath));
 	return (0);
 }
 
