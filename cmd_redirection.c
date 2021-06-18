@@ -76,16 +76,14 @@ int	open_file_for_redirect(t_cmd_redirection *red,
  *
  * return: return -1 if error has occurred, otherwise, return 0.
  */
-int	cmd_set_input_file(t_command_invocation *command)
+int	cmd_set_input_file(t_command_invocation *command, int pipe_heredoc_fd[2])
 {
 	int					fd;
 	t_list				*current;
 	t_cmd_redirection	*red;
 
 	current = command->input_redirections;
-	// ファイルのfdで上書きする前のINPUT_REDIRECTIONを持っとく
-	int	stdinfd;
-	stdinfd = dup(STDIN_FILENO);
+	close(pipe_heredoc_fd[1]);
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
@@ -94,8 +92,6 @@ int	cmd_set_input_file(t_command_invocation *command)
 			fd = open_file_for_redirect(red, O_RDONLY, 0);
 			if (fd == ERROR)
 				return (ERROR);
-			if (red->fd == stdinfd)
-				fd = dup(stdinfd);
 			if (dup2(fd, red->fd) == -1)
 				return (put_redirect_fd_err_msg_and_ret(ERROR,
 						red->fd, strerror(errno)));
@@ -103,13 +99,13 @@ int	cmd_set_input_file(t_command_invocation *command)
 		else
 		{
 			// heredoc(パイプfd)で標準入力を上書き
-			if (dup2(stdinfd, STDIN_FILENO) == -1)
+			if (pipe_heredoc_fd[0] != -1 && dup2(pipe_heredoc_fd[0], STDIN_FILENO) == -1)
 				return (put_redirect_fd_err_msg_and_ret(ERROR,
 						red->fd, strerror(errno)));
 		}
 		current = current->next;
 	}
-	close(stdinfd);
+	close(pipe_heredoc_fd[0]);
 	return (0);
 }
 
