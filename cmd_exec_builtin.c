@@ -68,22 +68,32 @@ static int	builtin_set_in_red(t_command_invocation *command,
 	t_list				*current;
 	t_cmd_redirection	*red;
 
-	*stdinfd = dup(STDIN_FILENO);
 	current = command->input_redirections;
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
-		fd = open_file_for_redirect(red, O_RDONLY, 0);
-		if (fd == ERROR)
-			return (ERROR);
-		if (red->fd == *stdinfd)
-			*stdinfd = dup(*stdinfd);
-		if (red->fd == *stdoutfd)
-			*stdoutfd = dup(*stdoutfd);
-		if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
-			|| !fd_list_add_fd(fd_list, red->fd))
-			return (put_redirect_fd_err_msg_and_ret(ERROR,
-					red->fd, strerror(errno)));
+		if (!red->is_heredoc)
+		{
+			fd = open_file_for_redirect(red, O_RDONLY, 0);
+			if (fd == ERROR)
+				return (ERROR);
+			if (red->fd == *stdinfd)
+				*stdinfd = dup(*stdinfd);
+			if (red->fd == *stdoutfd)
+				*stdoutfd = dup(*stdoutfd);
+			if  (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
+				|| !fd_list_add_fd(fd_list, red->fd))
+				return (put_redirect_fd_err_msg_and_ret(ERROR,
+						red->fd, strerror(errno)));
+		}
+		else
+		{
+			if (red->fd == *stdinfd)
+				*stdinfd = dup(*stdinfd);
+			if (red->fd == *stdoutfd)
+				*stdoutfd = dup(*stdoutfd);
+			close(red->fd);
+		}
 		current = current->next;
 	}
 	return (0);
@@ -107,7 +117,6 @@ static int	builtin_set_out_red(t_command_invocation *command,
 	t_cmd_redirection	*red;
 	int					flag_open;
 
-	*stdoutfd = dup(STDOUT_FILENO);
 	current = command->output_redirections;
 	while (current)
 	{
@@ -141,7 +150,10 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	t_fd_list		*fd_lst;
 
 	fd_lst = NULL;
-	if (builtin_set_in_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR
+	stdinfd = dup(STDIN_FILENO);
+	stdoutfd = dup(STDOUT_FILENO);
+	if (stdinfd == -1 || stdoutfd == -1
+		|| builtin_set_in_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR
 		|| builtin_set_out_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR)
 		return (set_status_and_ret(1, 1));
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);
