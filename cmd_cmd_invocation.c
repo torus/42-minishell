@@ -104,7 +104,7 @@ int	cmd_add_outredirect(t_command_invocation *command,
 		put_minish_err_msg_and_exit(1, "add_outredirect", "malloc() failed");
 	redirection->fd = fd;
 	redirection->is_append = is_append;
-	if (ft_lstadd_back_new(
+	if (!ft_lstadd_back_new(
 			&command->output_redirections, (void *)redirection))
 	{
 		free(redirection);
