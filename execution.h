@@ -59,6 +59,8 @@ int						cmd_add_inredirect(t_command_invocation *command,
 							const char *filepath, int fd);
 int						cmd_add_heredoc(t_command_invocation *command,
 							const char *limit_str, int fd);
+int						cmd_check_readline_has_finished(void);
+void					cmd_set_heredoc_sighandlers(void);
 int						cmd_add_outredirect(t_command_invocation *command,
 							const char *filepath, int fd, bool is_append);
 void					cmd_del_redirection(void *redirection);

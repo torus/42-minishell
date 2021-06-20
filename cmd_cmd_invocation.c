@@ -44,30 +44,6 @@ int	cmd_add_inredirect(t_command_invocation *command,
 	return (0);
 }
 
-static int	done_readline(void)
-{
-	if (g_shell.heredoc_interruption)
-		rl_done = 1;
-	return 0;
-}
-
-static void	heredoc_sigint_sighandler(int sig)
-{
-	g_shell.heredoc_interruption = 1;
-	set_status(128 + sig);
-}
-
-void	set_heredoc_sighandlers()
-{
-	g_shell.heredoc_interruption = 0;
-	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR
-		|| signal(SIGINT, heredoc_sigint_sighandler) == SIG_ERR)
-	{
-		printf("signal() failed\n");
-		exit(1);
-	}
-}
-
 int	cmd_add_heredoc(t_command_invocation *command,
 	const char *limit_str, int fd)
 {
@@ -80,8 +56,8 @@ int	cmd_add_heredoc(t_command_invocation *command,
 		put_minish_err_msg_and_exit(1, "heredoc", "malloc failed");
 	redirection->fd = fd;
 	redirection->is_heredoc = true;
-	set_heredoc_sighandlers();
-	rl_event_hook = done_readline;
+	cmd_set_heredoc_sighandlers();
+	rl_event_hook = cmd_check_readline_has_finished;
 	while (!g_shell.heredoc_interruption)
 	{
 		input_str = readline("> ");
