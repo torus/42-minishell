@@ -14,6 +14,7 @@ typedef struct s_shell {
 	t_var				*vars;
 	int					status;
 	int					signal_child_received;
+	int					heredoc_interruption;
 }				t_shell;
 extern t_shell	g_shell;
 
