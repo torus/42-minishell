@@ -1,5 +1,5 @@
+#include "libft/libft.h"
 #include "env.h"
-#include "minishell.h"
 
 /*
  * Get the variables with key substr(str, 0, env_len)
