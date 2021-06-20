@@ -37,10 +37,11 @@ int	invoke_sequential_commands(t_parse_ast *seqcmd)
 		inv = cmd_ast_pipcmds2cmdinvo(
 				seqcmd->content.sequential_commands->pipcmd_node
 				->content.piped_commands);
-		if (!inv)
-			die();
-		status = cmd_exec_commands(inv);
-		cmd_free_cmdinvo(inv);
+		if (inv)
+		{
+			status = cmd_exec_commands(inv);
+			cmd_free_cmdinvo(inv);
+		}
 		seqcmd = seqcmd->content.sequential_commands->rest_node;
 	}
 	return (status);
