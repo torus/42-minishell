@@ -47,8 +47,9 @@ int	cmd_add_inredirect(t_command_invocation *command,
 int	cmd_add_heredoc(t_command_invocation *command,
 	const char *limit_str, int fd)
 {
-	char	*input_str;
+	char				*input_str;
 	t_cmd_redirection	*redirection;
+	const char			*old_filepath;
 
 	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
 	if (!redirection)
@@ -72,6 +73,9 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	if (!input_str)
 		write(1, "\n", 1);
 	free(input_str);
+	old_filepath = redirection->filepath;
+	redirection->filepath = expand_env_var((char *)redirection->filepath);
+	free((void*)old_filepath);
 	if (!ft_lstadd_back_new(
 			&command->input_redirections, (void *)redirection))
 		put_minish_err_msg_and_exit(1, "heredoc", "lstadd_back failed");
