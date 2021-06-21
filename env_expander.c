@@ -8,7 +8,7 @@
  * Old result will be freed
  *   so caller doesn't need to free result after calling this function.
  */
-static char	*expand_env_and_join(char *result,
+char	*expand_env_and_join(char *result,
 	char *str, int env_len)
 {
 	char	*keyname;
@@ -40,7 +40,7 @@ static char	*expand_env_and_join(char *result,
  * Old result will be freed
  *   so caller doesn't need to free result after calling this function.
  */
-static char	*result_join_normal_str(char *result,
+char	*exp_result_join_normal_str(char *result,
 	char *str, int len)
 {
 	char	*tmp;
@@ -70,7 +70,7 @@ static char	*result_join_normal_str(char *result,
  *       srt[len] is invalid character as variable key.
  *   - str[len] has reached to the end of string.
  */
-static bool	will_toggle_env(bool is_in_env,
+bool	exp_will_toggle_env(bool is_in_env,
 	bool is_in_noexpand, char *str, int len)
 {
 	bool	will_start_env;
@@ -96,13 +96,13 @@ static bool	will_toggle_env(bool is_in_env,
  *
  * return: whether continue string processing.
  */
-static bool	join_str_or_env(char **result,
+bool	exp_join_str_or_env(char **result,
 	char **str, int *len, bool *is_in_env)
 {
 	if (*is_in_env)
 		*result = expand_env_and_join(*result, *str, *len);
 	else
-		*result = result_join_normal_str(*result, *str, *len);
+		*result = exp_result_join_normal_str(*result, *str, *len);
 	if (!(*str)[*len] || !result)
 		return (false);
 	*str += *len + !*is_in_env;
@@ -137,53 +137,8 @@ char	*expand_env_var(char *str)
 	{
 		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
-		if (will_toggle_env(is_in_env, is_in_noexpand, str, len))
-			is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
-		else
-			len++;
-	}
-	return (result);
-}
-
-/* Expand variables in document of heredoc.
- *
- * ex:
- *   in($ABC="hoge"):       |\$USER \\$USER $USER '$USER' "$USER" \"\'\$|
- *   out:                   |$USER \jun jun 'jun' "jun" \"\'$|
- */
-char	*expand_heredoc_document(char *str)
-{
-	char	*result;
-	int		len;  // 現在見ている範囲の長さ. 先頭は*strを直接動かす
-	bool	is_in_env;  // 現在環境変数にいるか
-	char	*tmpstr;
-	bool	is_continue;
-
-	result = ft_strdup("");
-	is_continue = true;
-	len = 0;
-	is_in_env = false;
-	while (is_continue)
-	{
-		// エスケープの処理
-		if (str[len] == '\\')
-		{
-			if (is_in_env)
-				is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
-			// ここまでの文字列を繋げる
-			// バックスラッシュの次の文字が特殊文字('$' | '\')じゃなければバックスラッシュも入れる
-			tmpstr = ft_substr(str, 0, len + !(str[len + 1] == '$' || str[len + 1] == '\\'));
-			result = strjoin_and_free_both(result, tmpstr);
-			str += len + 1;
-			// バックスラッシュの次の文字を繋げる
-			tmpstr = ft_substr(str, 0, 1);
-			result = strjoin_and_free_both(result, tmpstr);
-			str += 1;
-			len = 0;
-		}
-		// ドルマーク($) 環境変数開始の処理
-		else if (will_toggle_env(is_in_env, false, str, len))
-			is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
+		if (exp_will_toggle_env(is_in_env, is_in_noexpand, str, len))
+			is_continue = exp_join_str_or_env(&result, &str, &len, &is_in_env);
 		else
 			len++;
 	}
