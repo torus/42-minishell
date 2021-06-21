@@ -37,8 +37,8 @@ int	cmd_wait_commands(t_command_invocation *command)
 }
 
 /*
- * input_redirectionsの最後がheredocの場合, pipe_prev_fd(pipe_fd[1]) に書き込みを行う
- * pipe_fd: commandプロセスに対するpipe_fd
+ * Write to pipe_heredoc_fd[1]
+ *   if last element of input_redirections is heredoc.
  */
 int	write_heredoc(t_command_invocation *command, int pipe_heredoc_fd[2])
 {
