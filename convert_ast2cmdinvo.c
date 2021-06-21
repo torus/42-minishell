@@ -38,34 +38,17 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
  *     | ">" string
  *     | ">>" string
  */
-#include <stdio.h>
 int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	t_command_invocation *command)
 {
-	int			redirection_type;
-	const char	*text;
-	bool		is_expandable_heredoc;
-	int			fd;
-	int			status;
+	int		redirection_type;
+	char	*text;
+	int		fd;
+	int		status;
 
 	redirection_type = redirection_node->type;
-	text = string_node2string(redirection_node->string_node->content.string, redirection_type != TOKTYPE_HEREDOCUMENT);
-
-	// heredoc が expandable かどうか取得する
-	t_parse_node_string *str_node = redirection_node->string_node->content.string;
-	is_expandable_heredoc = 1;
-	while (str_node)
-	{
-		if (str_node->type == TOKTYPE_NON_EXPANDABLE)
-			is_expandable_heredoc = 0;
-		if (str_node->next)
-			str_node = str_node->next->content.string;
-		else
-			str_node = NULL;
-	}
-
-	printf("text: |%s|, is_expandable: %d\n", text, is_expandable_heredoc);
-
+	text = string_node2string(redirection_node->string_node->content.string,
+			redirection_type != TOKTYPE_HEREDOCUMENT);
 	fd = redirection_node->fd;
 	status = 0;
 	if (!text)
@@ -77,7 +60,8 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
 		status = cmd_add_outredirect(command, text, fd, true);
 	else if (redirection_type == TOKTYPE_HEREDOCUMENT)
-		status = cmd_add_heredoc(command, text, fd, is_expandable_heredoc);
+		status = cmd_add_heredoc(command, text, fd,
+				cmd_is_heredoc_expandable(redirection_node));
 	free((void *)text);
 	return (status);
 }
@@ -95,10 +79,10 @@ int	cmd_process_arguments_node(t_parse_node_arguments *args_node,
 {
 	if (args_node->string_node)
 		return (cmd_process_string_node(
-			args_node->string_node->content.string, command));
+				args_node->string_node->content.string, command));
 	else if (args_node->redirection_node)
 		return (cmd_process_redirection_node(
-			args_node->redirection_node->content.redirection, command));
+				args_node->redirection_node->content.redirection, command));
 	else
 		return (1);
 	return (0);

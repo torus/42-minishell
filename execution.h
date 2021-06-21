@@ -3,6 +3,7 @@
 
 # include <unistd.h>
 # include "libft/libft.h"
+# include "parse.h"
 
 # define HEREDOC_EXPANDABLE   0b01
 # define HEREDOC_NOEXPANDABLE 0b10
@@ -53,6 +54,7 @@ void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 void					cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
 int						cmd_set_heredoc_pipe_fd(t_command_invocation *command,
 							int pipe_heredoc_fd[2]);
+bool					cmd_is_heredoc_expandable(t_parse_node_redirection *redirection_node);
 char					*expand_heredoc_document(char *str);
 t_list					*cmd_lstadd_back_pid(t_list **lst, int pid);
 int						cmd_wait_pid_lst(t_list *lst);

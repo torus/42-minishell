@@ -28,3 +28,21 @@ void	cmd_set_heredoc_sighandlers()
 		exit(1);
 	}
 }
+
+bool	cmd_is_heredoc_expandable(t_parse_node_redirection *redirection_node)
+{
+	bool		is_expandable_heredoc;
+
+	t_parse_node_string *str_node = redirection_node->string_node->content.string;
+	is_expandable_heredoc = 1;
+	while (str_node)
+	{
+		if (str_node->type == TOKTYPE_NON_EXPANDABLE)
+			is_expandable_heredoc = 0;
+		if (str_node->next)
+			str_node = str_node->next->content.string;
+		else
+			str_node = NULL;
+	}
+	return (is_expandable_heredoc);
+}
