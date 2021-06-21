@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include "env.h"
 #include "utils.h"
 
 static bool	cmd_str_node_add_back(t_cmd_str_node ***str_node_arr,
