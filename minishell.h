@@ -31,7 +31,8 @@ typedef void	(*t_sighandler)(int);
 
 t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds);
 t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node);
-char					*string_node2string(t_parse_node_string *string_node, bool add_quotes);
+char					*string_node2string(t_parse_node_string *string_node,
+							bool add_quotes);
 char					**expand_string_node(t_parse_node_string *string_node);
 char					**split_expanded_str(char *str);
 char					**expand_string_node(t_parse_node_string *string_node);
