@@ -45,6 +45,7 @@ int						put_minish_err_msg_and_ret(int ret_val,
 							const char *cmd_name, const char *msg);
 void					put_minish_err_msg_and_exit(int status,
 							const char *cmd_name, const char *msg);
+void					check_malloc_has_succeeded(char *cmd_name, void *ptr);
 int						invoke_sequential_commands(t_parse_ast *seqcmd);
 int						interactive_shell(void);
 
