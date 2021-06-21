@@ -18,11 +18,12 @@ void	cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1)
 	pipe_fd[1] = pipe1;
 }
 
-int	cmd_set_heredoc_pipe_fd(t_command_invocation *command, int pipe_heredoc_fd[2])
+int	cmd_set_heredoc_pipe_fd(t_command_invocation *command,
+	int pipe_heredoc_fd[2])
 {
-	t_list	*current;
+	t_list				*current;
 	t_cmd_redirection	*red;
-	
+
 	if (!command->input_redirections)
 	{
 		pipe_heredoc_fd[0] = -1;
