@@ -63,8 +63,10 @@ static void	readline4heredoc(t_cmd_redirection *red, const char *limit_str)
 	}
 	rl_event_hook = NULL;
 	if (!input_str)
+	{
 		write(1, "\n", 1);
-	free(input_str);
+		free(input_str);
+	}
 }
 
 int	cmd_add_heredoc(t_command_invocation *command,
