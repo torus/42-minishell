@@ -57,13 +57,9 @@ static void	readline4heredoc(t_cmd_redirection *red, const char *limit_str)
 		red->filepath = strjoin_nullable_and_free_both(
 				(char *)red->filepath, input_str);
 		check_malloc_has_succeeded("heredoc", (void *)red->filepath);
-		if (!red->filepath)
-			put_minish_err_msg_and_exit(1, "heredoc", "strjoin failed");
 		red->filepath = strjoin_and_free_first(
 				(char *)red->filepath, "\n");
 		check_malloc_has_succeeded("heredoc", (void *)red->filepath);
-		if (!red->filepath)
-			put_minish_err_msg_and_exit(1, "heredoc", "strjoin failed");
 	}
 	rl_event_hook = NULL;
 	if (!input_str)
@@ -78,8 +74,7 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	const char			*old_filepath;
 
 	red = ft_calloc(1, sizeof(t_cmd_redirection));
-	if (!red)
-		put_minish_err_msg_and_exit(1, "heredoc", "malloc failed");
+	check_malloc_has_succeeded("heredoc", (void *)red);
 	red->fd = fd;
 	red->is_heredoc = true;
 	cmd_set_heredoc_sighandlers();

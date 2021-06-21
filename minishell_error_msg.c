@@ -42,8 +42,8 @@ void	check_malloc_has_succeeded(char *cmd_name, void *ptr)
 	if (!ptr)
 	{
 		if (cmd_name)
-			put_minish_err_msg_and_exit(1, cmd_name, "failed");
+			put_minish_err_msg_and_exit(1, cmd_name, "malloc() failed");
 		else
-			put_minish_err_msg_and_exit(1, "malloc", "failed");
+			put_minish_err_msg_and_exit(1, "malloc", "malloc() failed");
 	}
 }

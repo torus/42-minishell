@@ -13,12 +13,10 @@ static void	put_export_err_msg(char *identifer)
 	char	*errmsg;
 
 	tmp = ft_strjoin("`", identifer);
-	if (!tmp)
-		put_minish_err_msg_and_exit(1, "export", "failed malloc()");
+	check_malloc_has_succeeded("export", tmp);
 	errmsg = ft_strjoin(tmp, "': not a valid identifier");
 	free(tmp);
-	if (!errmsg)
-		put_minish_err_msg_and_exit(1, "export", "failed malloc()");
+	check_malloc_has_succeeded("export", errmsg);
 	put_minish_err_msg("export", errmsg);
 	free(errmsg);
 }

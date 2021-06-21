@@ -26,19 +26,17 @@ t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args)
 int	cmd_add_inredirect(t_command_invocation *command,
 	const char *filepath, int fd)
 {
-	t_cmd_redirection	*redirection;
+	t_cmd_redirection	*red;
 
-	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
-	if (!redirection)
-		put_minish_err_msg_and_exit(1, "add_inredirect", "malloc() failed");
-	redirection->filepath = ft_strdup(filepath);
-	if (!redirection->filepath)
-		put_minish_err_msg_and_exit(1, "add_inredirect", "malloc() failed");
-	redirection->fd = fd;
+	red = ft_calloc(1, sizeof(t_cmd_redirection));
+	check_malloc_has_succeeded("add_inredirect", red);
+	red->filepath = ft_strdup(filepath);
+	check_malloc_has_succeeded("add_inredirect", (void *)red->filepath);
+	red->fd = fd;
 	if (!ft_lstadd_back_new(
-			&command->input_redirections, (void *)redirection))
+			&command->input_redirections, (void *)red))
 	{
-		free(redirection);
+		free(red);
 		return (ERROR);
 	}
 	return (0);
@@ -47,20 +45,18 @@ int	cmd_add_inredirect(t_command_invocation *command,
 int	cmd_add_outredirect(t_command_invocation *command,
 	const char *filepath, int fd, bool is_append)
 {
-	t_cmd_redirection	*redirection;
+	t_cmd_redirection	*red;
 
-	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
-	if (!redirection)
-		put_minish_err_msg_and_exit(1, "add_outredirect", "malloc() failed");
-	redirection->filepath = ft_strdup(filepath);
-	if (!redirection->filepath)
-		put_minish_err_msg_and_exit(1, "add_outredirect", "malloc() failed");
-	redirection->fd = fd;
-	redirection->is_append = is_append;
+	red = ft_calloc(1, sizeof(t_cmd_redirection));
+	check_malloc_has_succeeded("add_outredirect", red);
+	red->filepath = ft_strdup(filepath);
+	check_malloc_has_succeeded("add_outredirect", (void *)red->filepath);
+	red->fd = fd;
+	red->is_append = is_append;
 	if (!ft_lstadd_back_new(
-			&command->output_redirections, (void *)redirection))
+			&command->output_redirections, (void *)red))
 	{
-		free(redirection);
+		free(red);
 		return (ERROR);
 	}
 	return (0);

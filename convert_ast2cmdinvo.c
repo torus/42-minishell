@@ -101,8 +101,7 @@ t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 	t_parse_node_arguments	*args_node;
 
 	cmdinvo = cmd_init_cmdinvo(NULL);
-	if (!cmdinvo)
-		put_minish_err_msg_and_exit(1, "ast2cmdinvo", "malloc() failed");
+	check_malloc_has_succeeded("ast2cmdinvo", cmdinvo);
 	args_node = cmd_node->arguments_node->content.arguments;
 	while (args_node)
 	{
