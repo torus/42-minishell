@@ -44,17 +44,20 @@ int						open_file_for_redirect(t_cmd_redirection *red,
 							int open_flags, mode_t open_mode);
 int						put_redirect_fd_err_msg_and_ret(int ret_value,
 							int fd, char *msg);
-int						cmd_set_input_file(t_command_invocation *command, int heredoc_pipe[2]);
+int						cmd_set_input_file(t_command_invocation *command,
+							int heredoc_pipe[2]);
 int						cmd_set_output_file(t_command_invocation *command);
 void					cmd_exec_command(t_command_invocation *command,
-							int pipe_prev_fd[2], int pipe_fd[2], int heredoc_pipe[2]);
+							int pipe_prev_fd[2], int pipe_fd[2],
+							int heredoc_pipe[2]);
 int						cmd_exec_builtin(t_command_invocation *command);
 void					cmd_close_pipe(int pipe_fd[2]);
 void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 void					cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
 int						cmd_set_heredoc_pipe_fd(t_command_invocation *command,
 							int pipe_heredoc_fd[2]);
-bool					cmd_is_heredoc_expandable(t_parse_node_redirection *redirection_node);
+bool					cmd_is_heredoc_expandable(
+							t_parse_node_redirection *redirection_node);
 char					*expand_heredoc_document(char *str);
 t_list					*cmd_lstadd_back_pid(t_list **lst, int pid);
 int						cmd_wait_pid_lst(t_list *lst);
