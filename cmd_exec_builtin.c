@@ -10,6 +10,18 @@
 #include "builtin.h"
 #include "minishell.h"
 
+static int	save_stdin_stdout(t_cmd_redirection *red,
+	int *stdinfd, int *stdoutfd)
+{
+	if (red->fd == *stdinfd)
+		*stdinfd = dup(*stdinfd);
+	if (red->fd == *stdoutfd)
+		*stdoutfd = dup(*stdoutfd);
+	if (*stdinfd == -1 || *stdoutfd == -1)
+		return (ERROR);
+	return (0);
+}
+
 /* Configure input redirection for builtin command.
  *
  * command: Command.
@@ -31,28 +43,20 @@ static int	builtin_set_in_red(t_command_invocation *command,
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
+		if (save_stdin_stdout(red, stdinfd, stdoutfd))
+			return (ERROR);
 		if (!red->is_heredoc)
 		{
 			fd = open_file_for_redirect(red, O_RDONLY, 0);
 			if (fd == ERROR)
 				return (ERROR);
-			if (red->fd == *stdinfd)
-				*stdinfd = dup(*stdinfd);
-			if (red->fd == *stdoutfd)
-				*stdoutfd = dup(*stdoutfd);
 			if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
 				|| !fd_list_add_fd(fd_list, red->fd))
 				return (put_redir_errmsg_and_ret(ERROR,
 						red->fd, strerror(errno)));
 		}
 		else
-		{
-			if (red->fd == *stdinfd)
-				*stdinfd = dup(*stdinfd);
-			if (red->fd == *stdoutfd)
-				*stdoutfd = dup(*stdoutfd);
 			close(red->fd);
-		}
 		current = current->next;
 	}
 	return (0);
@@ -82,12 +86,8 @@ static int	builtin_set_out_red(t_command_invocation *command,
 		red = (t_cmd_redirection *)current->content;
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open, 0644);
-		if (fd == ERROR)
+		if (fd == ERROR || save_stdin_stdout(red, stdinfd, stdoutfd))
 			return (ERROR);
-		if (red->fd == *stdinfd)
-			*stdinfd = dup(*stdinfd);
-		if (red->fd == *stdoutfd)
-			*stdoutfd = dup(*stdoutfd);
 		if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
 			|| !fd_list_add_fd(fd_list, red->fd))
 			return (put_redir_errmsg_and_ret(ERROR,
