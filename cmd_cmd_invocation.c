@@ -44,56 +44,6 @@ int	cmd_add_inredirect(t_command_invocation *command,
 	return (0);
 }
 
-int	cmd_add_heredoc(t_command_invocation *command,
-	const char *limit_str, int fd, bool is_expandable)
-{
-	char				*input_str;
-	t_cmd_redirection	*redirection;
-	const char			*old_filepath;
-
-	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
-	if (!redirection)
-		put_minish_err_msg_and_exit(1, "heredoc", "malloc failed");
-	redirection->fd = fd;
-	redirection->is_heredoc = true;
-	cmd_set_heredoc_sighandlers();
-	rl_event_hook = cmd_check_readline_has_finished;
-	while (!g_shell.heredoc_interruption)
-	{
-		input_str = readline("> ");
-		if (!input_str || !ft_strcmp(input_str, limit_str))
-			break ;
-		redirection->filepath = strjoin_nullable_and_free_both(
-			(char *)redirection->filepath, input_str);
-		if (!redirection->filepath)
-			put_minish_err_msg_and_exit(1, "heredoc", "strjoin failed");
-		redirection->filepath = strjoin_and_free_first(
-			(char *)redirection->filepath, "\n");
-		if (!redirection->filepath)
-			put_minish_err_msg_and_exit(1, "heredoc", "strjoin failed");
-	}
-	rl_event_hook = NULL;
-	if (g_shell.heredoc_interruption)
-	{
-		cmd_del_redirection(redirection);
-		return (ERROR);
-	}
-	if (!input_str)
-		write(1, "\n", 1);
-	free(input_str);
-	if (is_expandable)
-	{
-		old_filepath = redirection->filepath;
-		redirection->filepath = expand_heredoc_document((char *)redirection->filepath);
-		free((void*)old_filepath);
-	}
-	if (!ft_lstadd_back_new(
-			&command->input_redirections, (void *)redirection))
-		put_minish_err_msg_and_exit(1, "heredoc", "lstadd_back failed");
-	set_sighandlers_during_execution();
-	return (0);
-}
-
 int	cmd_add_outredirect(t_command_invocation *command,
 	const char *filepath, int fd, bool is_append)
 {
