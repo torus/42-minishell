@@ -48,7 +48,7 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	int			status;
 
 	redirection_type = redirection_node->type;
-	text = expand_strnode4red(redirection_node->string_node->content.string);
+	text = string_node2string(redirection_node->string_node->content.string);
 	is_expandable_heredoc = redirection_node->string_node->content.string->type != TOKTYPE_NON_EXPANDABLE;
 	fd = redirection_node->fd;
 	status = 0;

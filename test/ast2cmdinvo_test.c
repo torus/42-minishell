@@ -271,7 +271,7 @@ int main()
 		string_node = string_node->next->content.string;
 		CHECK_EQ(string_node->type, TOKTYPE_NON_EXPANDABLE);
 		CHECK_EQ_STR(string_node->text, "$ABC");
-		char *expanded_str = string_node2string_for_red(args_node->string_node->content.string);
+		char *expanded_str = string_node2string(args_node->string_node->content.string);
 		printf("expanded: %s\n", expanded_str);
 		CHECK_EQ_STR(expanded_str, "hoge$ABC\"hoge hoge\"'$ABC'");
 		free(expanded_str);

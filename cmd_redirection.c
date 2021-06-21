@@ -34,10 +34,13 @@ int	put_redirect_fd_err_msg_and_ret(int ret_value, int fd, char *msg)
  */
 char	*expand_redirect_filepath(char *red_target)
 {
+	char	*expanded_str;
 	char	**splitted_expanded_str;
 	char	*filepath;
 
-	splitted_expanded_str = split_expanded_str(red_target);
+	expanded_str = expand_env_var(red_target);
+	splitted_expanded_str = split_expanded_str(expanded_str);
+	free(expanded_str);
 	if (!splitted_expanded_str
 		|| ptrarr_len((void **)splitted_expanded_str) != 1)
 	{
