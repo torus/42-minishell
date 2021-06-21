@@ -25,8 +25,11 @@ int	cmd_wait_commands(t_command_invocation *command)
 
 	while (command)
 	{
-		waitpid(command->pid, &status, 0);
-		status = WEXITSTATUS(status);
+		if (command->pid > 0)
+		{
+			waitpid(command->pid, &status, 0);
+			status = WEXITSTATUS(status);
+		}
 		command = command->piped_command;
 	}
 	set_status(status);
