@@ -5,9 +5,6 @@
 # include "libft/libft.h"
 # include "parse.h"
 
-# define HEREDOC_EXPANDABLE   0b01
-# define HEREDOC_NOEXPANDABLE 0b10
-
 typedef struct s_cmd_redirection
 {
 	const char	*filepath;
