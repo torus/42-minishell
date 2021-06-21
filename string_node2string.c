@@ -3,6 +3,7 @@
 
 /*
  * Convert AST string node to string.
+ * TODO: 環境変数展開はここでする
  */
 char	*string_node2string(t_parse_node_string *string_node)
 {

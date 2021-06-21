@@ -119,6 +119,7 @@ static bool	join_str_or_env(char **result,
  *   in($ABC="hoge"):       |'$''$'"ABC"'\'"$ABC""$ABC"|
  *   out:                   |'$''$'"ABC"'\'"hoge""hoge"|
  */
+// TODO: シングルクオートなどの処理を消す
 char	*expand_env_var(char *str)
 {
 	int		len;

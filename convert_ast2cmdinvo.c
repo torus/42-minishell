@@ -43,11 +43,13 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 {
 	int			redirection_type;
 	const char	*text;
+	bool		is_expandable_heredoc;
 	int			fd;
 	int			status;
 
 	redirection_type = redirection_node->type;
 	text = string_node2string(redirection_node->string_node->content.string);
+	is_expandable_heredoc = redirection_node->string_node->content.string->type != TOKTYPE_NON_EXPANDABLE;
 	fd = redirection_node->fd;
 	status = 0;
 	if (!text)
@@ -59,7 +61,7 @@ int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
 		status = cmd_add_outredirect(command, text, fd, true);
 	else if (redirection_type == TOKTYPE_HEREDOCUMENT)
-		status = cmd_add_heredoc(command, text, fd);
+		status = cmd_add_heredoc(command, text, fd, is_expandable_heredoc);
 	free((void *)text);
 	return (status);
 }

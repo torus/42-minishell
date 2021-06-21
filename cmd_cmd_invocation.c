@@ -45,7 +45,7 @@ int	cmd_add_inredirect(t_command_invocation *command,
 }
 
 int	cmd_add_heredoc(t_command_invocation *command,
-	const char *limit_str, int fd)
+	const char *limit_str, int fd, bool is_expandable)
 {
 	char				*input_str;
 	t_cmd_redirection	*redirection;
