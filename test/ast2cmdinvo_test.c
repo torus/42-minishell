@@ -242,6 +242,48 @@ int main()
 		unsetenv("ABC");
 	}
 
+	/* bash での出力を元としたテストケース
+	 *
+	 * $ cat << HOGE
+	 * > \$USER
+	 * > "\$USER"
+	 * > '$USER'
+	 * > $USER
+	 * > $\USER
+	 * > \"\'\$\\
+	 * $USER
+	 * "$USER"
+	 * 'jun'
+	 * jun
+	 * $\USER
+	 * \"\'$\
+	 */
+	TEST_SECTION("expand_heredoc_document() 普通文字と各種記号とバックスラッシュ\n");
+	{
+		ft_setenv("USER", "jun", 0);
+		set_status(0);
+		char *input = ft_strdup(
+			"\\$USER\n"
+			"\"\\$USER\"\n"
+			"'$USER'\n"
+			"$USER\n"
+			"$\\USER\n"
+			"\\\"\\'\\$\\\\\n"
+			);
+		char *actual = expand_heredoc_document(input);
+		char *expected =
+			"$USER\n"
+			"\"$USER\"\n"
+			"'jun'\n"
+			"jun\n"
+			"$\\USER\n"
+			"\\\"\\\'$\\\n";
+		CHECK_EQ_STR(actual, expected);
+		free(input);
+		free(actual);
+		unsetenv("ABC");
+	}
+
 	TEST_SECTION("string_node2string()");
 	{
 		/* 準備 */
