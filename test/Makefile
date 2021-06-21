@@ -3,7 +3,8 @@ LIBFT_MAKE = $(MAKE) -C $(LIBFT_PATH)
 LIBFT_LIB = ../libft/libft.a
 LDFLAGS = -lreadline
 SRCFILES = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c	\
-	cmd_exec_commands.c cmd_pipe.c cmd_redirection.c convert_ast2cmdinvo.c	\
+	cmd_exec_commands.c cmd_pipe.c cmd_redirection.c cmd_heredoc_funcs.c	\
+	convert_ast2cmdinvo.c													\
 	cmd_status.c signal.c env_setter.c minishell_error_msg.c env.c exec.c	\
 	cmd_exec_builtin.c														\
 																			\
