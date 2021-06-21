@@ -42,7 +42,7 @@ int						cmd_exec_commands(t_command_invocation *command);
 char					*expand_redirect_filepath(char *red_target);
 int						open_file_for_redirect(t_cmd_redirection *red,
 							int open_flags, mode_t open_mode);
-int						put_redirect_fd_err_msg_and_ret(int ret_value,
+int						put_redir_errmsg_and_ret(int ret_value,
 							int fd, char *msg);
 int						cmd_set_input_file(t_command_invocation *command,
 							int heredoc_pipe[2]);

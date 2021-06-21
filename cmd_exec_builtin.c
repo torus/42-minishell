@@ -83,7 +83,7 @@ static int	builtin_set_in_red(t_command_invocation *command,
 				*stdoutfd = dup(*stdoutfd);
 			if  (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
 				|| !fd_list_add_fd(fd_list, red->fd))
-				return (put_redirect_fd_err_msg_and_ret(ERROR,
+				return (put_redir_errmsg_and_ret(ERROR,
 						red->fd, strerror(errno)));
 		}
 		else
@@ -131,7 +131,7 @@ static int	builtin_set_out_red(t_command_invocation *command,
 			*stdoutfd = dup(*stdoutfd);
 		if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
 			|| !fd_list_add_fd(fd_list, red->fd))
-			return (put_redirect_fd_err_msg_and_ret(ERROR,
+			return (put_redir_errmsg_and_ret(ERROR,
 					red->fd, strerror(errno)));
 		current = current->next;
 	}

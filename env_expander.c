@@ -8,7 +8,7 @@
  * Old result will be freed
  *   so caller doesn't need to free result after calling this function.
  */
-char	*expand_env_and_join(char *result,
+char	*exp_expand_env_and_join(char *result,
 	char *str, int env_len)
 {
 	char	*keyname;
@@ -100,7 +100,7 @@ bool	exp_join_str_or_env(char **result,
 	char **str, int *len, bool *is_in_env)
 {
 	if (*is_in_env)
-		*result = expand_env_and_join(*result, *str, *len);
+		*result = exp_expand_env_and_join(*result, *str, *len);
 	else
 		*result = exp_result_join_normal_str(*result, *str, *len);
 	if (!(*str)[*len] || !result)
