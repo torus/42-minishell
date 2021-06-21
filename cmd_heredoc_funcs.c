@@ -9,7 +9,7 @@ int	cmd_check_readline_has_finished(void)
 {
 	if (g_shell.heredoc_interruption)
 		rl_done = 1;
-	return 0;
+	return (0);
 }
 
 static void	heredoc_sigint_sighandler(int sig)
@@ -18,7 +18,7 @@ static void	heredoc_sigint_sighandler(int sig)
 	set_status(128 + sig);
 }
 
-void	cmd_set_heredoc_sighandlers()
+void	cmd_set_heredoc_sighandlers(void)
 {
 	g_shell.heredoc_interruption = 0;
 	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR
@@ -31,9 +31,10 @@ void	cmd_set_heredoc_sighandlers()
 
 bool	cmd_is_heredoc_expandable(t_parse_node_redirection *redirection_node)
 {
-	bool		is_expandable_heredoc;
+	bool				is_expandable_heredoc;
+	t_parse_node_string	*str_node;
 
-	t_parse_node_string *str_node = redirection_node->string_node->content.string;
+	str_node = redirection_node->string_node->content.string;
 	is_expandable_heredoc = 1;
 	while (str_node)
 	{
