@@ -16,7 +16,11 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 	char		**splitted_env_val;
 	const char	**strarr;
 
-	splitted_env_val = expand_string_node(string_node);
+	if (command->exec_and_args && command->exec_and_args[0]
+		&& !ft_strcmp(command->exec_and_args[0], "export"))
+		splitted_env_val = expand_string_node(string_node, true);
+	else
+		splitted_env_val = expand_string_node(string_node, false);
 	strarr = (const char **)ptrarr_merge((void **)command->exec_and_args,
 			(void **)splitted_env_val);
 	free(splitted_env_val);
