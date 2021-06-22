@@ -1,4 +1,9 @@
+#include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "execution.h"
+#include "minishell.h"
+#include "utils.h"
 
 /*
 ** Malloc and initialize t_command_invocation
@@ -18,42 +23,40 @@ t_command_invocation	*cmd_init_cmdinvo(const char **exec_and_args)
 	return (cmdinvo);
 }
 
-/*
- * add input redirection
- */
 int	cmd_add_inredirect(t_command_invocation *command,
 	const char *filepath, int fd)
 {
-	t_cmd_redirection	*redirection;
+	t_cmd_redirection	*red;
 
-	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
-	redirection->filepath = filepath;
-	redirection->fd = fd;
-	if (!redirection || !ft_lstadd_back_new(
-			&command->input_redirections, (void *)redirection))
+	red = ft_calloc(1, sizeof(t_cmd_redirection));
+	check_malloc_has_succeeded("add_inredirect", red);
+	red->filepath = ft_strdup(filepath);
+	check_malloc_has_succeeded("add_inredirect", (void *)red->filepath);
+	red->fd = fd;
+	if (!ft_lstadd_back_new(
+			&command->input_redirections, (void *)red))
 	{
-		free(redirection);
+		free(red);
 		return (ERROR);
 	}
 	return (0);
 }
 
-/*
- * add output redirection
- */
 int	cmd_add_outredirect(t_command_invocation *command,
 	const char *filepath, int fd, bool is_append)
 {
-	t_cmd_redirection	*redirection;
+	t_cmd_redirection	*red;
 
-	redirection = ft_calloc(1, sizeof(t_cmd_redirection));
-	redirection->filepath = filepath;
-	redirection->fd = fd;
-	redirection->is_append = is_append;
-	if (!redirection || !ft_lstadd_back_new(
-			&command->output_redirections, (void *)redirection))
+	red = ft_calloc(1, sizeof(t_cmd_redirection));
+	check_malloc_has_succeeded("add_outredirect", red);
+	red->filepath = ft_strdup(filepath);
+	check_malloc_has_succeeded("add_outredirect", (void *)red->filepath);
+	red->fd = fd;
+	red->is_append = is_append;
+	if (!ft_lstadd_back_new(
+			&command->output_redirections, (void *)red))
 	{
-		free(redirection);
+		free(red);
 		return (ERROR);
 	}
 	return (0);

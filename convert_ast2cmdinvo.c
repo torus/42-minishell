@@ -41,22 +41,29 @@ int	cmd_process_string_node(t_parse_node_string *string_node,
 int	cmd_process_redirection_node(t_parse_node_redirection *redirection_node,
 	t_command_invocation *command)
 {
-	int			redirection_type;
-	const char	*text;
-	int			fd;
+	int		redirection_type;
+	char	*text;
+	int		fd;
+	int		status;
 
 	redirection_type = redirection_node->type;
-	text = string_node2string(redirection_node->string_node->content.string);
+	text = string_node2string(redirection_node->string_node->content.string,
+			redirection_type != TOKTYPE_HEREDOCUMENT);
 	fd = redirection_node->fd;
+	status = 0;
 	if (!text)
 		return (ERROR);
 	if (redirection_type == TOKTYPE_INPUT_REDIRECTION)
-		cmd_add_inredirect(command, text, fd);
+		status = cmd_add_inredirect(command, text, fd);
 	else if (redirection_type == TOKTYPE_OUTPUT_REDIRECTION)
-		cmd_add_outredirect(command, text, fd, false);
+		status = cmd_add_outredirect(command, text, fd, false);
 	else if (redirection_type == TOKTYPE_OUTPUT_APPENDING)
-		cmd_add_outredirect(command, text, fd, true);
-	return (0);
+		status = cmd_add_outredirect(command, text, fd, true);
+	else if (redirection_type == TOKTYPE_HEREDOCUMENT)
+		status = cmd_add_heredoc(command, text, fd,
+				cmd_is_heredoc_expandable(redirection_node));
+	free((void *)text);
+	return (status);
 }
 
 /* parse argument_node and set values of command
@@ -71,11 +78,11 @@ int	cmd_process_arguments_node(t_parse_node_arguments *args_node,
 	t_command_invocation *command)
 {
 	if (args_node->string_node)
-		cmd_process_string_node(
-			args_node->string_node->content.string, command);
+		return (cmd_process_string_node(
+				args_node->string_node->content.string, command));
 	else if (args_node->redirection_node)
-		cmd_process_redirection_node(
-			args_node->redirection_node->content.redirection, command);
+		return (cmd_process_redirection_node(
+				args_node->redirection_node->content.redirection, command));
 	else
 		return (1);
 	return (0);
@@ -94,12 +101,15 @@ t_command_invocation	*cmd_ast_cmd2cmdinvo(t_parse_node_command *cmd_node)
 	t_parse_node_arguments	*args_node;
 
 	cmdinvo = cmd_init_cmdinvo(NULL);
-	if (!cmdinvo)
-		return (NULL);
+	check_malloc_has_succeeded("ast2cmdinvo", cmdinvo);
 	args_node = cmd_node->arguments_node->content.arguments;
 	while (args_node)
 	{
-		cmd_process_arguments_node(args_node, cmdinvo);
+		if (cmd_process_arguments_node(args_node, cmdinvo))
+		{
+			cmd_free_cmdinvo(cmdinvo);
+			return (NULL);
+		}
 		if (args_node->rest_node)
 			args_node = args_node->rest_node->content.arguments;
 		else
@@ -124,6 +134,11 @@ t_command_invocation	*cmd_ast_pipcmds2cmdinvo(t_parse_node_pipcmds *pipcmds)
 	while (pipcmds)
 	{
 		command = cmd_ast_cmd2cmdinvo(pipcmds->command_node->content.command);
+		if (!command)
+		{
+			cmd_free_cmdinvo(commands);
+			return (NULL);
+		}
 		cmd_cmdinvo_add_pipcmd(&commands, command);
 		if (pipcmds->next)
 			pipcmds = pipcmds->next->content.piped_commands;

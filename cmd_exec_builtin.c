@@ -10,45 +10,16 @@
 #include "builtin.h"
 #include "minishell.h"
 
-t_fd_list	*fd_list_add_fd(t_fd_list **lst, int fd)
+static int	save_stdin_stdout(t_cmd_redirection *red,
+	int *stdinfd, int *stdoutfd)
 {
-	t_fd_list	*new_lst;
-	t_fd_list	*tmp;
-
-	if (!lst)
-		return (NULL);
-	new_lst = ft_calloc(1, sizeof(t_fd_list));
-	new_lst->fd = fd;
-	if (!new_lst)
-		return (NULL);
-	if (!*lst)
-		*lst = new_lst;
-	else
-	{
-		tmp = *lst;
-		while (tmp->next)
-			tmp = tmp->next;
-		tmp->next = new_lst;
-	}
-	return (new_lst);
-}
-
-void	fd_list_close(t_fd_list **lst)
-{
-	t_fd_list	*current;
-	t_fd_list	*tmp;
-
-	if (!lst)
-		return ;
-	current = *lst;
-	while (current)
-	{
-		close(current->fd);
-		tmp = current;
-		current = current->next;
-		free(tmp);
-	}
-	*lst = NULL;
+	if (red->fd == *stdinfd)
+		*stdinfd = dup(*stdinfd);
+	if (red->fd == *stdoutfd)
+		*stdoutfd = dup(*stdoutfd);
+	if (*stdinfd == -1 || *stdoutfd == -1)
+		return (ERROR);
+	return (0);
 }
 
 /* Configure input redirection for builtin command.
@@ -68,22 +39,24 @@ static int	builtin_set_in_red(t_command_invocation *command,
 	t_list				*current;
 	t_cmd_redirection	*red;
 
-	*stdinfd = dup(STDIN_FILENO);
 	current = command->input_redirections;
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
-		fd = open_file_for_redirect(red, O_RDONLY, 0);
-		if (fd == ERROR)
+		if (save_stdin_stdout(red, stdinfd, stdoutfd))
 			return (ERROR);
-		if (red->fd == *stdinfd)
-			*stdinfd = dup(*stdinfd);
-		if (red->fd == *stdoutfd)
-			*stdoutfd = dup(*stdoutfd);
-		if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
-			|| !fd_list_add_fd(fd_list, red->fd))
-			return (put_redirect_fd_err_msg_and_ret(ERROR,
-					red->fd, strerror(errno)));
+		if (!red->is_heredoc)
+		{
+			fd = open_file_for_redirect(red, O_RDONLY, 0);
+			if (fd == ERROR)
+				return (ERROR);
+			if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
+				|| !fd_list_add_fd(fd_list, red->fd))
+				return (put_redir_errmsg_and_ret(ERROR,
+						red->fd, strerror(errno)));
+		}
+		else
+			close(red->fd);
 		current = current->next;
 	}
 	return (0);
@@ -107,22 +80,17 @@ static int	builtin_set_out_red(t_command_invocation *command,
 	t_cmd_redirection	*red;
 	int					flag_open;
 
-	*stdoutfd = dup(STDOUT_FILENO);
 	current = command->output_redirections;
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open, 0644);
-		if (fd == ERROR)
+		if (fd == ERROR || save_stdin_stdout(red, stdinfd, stdoutfd))
 			return (ERROR);
-		if (red->fd == *stdinfd)
-			*stdinfd = dup(*stdinfd);
-		if (red->fd == *stdoutfd)
-			*stdoutfd = dup(*stdoutfd);
 		if (dup2(fd, red->fd) == ERROR || close(fd) == ERROR
 			|| !fd_list_add_fd(fd_list, red->fd))
-			return (put_redirect_fd_err_msg_and_ret(ERROR,
+			return (put_redir_errmsg_and_ret(ERROR,
 					red->fd, strerror(errno)));
 		current = current->next;
 	}
@@ -141,7 +109,10 @@ int	cmd_exec_builtin(t_command_invocation *command)
 	t_fd_list		*fd_lst;
 
 	fd_lst = NULL;
-	if (builtin_set_in_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR
+	stdinfd = dup(STDIN_FILENO);
+	stdoutfd = dup(STDOUT_FILENO);
+	if (stdinfd == -1 || stdoutfd == -1
+		|| builtin_set_in_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR
 		|| builtin_set_out_red(command, &fd_lst, &stdinfd, &stdoutfd) == ERROR)
 		return (set_status_and_ret(1, 1));
 	builtin_func = get_builtin_func((char *)command->exec_and_args[0]);

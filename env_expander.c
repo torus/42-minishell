@@ -1,5 +1,6 @@
+#include "libft/libft.h"
 #include "env.h"
-#include "minishell.h"
+#include "utils.h"
 
 /*
  * Get the variables with key substr(str, 0, env_len)
@@ -7,7 +8,7 @@
  * Old result will be freed
  *   so caller doesn't need to free result after calling this function.
  */
-static char	*expand_env_and_join(char *result,
+char	*exp_expand_env_and_join(char *result,
 	char *str, int env_len)
 {
 	char	*keyname;
@@ -39,7 +40,7 @@ static char	*expand_env_and_join(char *result,
  * Old result will be freed
  *   so caller doesn't need to free result after calling this function.
  */
-static char	*result_join_normal_str(char *result,
+char	*exp_result_join_normal_str(char *result,
 	char *str, int len)
 {
 	char	*tmp;
@@ -69,7 +70,7 @@ static char	*result_join_normal_str(char *result,
  *       srt[len] is invalid character as variable key.
  *   - str[len] has reached to the end of string.
  */
-static bool	will_toggle_env(bool is_in_env,
+bool	exp_will_toggle_env(bool is_in_env,
 	bool is_in_noexpand, char *str, int len)
 {
 	bool	will_start_env;
@@ -95,13 +96,13 @@ static bool	will_toggle_env(bool is_in_env,
  *
  * return: whether continue string processing.
  */
-static bool	join_str_or_env(char **result,
+bool	exp_join_str_or_env(char **result,
 	char **str, int *len, bool *is_in_env)
 {
 	if (*is_in_env)
-		*result = expand_env_and_join(*result, *str, *len);
+		*result = exp_expand_env_and_join(*result, *str, *len);
 	else
-		*result = result_join_normal_str(*result, *str, *len);
+		*result = exp_result_join_normal_str(*result, *str, *len);
 	if (!(*str)[*len] || !result)
 		return (false);
 	*str += *len + !*is_in_env;
@@ -136,8 +137,8 @@ char	*expand_env_var(char *str)
 	{
 		if (str[len] == '\'' && !(len > 0 && str[len - 1] == '\\'))
 			is_in_noexpand = !is_in_noexpand;
-		if (will_toggle_env(is_in_env, is_in_noexpand, str, len))
-			is_continue = join_str_or_env(&result, &str, &len, &is_in_env);
+		if (exp_will_toggle_env(is_in_env, is_in_noexpand, str, len))
+			is_continue = exp_join_str_or_env(&result, &str, &len, &is_in_env);
 		else
 			len++;
 	}

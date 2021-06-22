@@ -26,6 +26,7 @@ void	parse_free_all_ast(void)
 	t_parse_ast_list	*next;
 
 	list = *get_ast_list();
+	parse_free_heredocs(list->ast.heredocs);
 	while (list)
 	{
 		next = list->next;

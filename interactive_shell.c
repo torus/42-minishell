@@ -54,8 +54,10 @@ int	interactive_shell(void)
 			set_status(1);
 		}
 		else
+		{
 			execute_seqcmd(cmdline);
-		parse_free_all_ast();
+			parse_free_all_ast();
+		}
 		free(input_str);
 		input_str = readline(MINISHELL_PROMPT);
 	}

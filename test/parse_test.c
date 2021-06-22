@@ -1312,7 +1312,6 @@ void test_parser(void)
 		check_pip_heredocument(here_node, "hij", "klm", 123);
 
 		free(tok.text);
-		parse_free_heredocs(cmdline_node->heredocs);
 	}
 
 }

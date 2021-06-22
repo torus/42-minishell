@@ -9,8 +9,7 @@ static void	put_exit_errmsg_and_exit(char *exit_status)
 	char	*tmp;
 
 	tmp = ft_strjoin(exit_status, ": numeric argument required");
-	if (!tmp)
-		put_minish_err_msg_and_exit(2, "exit", "ft_strjoin() failed");
+	check_malloc_has_succeeded("exit", tmp);
 	put_minish_err_msg_and_exit(2, "exit", tmp);
 }
 

@@ -22,11 +22,21 @@ t_var	*get_env(const char *env_key);
 char	*get_env_val(const char *env_key);
 char	**split_first_c(const char *str, char c);
 char	**get_colon_units(const char *str, const char *default_str);
-char	*get_val_from_kvstr(const char *kvstr, char delimiter);
-char	*expand_env_var(char *str);
 char	*generate_kvstr(const char *key, const char *value);
+char	*get_val_from_kvstr(const char *kvstr, char delimiter);
 int		ft_setenv(const char *key, const char *value, bool is_shell_var);
 int		ft_unsetenv(const char *key);
+
+// Expander (exp)
+bool	exp_join_str_or_env(char **result,
+			char **str, int *len, bool *is_in_env);
+bool	exp_will_toggle_env(bool is_in_env,
+			bool is_in_noexpand, char *str, int len);
+char	*exp_result_join_normal_str(char *result,
+			char *str, int len);
+char	*exp_expand_env_and_join(char *result,
+			char *str, int env_len);
+char	*expand_env_var(char *str);
 
 // Utilities for command exit code.
 int		get_status(void);

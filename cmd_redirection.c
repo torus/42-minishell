@@ -10,7 +10,7 @@
 #include "env.h"
 #include "minishell.h"
 
-int	put_redirect_fd_err_msg_and_ret(int ret_value, int fd, char *msg)
+int	put_redir_errmsg_and_ret(int ret_value, int fd, char *msg)
 {
 	char	*fd_str;
 
@@ -76,24 +76,31 @@ int	open_file_for_redirect(t_cmd_redirection *red,
  *
  * return: return -1 if error has occurred, otherwise, return 0.
  */
-int	cmd_set_input_file(t_command_invocation *command)
+int	cmd_set_input_file(t_command_invocation *command, int pipe_heredoc_fd[2])
 {
 	int					fd;
 	t_list				*current;
 	t_cmd_redirection	*red;
 
 	current = command->input_redirections;
+	close(pipe_heredoc_fd[1]);
 	while (current)
 	{
 		red = (t_cmd_redirection *)current->content;
-		fd = open_file_for_redirect(red, O_RDONLY, 0);
-		if (fd == ERROR)
-			return (ERROR);
-		if (dup2(fd, red->fd) == -1)
-			return (put_redirect_fd_err_msg_and_ret(ERROR,
-					red->fd, strerror(errno)));
+		if (!red->is_heredoc)
+		{
+			fd = open_file_for_redirect(red, O_RDONLY, 0);
+			if (fd == ERROR)
+				return (ERROR);
+			if (dup2(fd, red->fd) == -1)
+				return (put_redir_errmsg_and_ret(-1, red->fd, strerror(errno)));
+		}
+		else if (pipe_heredoc_fd[0] != -1
+			&& dup2(pipe_heredoc_fd[0], STDIN_FILENO) == -1)
+			return (put_redir_errmsg_and_ret(-1, red->fd, strerror(errno)));
 		current = current->next;
 	}
+	close(pipe_heredoc_fd[0]);
 	return (0);
 }
 
@@ -121,7 +128,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 		if (fd == ERROR)
 			return (ERROR);
 		if (dup2(fd, red->fd) == -1)
-			return (put_redirect_fd_err_msg_and_ret(ERROR,
+			return (put_redir_errmsg_and_ret(ERROR,
 					red->fd, strerror(errno)));
 		current = current->next;
 	}
