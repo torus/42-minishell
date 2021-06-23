@@ -10,13 +10,13 @@
  *
  * redirection: t_cmd_redirection object
  */
-void	cmd_del_redirection(t_cmd_redirection *redirection)
+void	cmd_free_redirection(t_cmd_redirection *redirection)
 {
 	free((void *)redirection->filepath);
 	free(redirection);
 }
 
-void	cmd_del_redirections(t_cmd_redirection *redirections)
+void	cmd_free_redirections(t_cmd_redirection *redirections)
 {
 	t_cmd_redirection *tmp;
 
@@ -24,7 +24,7 @@ void	cmd_del_redirections(t_cmd_redirection *redirections)
 	{
 		tmp = redirections;
 		redirections = redirections->next;
-		cmd_del_redirection(tmp);
+		cmd_free_redirection(tmp);
 	}
 }
 
@@ -43,8 +43,8 @@ void	cmd_free_cmdinvo(t_command_invocation *cmds)
 		current_cmd = cmds;
 		while (current_cmd)
 		{
-			cmd_del_redirections(current_cmd->input_redirections);
-			cmd_del_redirections(current_cmd->output_redirections);
+			cmd_free_redirections(current_cmd->input_redirections);
+			cmd_free_redirections(current_cmd->output_redirections);
 			free_ptrarr((void **)current_cmd->exec_and_args);
 			prev_cmd = current_cmd;
 			current_cmd = current_cmd->piped_command;
@@ -91,7 +91,7 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	readline4heredoc(red, limit_str);
 	if (g_shell.heredoc_interruption)
 	{
-		cmd_del_redirection(red);
+		cmd_free_redirection(red);
 		return (ERROR);
 	}
 	if (is_expandable)

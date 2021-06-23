@@ -58,6 +58,7 @@ void	free_fd_red_list(t_in_fd_reds_list *fd_red_list)
 		tmp = fd_red_list;
 		fd_red_list = fd_red_list->next;
 		cmd_close_pipe(tmp->heredoc_pipe);
+		cmd_free_redirections(tmp->reds);
 		free(tmp);
 	}
 }
