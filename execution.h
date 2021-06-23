@@ -28,19 +28,19 @@ typedef struct s_fd_list {
 
 /* 複数fdのheredocに対応するための構造体
  *
- * fdに対するもっとも後ろ(最新)のredを保持する.
+ * fdに対するリダイレクションを保持する.
  * red->is_heredoc=true の場合, pipe[2] には-1以外の値がpipe()によってセットされる.
  *
  * t_fd_list(contentはt_cmd_redirection)から変換されることを想定している.
  */
 typedef struct s_fd_red_list {
 	int					fd;
-	t_cmd_redirection	*reds;
-	int					pipe[2];
+	t_cmd_redirection	*reds;  // fdに対するリダイレクション. 後ろのほうが新しい.
+	int					pipe[2];  // redsの最後がheredocの場合はここにheredocのpipeが来る
 	struct s_fd_red_list	*next;
 }	t_fd_red_list;
 
-t_fd_red_list	*red_list2fd_red_list(t_list *red_list);
+t_fd_red_list	*reds2fd_red_list(t_cmd_redirection *reds);
 void			free_fd_red_list(t_fd_red_list *fd_red_list);
 
 typedef struct s_command_invocation
@@ -63,18 +63,16 @@ int						open_file_for_redirect(t_cmd_redirection *red,
 							int open_flags, mode_t open_mode);
 int						put_redir_errmsg_and_ret(int ret_value,
 							int fd, char *msg);
-int						cmd_set_input_file(t_command_invocation *command,
-							int heredoc_pipe[2]);
+int						cmd_set_input_file(t_fd_red_list *fd_red_list);
 int						cmd_set_output_file(t_command_invocation *command);
 void					cmd_exec_command(t_command_invocation *command,
 							int pipe_prev_fd[2], int pipe_fd[2],
-							int heredoc_pipe[2]);
+							t_fd_red_list *fd_red_list);
 int						cmd_exec_builtin(t_command_invocation *command);
 void					cmd_close_pipe(int pipe_fd[2]);
 void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 void					cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
-int						cmd_set_heredoc_pipe_fd(t_command_invocation *command,
-							int pipe_heredoc_fd[2]);
+int						cmd_set_heredoc_pipe_fd(t_fd_red_list *in_fd_red_list);
 bool					cmd_is_heredoc_expandable(
 							t_parse_node_redirection *redirection_node);
 char					*expand_heredoc_document(char *str);

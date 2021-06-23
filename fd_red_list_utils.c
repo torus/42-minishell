@@ -13,14 +13,14 @@ static t_fd_red_list	*get_fd_red_from_list(t_fd_red_list *fd_red_list, int fd)
 	return (NULL);
 }
 
-static void	addback_red_in_fd_red_list(t_fd_red_list *fd_red_list, t_cmd_redirection *red)
+static void	addback_new_fd_red2fd_red_list(t_fd_red_list *fd_red_list, t_cmd_redirection *red)
 {
 	t_fd_red_list	*new;
 
 	new = malloc(sizeof(t_cmd_redirection));
 	check_malloc_has_succeeded("fd_red_list", new);
 	new->fd = red->fd;
-	new->red = red;
+	new->reds = red;
 	cmd_init_pipe_fd(new->pipe, -1, -1);
 	new->next = NULL;
 	while (fd_red_list->next)
@@ -28,19 +28,18 @@ static void	addback_red_in_fd_red_list(t_fd_red_list *fd_red_list, t_cmd_redirec
 	fd_red_list->next = new;
 }
 
-t_fd_red_list	*red_list2fd_red_list(t_list *red_list)
+t_fd_red_list	*reds2fd_red_list(t_cmd_redirection *reds)
 {
 	t_fd_red_list		*fd_red_list;
 	t_cmd_redirection	*red;
 
 	fd_red_list = NULL;
-	while (red_list)
+	while (reds)
 	{
-		red = (t_cmd_redirection *)red_list->content;
 		if (!get_fd_red_from_list(fd_red_list, red->fd))
-			addback_red_in_fd_red_list(fd_red_list, red);
+			addback_new_fd_red2fd_red_list(fd_red_list, red);
 		else
-			get_fd_red_from_list(fd_red_list, red->fd)->red = red;
+			cmd_redirection_add_back(get_fd_red_from_list(fd_red_list, red->fd)->reds, red);
 	}
 	return (fd_red_list);
 }
