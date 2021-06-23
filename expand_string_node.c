@@ -87,7 +87,7 @@ static char	*expandable_node2strarr(void ***result,
 	return (next_str);
 }
 
-static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
+static char	**cmd_str2str_arr(t_cmd_str_node **str_node, bool is_export_cmd)
 {
 	void	**result;
 	char	*next_str;
@@ -98,7 +98,7 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	next_str = NULL;
 	while (str_node[i])
 	{
-		if (str_node[i]->type != TOKTYPE_EXPANDABLE)
+		if (str_node[i]->type != TOKTYPE_EXPANDABLE || is_export_cmd)
 		{
 			if (next_str)
 				next_str = strjoin_and_free_first(next_str, str_node[i]->text);
@@ -115,8 +115,19 @@ static char	**cmd_str2str_arr(t_cmd_str_node **str_node)
 	return ((char **)result);
 }
 
-/* Convert AST string node to array of string with variable expansion. */
-char	**expand_string_node(t_parse_node_string *string_node)
+/* Convert AST string node to array of string with variable expansion.
+ *
+ * bash behaves differently in how it processes string
+ *   when the command is "export".
+ *
+ * ex: ($b has value "a   b")
+ *   if the command is "export":     (is_export_cmd == true)
+ *     abc="a"$b"c"  -> ["abc=aa   bc"]
+ *   else:                           (is_export_cmd == false)
+ *     abc="a"$b"c"  -> ["abc=aa", "bc"]
+ */
+char	**expand_string_node(t_parse_node_string *string_node,
+	bool is_export_cmd)
 {
 	t_cmd_str_node	**cmd_str;
 	int				i;
@@ -125,7 +136,7 @@ char	**expand_string_node(t_parse_node_string *string_node)
 	cmd_str = ast_str2cmd_str(string_node);
 	if (!cmd_str)
 		return (NULL);
-	result = cmd_str2str_arr(cmd_str);
+	result = cmd_str2str_arr(cmd_str, is_export_cmd);
 	i = 0;
 	while (cmd_str[i])
 	{
