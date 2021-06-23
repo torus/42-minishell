@@ -18,7 +18,7 @@ void	cmd_free_redirection(t_cmd_redirection *redirection)
 
 void	cmd_free_redirections(t_cmd_redirection *redirections)
 {
-	t_cmd_redirection *tmp;
+	t_cmd_redirection	*tmp;
 
 	while (redirections)
 	{
