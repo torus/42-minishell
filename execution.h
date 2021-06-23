@@ -21,6 +21,23 @@ typedef struct s_fd_list {
 	struct s_fd_list	*next;
 }	t_fd_list;
 
+/* 複数fdのheredocに対応するための構造体
+ *
+ * fdに対するもっとも後ろ(最新)のredを保持する.
+ * red->is_heredoc=true の場合, pipe[2] には-1以外の値がpipe()によってセットされる.
+ *
+ * t_fd_list(contentはt_cmd_redirection)から変換されることを想定している.
+ */
+typedef struct s_fd_red_list {
+	int					fd;
+	t_cmd_redirection	*red;
+	int					pipe[2];
+	struct s_fd_red_list	*next;
+}	t_fd_red_list;
+
+t_fd_red_list	*red_list2fd_red_list(t_list *red_list);
+void			free_fd_red_list(t_fd_red_list *fd_red_list);
+
 typedef struct s_command_invocation
 {
 	t_list						*output_redirections;
