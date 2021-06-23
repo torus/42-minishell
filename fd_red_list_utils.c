@@ -31,15 +31,15 @@ static void	addback_new_fd_red2fd_red_list(t_fd_red_list *fd_red_list, t_cmd_red
 t_fd_red_list	*reds2fd_red_list(t_cmd_redirection *reds)
 {
 	t_fd_red_list		*fd_red_list;
-	t_cmd_redirection	*red;
 
 	fd_red_list = NULL;
 	while (reds)
 	{
-		if (!get_fd_red_from_list(fd_red_list, red->fd))
-			addback_new_fd_red2fd_red_list(fd_red_list, red);
+		if (!get_fd_red_from_list(fd_red_list, reds->fd))
+			addback_new_fd_red2fd_red_list(fd_red_list, reds);
 		else
-			cmd_redirection_add_back(get_fd_red_from_list(fd_red_list, red->fd)->reds, red);
+			cmd_redirection_add_back(get_fd_red_from_list(fd_red_list, reds->fd)->reds, reds);
+		reds = reds->next;
 	}
 	return (fd_red_list);
 }
