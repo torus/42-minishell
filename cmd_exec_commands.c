@@ -52,7 +52,8 @@ static int	write_heredoc(t_in_fd_reds_list *in_fd_red_list)
 			red = red->next;
 		close(in_fd_red_list->heredoc_pipe[0]);
 		if (red->is_heredoc && red->filepath)
-			write(in_fd_red_list->heredoc_pipe[1], red->filepath, ft_strlen(red->filepath));
+			write(in_fd_red_list->heredoc_pipe[1], red->filepath,
+				ft_strlen(red->filepath));
 		in_fd_red_list = in_fd_red_list->next;
 	}
 	return (0);
@@ -61,7 +62,7 @@ static int	write_heredoc(t_in_fd_reds_list *in_fd_red_list)
 static int	cmd_exec_one_command(t_command_invocation *current_cmd,
 	int	pipe_fd[2], int pipe_prev_fd[2])
 {
-	pid_t	pid;
+	pid_t				pid;
 	t_in_fd_reds_list	*in_fd_red_list;
 
 	in_fd_red_list = reds2in_fd_reds_list(current_cmd->input_redirections);
