@@ -100,7 +100,7 @@ int	cmd_add_heredoc(t_command_invocation *command,
 		red->filepath = expand_heredoc_document((char *)red->filepath);
 		free((void *)old_filepath);
 	}
-	if (!cmd_redirection_add_back(command->input_redirections, red))
+	if (!cmd_redirection_add_back(&command->input_redirections, red))
 		put_minish_err_msg_and_exit(1, "heredoc", "lstadd_back failed");
 	set_sighandlers_during_execution();
 	return (0);

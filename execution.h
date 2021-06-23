@@ -14,7 +14,7 @@ typedef struct s_cmd_redirection
 	struct s_cmd_redirection	*next;
 }	t_cmd_redirection;
 
-t_cmd_redirection	*cmd_redirection_add_back(t_cmd_redirection *lst, t_cmd_redirection *new_red);
+t_cmd_redirection	*cmd_redirection_add_back(t_cmd_redirection **reds, t_cmd_redirection *new_red);
 void				cmd_del_redirection(t_cmd_redirection *redirection);
 void				cmd_del_redirections(t_cmd_redirection *redirections);
 

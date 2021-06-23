@@ -33,7 +33,7 @@ int	cmd_add_inredirect(t_command_invocation *command,
 	red->filepath = ft_strdup(filepath);
 	check_malloc_has_succeeded("add_inredirect", (void *)red->filepath);
 	red->fd = fd;
-	if (!cmd_redirection_add_back(command->input_redirections, red))
+	if (!cmd_redirection_add_back(&command->input_redirections, red))
 	{
 		free(red);
 		return (ERROR);
@@ -52,7 +52,7 @@ int	cmd_add_outredirect(t_command_invocation *command,
 	check_malloc_has_succeeded("add_outredirect", (void *)red->filepath);
 	red->fd = fd;
 	red->is_append = is_append;
-	if (!cmd_redirection_add_back(command->output_redirections, red))
+	if (!cmd_redirection_add_back(&command->output_redirections, red))
 	{
 		free(red);
 		return (ERROR);
