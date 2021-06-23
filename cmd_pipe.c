@@ -19,7 +19,7 @@ void	cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1)
 }
 
 // heredoc用に複数fdのパイプを作成する
-int	cmd_set_heredoc_pipe_fd(t_fd_red_list *in_fd_red_list)
+int	cmd_set_heredoc_pipe_fd(t_in_fd_reds_list *in_fd_red_list)
 {
 	t_cmd_redirection	*red;
 
@@ -30,7 +30,7 @@ int	cmd_set_heredoc_pipe_fd(t_fd_red_list *in_fd_red_list)
 		red = in_fd_red_list->reds;
 		while (red->next)
 			red = red->next;
-		if (red->is_heredoc && pipe(in_fd_red_list->pipe) == -1)
+		if (red->is_heredoc && pipe(in_fd_red_list->heredoc_pipe) == -1)
 			return (ERROR);
 		in_fd_red_list = in_fd_red_list->next;
 	}

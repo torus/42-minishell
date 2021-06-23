@@ -37,7 +37,7 @@ static void	replace_stdio_with_pipe(t_command_invocation *command,
  * pipe_fd[2]: A pipe that connects the current and next process.
  */
 void	cmd_exec_command(t_command_invocation *command,
-	int pipe_prev_fd[2], int pipe_fd[2], t_fd_red_list *fd_red_list)
+	int pipe_prev_fd[2], int pipe_fd[2], t_in_fd_reds_list *fd_red_list)
 {
 	t_builtin_cmd	*builtin_func;
 

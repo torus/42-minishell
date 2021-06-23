@@ -76,14 +76,14 @@ int	open_file_for_redirect(t_cmd_redirection *red,
  *
  * return: return -1 if error has occurred, otherwise, return 0.
  */
-int	cmd_set_input_file(t_fd_red_list *fd_red_list)
+int	cmd_set_input_file(t_in_fd_reds_list *fd_red_list)
 {
 	int					fd;
 	t_cmd_redirection	*red;
 
 	while (fd_red_list)
 	{
-		close(fd_red_list->pipe[1]);
+		close(fd_red_list->heredoc_pipe[1]);
 		red = fd_red_list->reds;
 		while (red->next)
 			red = red->next;
@@ -95,10 +95,10 @@ int	cmd_set_input_file(t_fd_red_list *fd_red_list)
 			if (dup2(fd, red->fd) == -1)
 				return (put_redir_errmsg_and_ret(-1, red->fd, strerror(errno)));
 		}
-		else if (fd_red_list->pipe[0] != -1
-			&& dup2(fd_red_list->pipe[0], fd_red_list->fd) == -1)
+		else if (fd_red_list->heredoc_pipe[0] != -1
+			&& dup2(fd_red_list->heredoc_pipe[0], fd_red_list->fd) == -1)
 			return (put_redir_errmsg_and_ret(-1, fd_red_list->fd, strerror(errno)));
-		close(fd_red_list->pipe[0]);
+		close(fd_red_list->heredoc_pipe[0]);
 		fd_red_list = fd_red_list->next;
 	}
 	return (0);
