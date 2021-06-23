@@ -35,32 +35,26 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 	{
 		if (actual_cmdinvo->input_redirections || expected_invo->input_redirections)
 		{
-			t_list	*current_actual = actual_cmdinvo->input_redirections;
-			t_list	*current_expected = expected_invo->input_redirections;
-			while (current_actual || current_expected)
+			t_cmd_redirection	*red_actual = actual_cmdinvo->input_redirections;
+			t_cmd_redirection	*red_expected = expected_invo->input_redirections;
+			while (red_actual || red_expected)
 			{
-				t_cmd_redirection	*red_actual = (t_cmd_redirection *)current_actual->content;
-				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
-
 				printf("  |%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK(red_actual->filepath && red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
 				printf("  |%d| == |%d|\n", red_actual->fd, red_expected->fd);
 				CHECK_EQ(red_actual->fd, red_expected->fd);
 
-				current_actual = current_actual->next;
-				current_expected = current_expected->next;
+				red_actual = red_actual->next;
+				red_expected = red_expected->next;
 			}
 		}
 		if (actual_cmdinvo->output_redirections || expected_invo->output_redirections)
 		{
-			t_list	*current_actual = actual_cmdinvo->output_redirections;
-			t_list	*current_expected = expected_invo->output_redirections;
-			while (current_actual || current_expected)
+			t_cmd_redirection	*red_actual = actual_cmdinvo->input_redirections;
+			t_cmd_redirection	*red_expected = expected_invo->input_redirections;
+			while (red_actual || red_expected)
 			{
-				t_cmd_redirection	*red_actual = (t_cmd_redirection *)current_actual->content;
-				t_cmd_redirection	*red_expected = (t_cmd_redirection *)current_expected->content;
-
 				printf("  |%s| == |%s|\n", red_actual->filepath, red_expected->filepath);
 				CHECK(red_actual->filepath && red_expected->filepath);
 				CHECK_EQ_STR(red_actual->filepath, red_expected->filepath);
@@ -69,8 +63,8 @@ void check_cmdinvo(t_command_invocation *actual_cmdinvo, t_command_invocation *e
 				printf("  |%d| == |%d|\n", red_actual->is_append, red_expected->is_append);
 				CHECK(red_actual->is_append == red_expected->is_append);
 
-				current_actual = current_actual->next;
-				current_expected = current_expected->next;
+				red_actual = red_actual->next;
+				red_expected = red_expected->next;
 			}
 		}
 		check_strarr(actual_cmdinvo->exec_and_args, expected_invo->exec_and_args);
