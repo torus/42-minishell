@@ -36,13 +36,11 @@ static int	builtin_set_in_red(t_command_invocation *command,
 	t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
 {
 	int					fd;
-	t_list				*current;
 	t_cmd_redirection	*red;
 
-	current = command->input_redirections;
-	while (current)
+	red = command->input_redirections;
+	while (red)
 	{
-		red = (t_cmd_redirection *)current->content;
 		if (save_stdin_stdout(red, stdinfd, stdoutfd))
 			return (ERROR);
 		if (!red->is_heredoc)
@@ -57,7 +55,7 @@ static int	builtin_set_in_red(t_command_invocation *command,
 		}
 		else
 			close(red->fd);
-		current = current->next;
+		red = red->next;
 	}
 	return (0);
 }

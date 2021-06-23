@@ -7,11 +7,16 @@
 
 typedef struct s_cmd_redirection
 {
-	const char	*filepath;
-	bool		is_append;
-	bool		is_heredoc;
-	int			fd;
+	const char					*filepath;
+	bool						is_append;
+	bool						is_heredoc;
+	int							fd;
+	struct s_cmd_redirection	*next;
 }	t_cmd_redirection;
+
+t_cmd_redirection	*cmd_redirection_add_back(t_cmd_redirection *lst, t_cmd_redirection *new_red);
+void				cmd_del_redirection(t_cmd_redirection *redirection);
+void				cmd_del_redirections(t_cmd_redirection *redirections);
 
 /* This struct is to remember opened filed descriptors
  *   to close them after finish builtin command.
@@ -30,7 +35,7 @@ typedef struct s_fd_list {
  */
 typedef struct s_fd_red_list {
 	int					fd;
-	t_cmd_redirection	*red;
+	t_cmd_redirection	*reds;
 	int					pipe[2];
 	struct s_fd_red_list	*next;
 }	t_fd_red_list;
@@ -40,9 +45,9 @@ void			free_fd_red_list(t_fd_red_list *fd_red_list);
 
 typedef struct s_command_invocation
 {
-	t_list						*output_redirections;
+	t_cmd_redirection			*output_redirections;
 	struct s_command_invocation	*piped_command;
-	t_list						*input_redirections;
+	t_cmd_redirection			*input_redirections;
 	const char					**exec_and_args;
 	pid_t						pid;
 }	t_command_invocation;
@@ -86,7 +91,6 @@ int						cmd_check_readline_has_finished(void);
 void					cmd_set_heredoc_sighandlers(void);
 int						cmd_add_outredirect(t_command_invocation *command,
 							const char *filepath, int fd, bool is_append);
-void					cmd_del_redirection(void *redirection);
 void					cmd_free_cmdinvo(t_command_invocation *cmds);
 void					fd_list_close(t_fd_list **lst);
 t_fd_list				*fd_list_add_fd(t_fd_list **lst, int fd);

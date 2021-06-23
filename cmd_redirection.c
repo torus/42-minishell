@@ -114,14 +114,12 @@ int	cmd_set_input_file(t_command_invocation *command, int pipe_heredoc_fd[2])
 int	cmd_set_output_file(t_command_invocation *command)
 {
 	int					fd;
-	t_list				*current;
 	int					flag_open;
 	t_cmd_redirection	*red;
 
-	current = command->output_redirections;
-	while (current)
+	red = command->output_redirections;
+	while (red)
 	{
-		red = (t_cmd_redirection *)current->content;
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
@@ -130,7 +128,7 @@ int	cmd_set_output_file(t_command_invocation *command)
 		if (dup2(fd, red->fd) == -1)
 			return (put_redir_errmsg_and_ret(ERROR,
 					red->fd, strerror(errno)));
-		current = current->next;
+		red = red->next;
 	}
 	return (0);
 }
