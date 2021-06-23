@@ -47,7 +47,7 @@ t_in_fd_reds_list	*reds2in_fd_reds_list(t_cmd_redirection *reds)
 	while (reds)
 	{
 		fd_red_element = get_fd_red_from_list(fd_red_list, reds->fd);
-		new_red = copy_t_cmd_redirection(reds);
+		new_red = cmd_copy_redirection(reds);
 		check_malloc_has_succeeded("addback_new_fd_red2fd_red_list", new_red);
 		if (!fd_red_element)
 			addback_new_fd_red2fd_red_list(&fd_red_list, new_red);

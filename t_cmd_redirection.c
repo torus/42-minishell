@@ -17,7 +17,7 @@ t_cmd_redirection	*cmd_redirection_add_back(t_cmd_redirection **reds, t_cmd_redi
 	return (new_red);
 }
 
-t_cmd_redirection	*copy_t_cmd_redirection(t_cmd_redirection *original)
+t_cmd_redirection	*cmd_copy_redirection(t_cmd_redirection *original)
 {
 	t_cmd_redirection	*new;
 
