@@ -36,6 +36,26 @@ static t_parse_ast	*get_cmdline_from_input_str(char *input_str)
 	return (cmdline);
 }
 
+static bool	is_valid_input_str(char *input_str)
+{
+	while (*input_str)
+	{
+		if (*input_str & 0x80 || (unsigned char)*input_str > ' ')
+			return (true);
+		input_str++;
+	}
+	return (false);
+}
+
+static void	show_parse_err(char *input_str)
+{
+	if (is_valid_input_str(input_str))
+	{
+		put_err_msg("Parse error.");
+		set_status(1);
+	}
+}
+
 int	interactive_shell(void)
 {
 	char				*input_str;
@@ -49,10 +69,7 @@ int	interactive_shell(void)
 			add_history(input_str);
 		cmdline = get_cmdline_from_input_str(input_str);
 		if (!cmdline)
-		{
-			put_err_msg("Parse error.");
-			set_status(1);
-		}
+			show_parse_err(input_str);
 		else
 		{
 			execute_seqcmd(cmdline);
