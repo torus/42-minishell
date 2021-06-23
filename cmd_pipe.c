@@ -18,15 +18,12 @@ void	cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1)
 	pipe_fd[1] = pipe1;
 }
 
-// heredoc用に複数fdのパイプを作成する
 int	cmd_set_heredoc_pipe_fd(t_in_fd_reds_list *in_fd_red_list)
 {
 	t_cmd_redirection	*red;
 
 	while (in_fd_red_list)
 	{
-		// 最後のリダイレクションがheredocかどうか.
-		// heredocならパイプ作成
 		red = in_fd_red_list->reds;
 		while (red->next)
 			red = red->next;
