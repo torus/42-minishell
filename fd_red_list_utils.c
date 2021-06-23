@@ -2,7 +2,8 @@
 #include "minishell.h"
 #include "utils.h"
 
-static t_in_fd_reds_list	*get_fd_red_from_list(t_in_fd_reds_list *fd_red_list, int fd)
+static t_in_fd_reds_list	*get_fd_red_from_list(
+	t_in_fd_reds_list *fd_red_list, int fd)
 {
 	while (fd_red_list)
 	{
@@ -13,7 +14,8 @@ static t_in_fd_reds_list	*get_fd_red_from_list(t_in_fd_reds_list *fd_red_list, i
 	return (NULL);
 }
 
-static void	addback_new_fd_red2fd_red_list(t_in_fd_reds_list **fd_red_list, t_cmd_redirection *red)
+static void	addback_new_fd_red2fd_red_list(
+	t_in_fd_reds_list **fd_red_list, t_cmd_redirection *red)
 {
 	t_in_fd_reds_list	*tmp;
 	t_in_fd_reds_list	*new_fd_red;
