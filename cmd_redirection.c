@@ -96,7 +96,7 @@ int	cmd_set_input_file(t_command_invocation *command, int pipe_heredoc_fd[2])
 				return (put_redir_errmsg_and_ret(-1, red->fd, strerror(errno)));
 		}
 		else if (pipe_heredoc_fd[0] != -1
-			&& dup2(pipe_heredoc_fd[0], STDIN_FILENO) == -1)
+			&& dup2(pipe_heredoc_fd[0], red->fd) == -1)
 			return (put_redir_errmsg_and_ret(-1, red->fd, strerror(errno)));
 		current = current->next;
 	}
