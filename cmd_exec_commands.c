@@ -62,19 +62,19 @@ static int	cmd_exec_one_command(t_command_invocation *current_cmd,
 	int	pipe_fd[2], int pipe_prev_fd[2])
 {
 	pid_t	pid;
-	t_in_fd_reds_list	*fd_red_list;
+	t_in_fd_reds_list	*in_fd_red_list;
 
-	fd_red_list = reds2fd_red_list(current_cmd->input_redirections);
-	if (pipe(pipe_fd) || cmd_set_heredoc_pipe_fd(fd_red_list))
+	in_fd_red_list = reds2fd_red_list(current_cmd->input_redirections);
+	if (pipe(pipe_fd) || cmd_set_heredoc_pipe_fd(in_fd_red_list))
 		return (put_err_msg_and_ret("error pipe()"));
 	pid = fork();
 	if (pid < 0)
 		return (put_err_msg_and_ret("error fork()"));
 	else if (pid == 0)
 		cmd_exec_command(current_cmd, pipe_prev_fd, pipe_fd,
-			fd_red_list);
-	write_heredoc(fd_red_list);
-	free_fd_red_list(fd_red_list);
+			in_fd_red_list);
+	write_heredoc(in_fd_red_list);
+	free_fd_red_list(in_fd_red_list);
 	current_cmd->pid = pid;
 	if (cmd_connect_pipe(pipe_prev_fd, pipe_fd) != 0)
 		return (put_err_msg_and_ret("error cmd_connect_pipe()"));
