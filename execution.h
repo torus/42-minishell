@@ -14,10 +14,11 @@ typedef struct s_cmd_redirection
 	struct s_cmd_redirection	*next;
 }	t_cmd_redirection;
 
-t_cmd_redirection	*cmd_copy_redirection(t_cmd_redirection *original);
-t_cmd_redirection	*cmd_redirection_add_back(t_cmd_redirection **reds, t_cmd_redirection *new_red);
-void				cmd_free_redirection(t_cmd_redirection *redirection);
-void				cmd_free_redirections(t_cmd_redirection *redirections);
+t_cmd_redirection		*cmd_copy_redirection(t_cmd_redirection *original);
+t_cmd_redirection		*cmd_redirection_add_back(t_cmd_redirection **reds,
+							t_cmd_redirection *new_red);
+void					cmd_free_redirection(t_cmd_redirection *redirection);
+void					cmd_free_redirections(t_cmd_redirection *redirections);
 
 /* This struct is to remember opened filed descriptors
  *   to close them after finish builtin command.
@@ -27,22 +28,22 @@ typedef struct s_fd_list {
 	struct s_fd_list	*next;
 }	t_fd_list;
 
-/* 複数fdのheredocに対応するための構造体
+/* Keep input redirections or heredocs for each fd.
  *
- * fdに対するリダイレクションを保持する.
- * red->is_heredoc=true の場合, pipe[2] には-1以外の値がpipe()によってセットされる.
+ * `heredoc_pipe` would be set to `pipe(heredoc_pipe)`
+ *   if last element of `reds` is heredoc.
  *
- * t_fd_list(contentはt_cmd_redirection)から変換されることを想定している.
+ * You should get this struct through reds2in_fd_reds_list().
  */
 typedef struct s_in_fd_reds_list {
-	int					fd;
-	t_cmd_redirection	*reds;  // fdに対するリダイレクション. 後ろのほうが新しい.
-	int					heredoc_pipe[2];  // redsの最後がheredocの場合はここにheredocのpipeが来る
+	int							fd;
+	t_cmd_redirection			*reds;
+	int							heredoc_pipe[2];
 	struct s_in_fd_reds_list	*next;
 }	t_in_fd_reds_list;
 
-t_in_fd_reds_list	*reds2in_fd_reds_list(t_cmd_redirection *reds);
-void				free_fd_red_list(t_in_fd_reds_list *fd_red_list);
+t_in_fd_reds_list		*reds2in_fd_reds_list(t_cmd_redirection *reds);
+void					free_fd_red_list(t_in_fd_reds_list *fd_red_list);
 
 typedef struct s_command_invocation
 {
@@ -73,7 +74,8 @@ int						cmd_exec_builtin(t_command_invocation *command);
 void					cmd_close_pipe(int pipe_fd[2]);
 void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
 void					cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1);
-int						cmd_set_heredoc_pipe_fd(t_in_fd_reds_list *in_fd_red_list);
+int						cmd_set_heredoc_pipe_fd(
+							t_in_fd_reds_list *in_fd_red_list);
 bool					cmd_is_heredoc_expandable(
 							t_parse_node_redirection *redirection_node);
 char					*expand_heredoc_document(char *str);
