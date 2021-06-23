@@ -64,7 +64,7 @@ static int	cmd_exec_one_command(t_command_invocation *current_cmd,
 	pid_t	pid;
 	t_in_fd_reds_list	*in_fd_red_list;
 
-	in_fd_red_list = reds2fd_red_list(current_cmd->input_redirections);
+	in_fd_red_list = reds2in_fd_reds_list(current_cmd->input_redirections);
 	if (pipe(pipe_fd) || cmd_set_heredoc_pipe_fd(in_fd_red_list))
 		return (put_err_msg_and_ret("error pipe()"));
 	pid = fork();

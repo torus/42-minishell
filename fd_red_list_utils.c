@@ -33,7 +33,7 @@ static void	addback_new_fd_red2fd_red_list(t_in_fd_reds_list **fd_red_list, t_cm
 	}
 }
 
-t_in_fd_reds_list	*reds2fd_red_list(t_cmd_redirection *reds)
+t_in_fd_reds_list	*reds2in_fd_reds_list(t_cmd_redirection *reds)
 {
 	t_in_fd_reds_list		*fd_red_list;
 

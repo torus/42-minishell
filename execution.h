@@ -40,7 +40,7 @@ typedef struct s_in_fd_reds_list {
 	struct s_in_fd_reds_list	*next;
 }	t_in_fd_reds_list;
 
-t_in_fd_reds_list	*reds2fd_red_list(t_cmd_redirection *reds);
+t_in_fd_reds_list	*reds2in_fd_reds_list(t_cmd_redirection *reds);
 void			free_fd_red_list(t_in_fd_reds_list *fd_red_list);
 
 typedef struct s_command_invocation
