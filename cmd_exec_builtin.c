@@ -36,13 +36,11 @@ static int	builtin_set_in_red(t_command_invocation *command,
 	t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
 {
 	int					fd;
-	t_list				*current;
 	t_cmd_redirection	*red;
 
-	current = command->input_redirections;
-	while (current)
+	red = command->input_redirections;
+	while (red)
 	{
-		red = (t_cmd_redirection *)current->content;
 		if (save_stdin_stdout(red, stdinfd, stdoutfd))
 			return (ERROR);
 		if (!red->is_heredoc)
@@ -57,7 +55,7 @@ static int	builtin_set_in_red(t_command_invocation *command,
 		}
 		else
 			close(red->fd);
-		current = current->next;
+		red = red->next;
 	}
 	return (0);
 }
@@ -76,14 +74,12 @@ static int	builtin_set_out_red(t_command_invocation *command,
 	t_fd_list **fd_list, int *stdinfd, int *stdoutfd)
 {
 	int					fd;
-	t_list				*current;
 	t_cmd_redirection	*red;
 	int					flag_open;
 
-	current = command->output_redirections;
-	while (current)
+	red = command->output_redirections;
+	while (red)
 	{
-		red = (t_cmd_redirection *)current->content;
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open, 0644);
 		if (fd == ERROR || save_stdin_stdout(red, stdinfd, stdoutfd))
@@ -92,7 +88,7 @@ static int	builtin_set_out_red(t_command_invocation *command,
 			|| !fd_list_add_fd(fd_list, red->fd))
 			return (put_redir_errmsg_and_ret(ERROR,
 					red->fd, strerror(errno)));
-		current = current->next;
+		red = red->next;
 	}
 	return (0);
 }

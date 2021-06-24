@@ -8,6 +8,9 @@ SRCFILES = cmd_cmd_invocation.c cmd_cmd_invocation2.c cmd_exec_command.c	\
 	cmd_status.c signal.c env_setter.c minishell_error_msg.c env.c exec.c	\
 	cmd_exec_builtin.c														\
 																			\
+	t_cmd_redirection.c fd_reds_list_utils.c								\
+																			\
+																			\
 	lexer1.c lexer2.c lexer3.c lexer4.c parse1.c parse2.c parse3.c			\
 	parse_utils.c parse_utils2.c											\
 																			\

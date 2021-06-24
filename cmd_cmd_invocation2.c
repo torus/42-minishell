@@ -10,13 +10,22 @@
  *
  * redirection: t_cmd_redirection object
  */
-void	cmd_del_redirection(void *redirection)
+void	cmd_free_redirection(t_cmd_redirection *redirection)
 {
-	const char	*filepath;
-
-	filepath = ((t_cmd_redirection *)redirection)->filepath;
-	free((void *)filepath);
+	free((void *)redirection->filepath);
 	free(redirection);
+}
+
+void	cmd_free_redirections(t_cmd_redirection *redirections)
+{
+	t_cmd_redirection	*tmp;
+
+	while (redirections)
+	{
+		tmp = redirections;
+		redirections = redirections->next;
+		cmd_free_redirection(tmp);
+	}
 }
 
 /*
@@ -34,8 +43,8 @@ void	cmd_free_cmdinvo(t_command_invocation *cmds)
 		current_cmd = cmds;
 		while (current_cmd)
 		{
-			ft_lstclear(&current_cmd->input_redirections, cmd_del_redirection);
-			ft_lstclear(&current_cmd->output_redirections, cmd_del_redirection);
+			cmd_free_redirections(current_cmd->input_redirections);
+			cmd_free_redirections(current_cmd->output_redirections);
 			free_ptrarr((void **)current_cmd->exec_and_args);
 			prev_cmd = current_cmd;
 			current_cmd = current_cmd->piped_command;
@@ -56,6 +65,7 @@ static void	readline4heredoc(t_cmd_redirection *red, const char *limit_str)
 			break ;
 		red->filepath = strjoin_nullable_and_free_both(
 				(char *)red->filepath, input_str);
+		input_str = NULL;
 		check_malloc_has_succeeded("heredoc", (void *)red->filepath);
 		red->filepath = strjoin_and_free_first(
 				(char *)red->filepath, "\n");
@@ -64,8 +74,6 @@ static void	readline4heredoc(t_cmd_redirection *red, const char *limit_str)
 	rl_event_hook = NULL;
 	if (input_str)
 		free(input_str);
-	else
-		write(1, "\n", 1);
 }
 
 int	cmd_add_heredoc(t_command_invocation *command,
@@ -82,7 +90,7 @@ int	cmd_add_heredoc(t_command_invocation *command,
 	readline4heredoc(red, limit_str);
 	if (g_shell.heredoc_interruption)
 	{
-		cmd_del_redirection(red);
+		cmd_free_redirection(red);
 		return (ERROR);
 	}
 	if (is_expandable)
@@ -91,7 +99,7 @@ int	cmd_add_heredoc(t_command_invocation *command,
 		red->filepath = expand_heredoc_document((char *)red->filepath);
 		free((void *)old_filepath);
 	}
-	if (!ft_lstadd_back_new(&command->input_redirections, (void *)red))
+	if (!cmd_redirection_add_back(&command->input_redirections, red))
 		put_minish_err_msg_and_exit(1, "heredoc", "lstadd_back failed");
 	set_sighandlers_during_execution();
 	return (0);

@@ -18,27 +18,18 @@ void	cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1)
 	pipe_fd[1] = pipe1;
 }
 
-int	cmd_set_heredoc_pipe_fd(t_command_invocation *command,
-	int pipe_heredoc_fd[2])
+int	cmd_set_heredoc_pipe_fd(t_fd_reds_list *in_fd_red_list)
 {
-	t_list				*current;
 	t_cmd_redirection	*red;
 
-	if (!command->input_redirections)
+	while (in_fd_red_list)
 	{
-		pipe_heredoc_fd[0] = -1;
-		pipe_heredoc_fd[1] = -1;
-		return (0);
+		red = in_fd_red_list->reds;
+		while (red->next)
+			red = red->next;
+		if (red->is_heredoc && pipe(in_fd_red_list->heredoc_pipe) == -1)
+			return (ERROR);
+		in_fd_red_list = in_fd_red_list->next;
 	}
-	current = command->input_redirections;
-	while (current->next)
-		current = current->next;
-	red = (t_cmd_redirection *)current->content;
-	if (!red->is_heredoc)
-	{
-		pipe_heredoc_fd[0] = -1;
-		pipe_heredoc_fd[1] = -1;
-		return (0);
-	}
-	return (pipe(pipe_heredoc_fd));
+	return (0);
 }
