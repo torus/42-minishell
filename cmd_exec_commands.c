@@ -40,7 +40,6 @@ int	cmd_wait_commands(t_command_invocation *command)
  * Write to pipe_heredoc_fd[1]
  *   if last element of input_redirections is heredoc.
  */
-// 複数fd heredoc の対応 (t_fd_red_listとか使う)
 static int	write_heredoc(t_fd_reds_list *in_fd_red_list)
 {
 	t_cmd_redirection	*red;
