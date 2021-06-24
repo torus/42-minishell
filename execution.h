@@ -69,7 +69,7 @@ int						cmd_set_input_file(t_fd_reds_list *fd_red_list);
 int						cmd_set_output_file(t_command_invocation *command);
 void					cmd_exec_command(t_command_invocation *command,
 							int pipe_prev_fd[2], int pipe_fd[2],
-							t_fd_reds_list *fd_red_list);
+							t_fd_reds_list *in_fd_red_list);
 int						cmd_exec_builtin(t_command_invocation *command);
 void					cmd_close_pipe(int pipe_fd[2]);
 void					cmd_copy_pipe(int pipe_new_fd[2], int pipe_fd[2]);
