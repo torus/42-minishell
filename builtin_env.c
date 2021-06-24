@@ -17,5 +17,6 @@ int	builtin_env(char **argv)
 		if (ft_strchr(envs[i], '='))
 			ft_putendl_fd(envs[i++], STDOUT_FILENO);
 	}
+	free_ptrarr((void **)envs);
 	return (0);
 }
