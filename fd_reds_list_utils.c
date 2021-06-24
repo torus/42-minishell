@@ -2,8 +2,8 @@
 #include "minishell.h"
 #include "utils.h"
 
-static t_in_fd_reds_list	*get_fd_red_from_list(
-	t_in_fd_reds_list *fd_red_list, int fd)
+static t_fd_reds_list	*get_fd_red_from_list(
+	t_fd_reds_list *fd_red_list, int fd)
 {
 	while (fd_red_list)
 	{
@@ -15,12 +15,12 @@ static t_in_fd_reds_list	*get_fd_red_from_list(
 }
 
 static void	addback_new_fd_red2fd_red_list(
-	t_in_fd_reds_list **fd_red_list, t_cmd_redirection *red)
+	t_fd_reds_list **fd_red_list, t_cmd_redirection *red)
 {
-	t_in_fd_reds_list	*tmp;
-	t_in_fd_reds_list	*new_fd_red;
+	t_fd_reds_list	*tmp;
+	t_fd_reds_list	*new_fd_red;
 
-	new_fd_red = malloc(sizeof(t_in_fd_reds_list));
+	new_fd_red = malloc(sizeof(t_fd_reds_list));
 	check_malloc_has_succeeded("fd_red_list", new_fd_red);
 	new_fd_red->fd = red->fd;
 	cmd_init_pipe_fd(new_fd_red->heredoc_pipe, -1, -1);
@@ -39,11 +39,11 @@ static void	addback_new_fd_red2fd_red_list(
 	}
 }
 
-t_in_fd_reds_list	*reds2in_fd_reds_list(t_cmd_redirection *reds)
+t_fd_reds_list	*reds2fd_reds_list(t_cmd_redirection *reds)
 {
-	t_in_fd_reds_list		*fd_red_list;
-	t_in_fd_reds_list		*fd_red_element;
-	t_cmd_redirection		*new_red;
+	t_fd_reds_list		*fd_red_list;
+	t_fd_reds_list		*fd_red_element;
+	t_cmd_redirection	*new_red;
 
 	fd_red_list = NULL;
 	while (reds)
@@ -60,9 +60,9 @@ t_in_fd_reds_list	*reds2in_fd_reds_list(t_cmd_redirection *reds)
 	return (fd_red_list);
 }
 
-void	free_fd_red_list(t_in_fd_reds_list *fd_red_list)
+void	free_fd_red_list(t_fd_reds_list *fd_red_list)
 {
-	t_in_fd_reds_list	*tmp;
+	t_fd_reds_list	*tmp;
 
 	while (fd_red_list)
 	{

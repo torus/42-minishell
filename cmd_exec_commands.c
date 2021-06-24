@@ -41,7 +41,7 @@ int	cmd_wait_commands(t_command_invocation *command)
  *   if last element of input_redirections is heredoc.
  */
 // 複数fd heredoc の対応 (t_fd_red_listとか使う)
-static int	write_heredoc(t_in_fd_reds_list *in_fd_red_list)
+static int	write_heredoc(t_fd_reds_list *in_fd_red_list)
 {
 	t_cmd_redirection	*red;
 
@@ -62,10 +62,10 @@ static int	write_heredoc(t_in_fd_reds_list *in_fd_red_list)
 static int	cmd_exec_one_command(t_command_invocation *current_cmd,
 	int	pipe_fd[2], int pipe_prev_fd[2])
 {
-	pid_t				pid;
-	t_in_fd_reds_list	*in_fd_red_list;
+	pid_t			pid;
+	t_fd_reds_list	*in_fd_red_list;
 
-	in_fd_red_list = reds2in_fd_reds_list(current_cmd->input_redirections);
+	in_fd_red_list = reds2fd_reds_list(current_cmd->input_redirections);
 	if (pipe(pipe_fd) || cmd_set_heredoc_pipe_fd(in_fd_red_list))
 		return (put_err_msg_and_ret("error pipe()"));
 	pid = fork();

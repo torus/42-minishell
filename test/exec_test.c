@@ -67,8 +67,8 @@ int main(){
 		cmd_redirection_add_back(&input_redirections, create_new_redir("heredoc", 1, 0, 1));
 		cmd_redirection_add_back(&input_redirections, create_new_redir("normal2", 1, 0, 0));
 
-		t_in_fd_reds_list *fd_red_list_actual = reds2in_fd_reds_list(input_redirections);
-		t_in_fd_reds_list *tmp = fd_red_list_actual;
+		t_fd_reds_list *fd_red_list_actual = reds2fd_reds_list(input_redirections);
+		t_fd_reds_list *tmp = fd_red_list_actual;
 		CHECK(fd_red_list_actual);
 		CHECK_EQ(fd_red_list_actual->fd, 1);
 		CHECK(fd_red_list_actual->reds);
@@ -99,8 +99,8 @@ int main(){
 		cmd_redirection_add_back(&input_redirections, create_new_redir("normal2", 1, 0, 0));
 		cmd_redirection_add_back(&input_redirections, create_new_redir("heredoc2", 1, 0, 1));
 
-		t_in_fd_reds_list *fd_red_list_actual = reds2in_fd_reds_list(input_redirections);
-		t_in_fd_reds_list *tmp = fd_red_list_actual;
+		t_fd_reds_list *fd_red_list_actual = reds2fd_reds_list(input_redirections);
+		t_fd_reds_list *tmp = fd_red_list_actual;
 		CHECK(fd_red_list_actual);
 		CHECK_EQ(fd_red_list_actual->fd, 1);
 		CHECK(fd_red_list_actual->reds);
@@ -130,8 +130,8 @@ int main(){
 		cmd_redirection_add_back(&input_redirections, create_new_redir("normal2", 2, 0, 0));
 		cmd_redirection_add_back(&input_redirections, create_new_redir("heredoc2", 1, 0, 1));
 
-		t_in_fd_reds_list *fd_red_list_actual = reds2in_fd_reds_list(input_redirections);
-		t_in_fd_reds_list *tmp = fd_red_list_actual;
+		t_fd_reds_list *fd_red_list_actual = reds2fd_reds_list(input_redirections);
+		t_fd_reds_list *tmp = fd_red_list_actual;
 		CHECK(fd_red_list_actual);
 		CHECK_EQ(fd_red_list_actual->fd, 1);
 		CHECK(fd_red_list_actual->reds);

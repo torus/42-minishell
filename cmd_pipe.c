@@ -18,7 +18,7 @@ void	cmd_init_pipe_fd(int pipe_fd[2], int pipe0, int pipe1)
 	pipe_fd[1] = pipe1;
 }
 
-int	cmd_set_heredoc_pipe_fd(t_in_fd_reds_list *in_fd_red_list)
+int	cmd_set_heredoc_pipe_fd(t_fd_reds_list *in_fd_red_list)
 {
 	t_cmd_redirection	*red;
 

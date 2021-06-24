@@ -76,7 +76,7 @@ int	open_file_for_redirect(t_cmd_redirection *red,
  *
  * return: return -1 if error has occurred, otherwise, return 0.
  */
-int	cmd_set_input_file(t_in_fd_reds_list *fd_red_list)
+int	cmd_set_input_file(t_fd_reds_list *fd_red_list)
 {
 	int					fd;
 	t_cmd_redirection	*red;
