@@ -39,7 +39,7 @@ static void	addback_new_fd_red2fd_red_list(
 	}
 }
 
-t_fd_reds_list	*reds2fd_reds_list(t_cmd_redirection *reds)
+t_fd_reds_list	*cmd_reds2fd_reds_list(t_cmd_redirection *reds)
 {
 	t_fd_reds_list		*fd_red_list;
 	t_fd_reds_list		*fd_red_element;
@@ -60,7 +60,7 @@ t_fd_reds_list	*reds2fd_reds_list(t_cmd_redirection *reds)
 	return (fd_red_list);
 }
 
-void	free_fd_reds_list(t_fd_reds_list *fd_red_list)
+void	cmd_free_fd_reds_list(t_fd_reds_list *fd_red_list)
 {
 	t_fd_reds_list	*tmp;
 

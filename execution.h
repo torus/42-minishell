@@ -42,8 +42,8 @@ typedef struct s_fd_reds_list {
 	struct s_fd_reds_list		*next;
 }	t_fd_reds_list;
 
-t_fd_reds_list			*reds2fd_reds_list(t_cmd_redirection *reds);
-void					free_fd_reds_list(t_fd_reds_list *fd_red_list);
+t_fd_reds_list			*cmd_reds2fd_reds_list(t_cmd_redirection *reds);
+void					cmd_free_fd_reds_list(t_fd_reds_list *fd_red_list);
 
 typedef struct s_command_invocation
 {
