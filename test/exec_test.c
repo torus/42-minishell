@@ -85,7 +85,7 @@ int main(){
 		fd_red_list_actual = fd_red_list_actual->next;
 		CHECK(!fd_red_list_actual);
 
-		free_fd_red_list(tmp);
+		free_fd_reds_list(tmp);
 		cmd_free_redirections(input_redirections);
 	}
 
@@ -116,7 +116,7 @@ int main(){
 		fd_red_list_actual = fd_red_list_actual->next;
 		CHECK(!fd_red_list_actual);
 
-		free_fd_red_list(tmp);
+		free_fd_reds_list(tmp);
 		cmd_free_redirections(input_redirections);
 	}
 
@@ -156,7 +156,7 @@ int main(){
 		fd_red_list_actual = fd_red_list_actual->next;
 		CHECK(!fd_red_list_actual);
 
-		free_fd_red_list(tmp);
+		free_fd_reds_list(tmp);
 		cmd_free_redirections(input_redirections);
 	}
 

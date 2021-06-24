@@ -60,7 +60,7 @@ t_fd_reds_list	*reds2fd_reds_list(t_cmd_redirection *reds)
 	return (fd_red_list);
 }
 
-void	free_fd_red_list(t_fd_reds_list *fd_red_list)
+void	free_fd_reds_list(t_fd_reds_list *fd_red_list)
 {
 	t_fd_reds_list	*tmp;
 
