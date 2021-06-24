@@ -90,14 +90,12 @@ int	cmd_set_input_file(t_in_fd_reds_list *fd_red_list)
 			if (!red->is_heredoc)
 			{
 				fd = open_file_for_redirect(red, O_RDONLY, 0);
-				if (fd == ERROR)
+				if (fd == ERROR || dup2(fd, red->fd) == -1)
 					return (ERROR);
-				if (dup2(fd, red->fd) == -1)
-					return (put_redir_errmsg_and_ret(-1, red->fd, strerror(errno)));
 			}
 			else if (!red->next && fd_red_list->heredoc_pipe[0] != -1
 				&& dup2(fd_red_list->heredoc_pipe[0], fd_red_list->fd) == -1)
-				return (put_redir_errmsg_and_ret(-1, fd_red_list->fd, strerror(errno)));
+				return (ERROR);
 			red = red->next;
 		}
 		close(fd_red_list->heredoc_pipe[0]);
@@ -125,11 +123,8 @@ int	cmd_set_output_file(t_command_invocation *command)
 		flag_open = O_TRUNC * !red->is_append + O_APPEND * red->is_append;
 		fd = open_file_for_redirect(red, O_WRONLY | O_CREAT | flag_open,
 				S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
-		if (fd == ERROR)
+		if (fd == ERROR || dup2(fd, red->fd) == -1)
 			return (ERROR);
-		if (dup2(fd, red->fd) == -1)
-			return (put_redir_errmsg_and_ret(ERROR,
-					red->fd, strerror(errno)));
 		red = red->next;
 	}
 	return (0);
