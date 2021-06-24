@@ -65,6 +65,7 @@ static void	readline4heredoc(t_cmd_redirection *red, const char *limit_str)
 			break ;
 		red->filepath = strjoin_nullable_and_free_both(
 				(char *)red->filepath, input_str);
+		input_str = NULL;
 		check_malloc_has_succeeded("heredoc", (void *)red->filepath);
 		red->filepath = strjoin_and_free_first(
 				(char *)red->filepath, "\n");
@@ -73,8 +74,6 @@ static void	readline4heredoc(t_cmd_redirection *red, const char *limit_str)
 	rl_event_hook = NULL;
 	if (input_str)
 		free(input_str);
-	else
-		write(1, "\n", 1);
 }
 
 int	cmd_add_heredoc(t_command_invocation *command,
