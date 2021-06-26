@@ -1,7 +1,6 @@
 NAME = minishell
 CC = gcc
-CFLAGS := -Werror -Wall -Wextra -g
-CFLAGS += -fsanitize=address
+CFLAGS := -Werror -Wall -Wextra
 LINK_LIB := -lreadline
 ifeq ($(shell uname), Linux)
 	LINK_LIB += -lbsd
